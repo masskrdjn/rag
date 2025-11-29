@@ -51,35 +51,27 @@ class SimpleRAG:
         # Configurer le récupérateur selon le mode
         retriever = self._create_retriever(vectorstore)
             
-        # Initialiser le LLM
-        llm = ChatOllama(model=self.model_name)
+        # Initialiser le LLM avec température basse pour des réponses plus fidèles
+        llm = ChatOllama(model=self.model_name, temperature=0.1)
         
         # Créer le modèle de prompt
-        template = """Tu es un assistant interne qui aide les employés à appliquer les procédures de l'entreprise.
+        template = """Tu es un assistant QA RAG pour une documentation interne d'agents de voyages.
 
-RÈGLES STRICTES - TU DOIS LES SUIVRE À LA LETTRE :
-1. Réponds TOUJOURS en français, de façon concise et professionnelle.
-2. Utilise UNIQUEMENT et EXCLUSIVEMENT les informations exactes du contexte ci-dessous.
-3. INTERDICTION ABSOLUE d'inventer, déduire, ou compléter des informations qui ne sont pas EXPLICITEMENT dans le contexte.
-4. Si le contexte dit "consulter X" ou "voir Y", réponds EXACTEMENT cela. N'invente PAS d'étapes supplémentaires.
-5. Si le contexte mentionne une source (Whaller, Gravity, email, lien), cite-la TEXTUELLEMENT telle qu'elle apparaît.
-6. Si une information n'est PAS dans le contexte, réponds : "Je n'ai pas cette information dans ma base de connaissances."
-7. Ne JAMAIS inventer de liens, URLs, adresses email, noms d'outils, formulaires ou procédures.
-8. Ne JAMAIS mélanger des informations de documents différents.
-9. Si le Document 1 répond à la question, utilise UNIQUEMENT celui-ci et ignore les autres.
-
-FORMAT DE RÉPONSE :
-- Répète TEXTUELLEMENT ce que dit le contexte
-- Cite la source si elle est mentionnée
-- Reste concis et factuel
-
-CONTEXTE :
+CONTEXTE RÉCUPÉRÉ :
 {context}
 
 QUESTION :
 {question}
 
-RÉPONSE :"""
+INSTRUCTIONS :
+1. Réponds en te basant UNIQUEMENT sur le CONTEXTE RÉCUPÉRÉ ci-dessus.
+2. Si le contexte mentionne de "consulter" une source externe (Whaller, sphère, intranet, lien, etc.), 
+   CITE cette source EXACTEMENT comme elle apparaît dans le contexte.
+3. N'invente RIEN. Si l'information n'est pas dans le contexte, dis-le.
+4. Réponds en français.
+
+RÉPONSE :
+"""
         
         prompt = ChatPromptTemplate.from_template(template)
         

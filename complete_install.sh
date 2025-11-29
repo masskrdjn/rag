@@ -75,7 +75,7 @@ sudo -u ragapp mkdir -p /home/ragapp/rag-system/data
 echo "ÉTAPE MANUELLE : Copiez les fichiers suivants dans /home/ragapp/rag-system/ :"
 echo "  - server.py"
 echo "  - rag_pipeline.py"
-echo "  - ingest.py"
+echo "  - ingest_adaptive.py"
 echo "  - rag-api.service (pour systemd, facultatif)"
 echo ""
 read -p "Appuyez sur Entrée une fois les fichiers copiés..."
@@ -123,7 +123,7 @@ sudo -u ragapp bash -c "echo 'La Tour Eiffel mesure 330 mètres de hauteur. Elle
 
 # Exécuter le script d'ingestion
 echo "Exécution du script d'ingestion de données..."
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest.py"
+sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest_adaptive.py"
 
 echo "[5/7] Ingestion des données terminée ✓"
 echo ""
@@ -199,7 +199,7 @@ echo "       -d '{\"question\": \"Votre question ici\"}'"
 echo ""
 echo "Pour ajouter plus de données :"
 echo "  1. Placez les fichiers .txt dans /home/ragapp/rag-system/data/"
-echo "  2. Exécutez : sudo -u ragapp bash -c 'cd /home/ragapp/rag-system && venv/bin/python3 ingest.py'"
+echo "  2. Exécutez : sudo -u ragapp bash -c 'cd /home/ragapp/rag-system && venv/bin/python3 ingest_adaptive.py'"
 echo "  3. Redémarrez le service : sudo pkill -f uvicorn && sudo -u ragapp bash -c 'cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &'"
 echo ""
 echo "Dépannage :"
