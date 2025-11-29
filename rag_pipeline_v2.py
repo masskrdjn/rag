@@ -17,44 +17,44 @@ class SimpleRAG:
                  use_hybrid=False,
                  hybrid_weights=None):
         """
-        Initialise le pipeline RAG avec des stratégies de récupération configurables.
+        Initialize RAG pipeline with configurable retrieval strategies.
         
         Args:
-            retrieval_mode (str): "similarity" ou "similarity_score_threshold"
-            top_k (int): Nombre de documents à récupérer (3-8 recommandé)
-            score_threshold (float): Score de similarité minimum (0.5-0.8, uniquement pour le mode seuil)
-            use_hybrid (bool): Utiliser la recherche hybride BM25 + vectorielle
-            hybrid_weights (list): Poids pour [vectoriel, bm25] (par défaut [0.5, 0.5])
+            retrieval_mode (str): "similarity" or "similarity_score_threshold"
+            top_k (int): Number of documents to retrieve (3-8 recommended)
+            score_threshold (float): Minimum similarity score (0.5-0.8, only for threshold mode)
+            use_hybrid (bool): Whether to use hybrid BM25 + vector search
+            hybrid_weights (list): Weights for [vector, bm25] (default [0.5, 0.5])
         """
         self.persist_directory = "chroma_db"
         self.model_name = "llama3.2"
         self.embedding_model = "nomic-embed-text"
         self.qa_chain = None
         
-        # Configuration de récupération
+        # Retrieval configuration
         self.retrieval_mode = retrieval_mode
         self.top_k = top_k
         self.score_threshold = score_threshold
         self.use_hybrid = use_hybrid
         self.hybrid_weights = hybrid_weights if hybrid_weights else [0.5, 0.5]
         
-        # Cache pour les documents (nécessaire pour BM25)
+        # Cache for documents (needed for BM25)
         self.documents = None
 
     def setup_chain(self):
-        # Initialiser les embeddings
+        # Initialize embeddings
         embeddings = OllamaEmbeddings(model=self.embedding_model)
         
-        # Initialiser le magasin vectoriel
+        # Initialize vector store
         vectorstore = Chroma(persist_directory=self.persist_directory, embedding_function=embeddings)
         
-        # Configurer le récupérateur selon le mode
+        # Configure retriever based on mode
         retriever = self._create_retriever(vectorstore)
             
-        # Initialiser le LLM
+        # Initialize LLM
         llm = ChatOllama(model=self.model_name)
         
-        # Créer le modèle de prompt
+        # Create prompt template
         template = """Tu es un assistant interne qui aide les employés à appliquer les procédures de l'entreprise.
 
 RÈGLES STRICTES - TU DOIS LES SUIVRE À LA LETTRE :
@@ -83,20 +83,20 @@ RÉPONSE :"""
         
         prompt = ChatPromptTemplate.from_template(template)
         
-        # Créer la chaîne en utilisant LCEL (LangChain Expression Language)
+        # Create chain using LCEL (LangChain Expression Language)
         def format_docs(docs):
-            # Filtrer et classer les documents pour prioriser la qualité sur la quantité
+            # Filter and rank documents to prioritize quality over quantity
             if not docs:
                 return "Aucun contexte pertinent trouvé."
             
-            # Si nous avons beaucoup de docs, préférer les plus courts et plus ciblés en premier
-            # pour éviter de submerger le contexte avec du bruit
+            # If we have many docs, prefer shorter, more focused ones first
+            # to avoid overwhelming the context with noise
             formatted_parts = []
-            for i, doc in enumerate(docs[:self.top_k], 1):  # Limiter à top_k
+            for i, doc in enumerate(docs[:self.top_k], 1):  # Limit to top_k
                 content = doc.page_content.strip()
                 source = doc.metadata.get('source', 'Source inconnue') if hasattr(doc, 'metadata') else 'Source inconnue'
                 
-                # Ajouter une référence de source pour la traçabilité
+                # Add source reference for traceability
                 formatted_parts.append(f"[Document {i} - {source}]\n{content}")
             
             return "\n\n---\n\n".join(formatted_parts)
@@ -109,14 +109,14 @@ RÉPONSE :"""
         )
     
     def _create_retriever(self, vectorstore):
-        """Créer un récupérateur basé sur la configuration."""
+        """Create retriever based on configuration."""
         
         if self.use_hybrid:
-            # Mode hybride : combiner vectoriel + BM25
+            # Hybrid mode: combine vector + BM25
             return self._create_hybrid_retriever(vectorstore)
         
         elif self.retrieval_mode == "similarity_score_threshold":
-            # Récupération basée sur le seuil
+            # Threshold-based retrieval
             return vectorstore.as_retriever(
                 search_type="similarity_score_threshold",
                 search_kwargs={
@@ -126,25 +126,25 @@ RÉPONSE :"""
             )
         
         else:
-            # Recherche de similarité standard
+            # Standard similarity search
             return vectorstore.as_retriever(
                 search_type="similarity",
                 search_kwargs={"k": self.top_k}
             )
     
     def _create_hybrid_retriever(self, vectorstore):
-        """Créer un récupérateur hybride combinant recherche vectorielle et BM25."""
+        """Create hybrid retriever combining vector search and BM25."""
         
-        # Créer le récupérateur vectoriel
+        # Create vector retriever
         vector_retriever = vectorstore.as_retriever(
             search_type="similarity",
             search_kwargs={"k": self.top_k}
         )
         
-        # Charger les documents depuis le vectorstore pour BM25
-        # Nous devons obtenir tous les documents de Chroma
+        # Load documents from vectorstore for BM25
+        # We need to get all documents from Chroma
         if self.documents is None:
-            # Obtenir tous les documents de la collection
+            # Get all documents from the collection
             all_docs = vectorstore.get()
             if all_docs and 'documents' in all_docs and all_docs['documents']:
                 from langchain_core.documents import Document
@@ -156,15 +156,15 @@ RÉPONSE :"""
                     )
                 ]
             else:
-                # Repli : pas de documents, retourner seulement le récupérateur vectoriel
-                print("Avertissement : Aucun document trouvé pour BM25, utilisation du récupérateur vectoriel uniquement")
+                # Fallback: no documents, return only vector retriever
+                print("Warning: No documents found for BM25, using vector retriever only")
                 return vector_retriever
         
-        # Créer le récupérateur BM25
+        # Create BM25 retriever
         bm25_retriever = BM25Retriever.from_documents(self.documents)
         bm25_retriever.k = self.top_k
         
-        # Combiner les deux récupérateurs
+        # Combine both retrievers
         ensemble_retriever = EnsembleRetriever(
             retrievers=[vector_retriever, bm25_retriever],
             weights=self.hybrid_weights
@@ -175,6 +175,9 @@ RÉPONSE :"""
     def ask(self, question):
         if not self.qa_chain:
             self.setup_chain()
-        # La chaîne retourne une chaîne directement
+        # Chain returns a string directly
         response = self.qa_chain.invoke(question)
         return response
+
+
+
