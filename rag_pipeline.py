@@ -12,8 +12,8 @@ import os
 class SimpleRAG:
     def __init__(self, 
                  retrieval_mode="similarity",
-                 top_k=3,
-                 score_threshold=0.7,
+                 top_k=5,
+                 score_threshold=0.6,
                  use_hybrid=False,
                  hybrid_weights=None):
         """
@@ -31,10 +31,10 @@ class SimpleRAG:
         self.embedding_model = "nomic-embed-text"
         self.qa_chain = None
         
-        # Configuration de récupération
+        # Configuration de récupération (améliorée pour mieux capturer les sections courtes)
         self.retrieval_mode = retrieval_mode
-        self.top_k = top_k
-        self.score_threshold = score_threshold
+        self.top_k = top_k  # Augmenté de 3 à 5 par défaut
+        self.score_threshold = score_threshold  # Réduit de 0.7 à 0.6 pour être moins strict
         self.use_hybrid = use_hybrid
         self.hybrid_weights = hybrid_weights if hybrid_weights else [0.5, 0.5]
         
