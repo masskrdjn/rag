@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="4487">
+    <meta name="date" content="2017-08-07T14:47:04">
+    <meta name="modified" content="2020-11-24T12:37:08">
+    <meta name="slug" content="traitement-des-queues">
+    <meta name="categories" content="Daily Tasks, RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/traitement-des-queues/">
+    <title>Traitement des queues par le robot</title>
+</head>
+<body>
+<article>
+<h1>Traitement des queues par le robot</h1>
+<section class="excerpt"></section>
+<section class="content">
+Dernière mise à jour : 24/11/2020
+
+Chaque jour, l’agent responsable des queues reporte le nombre de queues constatées le matin ainsi que le nombre de queues constatées le soir, GDS, par GDS sur le tableau de suivi des daily tasks
+
+## Queues Sabre (1S), Amadeus (1A), SPRK, Nouvelair
+
+Attention : Pour SPRK, il faut traiter les queues sous code client Lufthansa et Olympic Air.
+Ces queues sont gérées manuellement.
+
+Consultez ici le process en cas de modification de plan de vol du fait de la compagnie (les plus nombreuses)
+
+## Queues Galileo France et Italie (1G)
+
+Attention : le traitement des queues doit se faire sur nos deux PCC, français et Italien.
+Ces queues sont principalement gérées manuellement mais sont en voie d’automatisation.
+
+Consultez ici le process en cas de modification de plan de vol du fait de la compagnie (les plus nombreuses)
+
++-Principe du traitement automatique des queues par Galaxy
+
+- Heures de passage
+- Actions réalisées par Galaxy
+
+3 fois par jours, un “script” (programme informatique) passe sur les files d’appels Galileo et réalise des actions automatiques que nous l’autorisons à faire. Heures de passages :
+
+- 9h10
+
+- 13h10
+
+- 17h10
+
+Pour l’instant, Galaxy ne traite que 20 dossiers dans la file d’appel. Ce développement informatique est toujours en phase de test.
+
+Cliquez ici pour prendre connaissance des 13 règles.
+
+Lorsque Galaxy n’a pas appris à traiter un cas de figure, il laisse le dossier dans les files d’appels
+
+A ce jour, Galaxy est capable soit :
+
+- de sortir des dossiers des files d’appels (en faisant QR) car l’information ne nous intéresse pas
+
+Ex : si nous recevons une VR nous disant d’émettre le billet alors que c’est déjà émis, Galaxy va faire QR tout seul
+
+- de créer une alerte sur Galaxy pour nous dire que nous avons une action à réaliser sur le PNR et de sortir le dossier des files d’appels
+
+Ex : Tous les dossiers qui arrivent en Q21 (File d’appel des vols UN ou UC), remontent via une alerte sur Galaxy
+
+A ce jour Galaxy n’est pas capable :
+
+- De traiter les schedule change
+
+- De traiter la plupart des Vendor Remarks
+
+ 
+</section>
+</article>
+</body>
+</html>

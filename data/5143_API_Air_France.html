@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="5143">
+    <meta name="date" content="2018-06-15T09:56:51">
+    <meta name="modified" content="2024-03-21T15:32:39">
+    <meta name="slug" content="api-air-france">
+    <meta name="categories" content="Fournisseurs/Connectivité">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/api-air-france/">
+    <title>API Air France</title>
+</head>
+<body>
+<article>
+<h1>API Air France</h1>
+<section class="excerpt"></section>
+<section class="content">
+Dernière mise à jour : 05/11/2019
+
+Information essentielles : 
+
+Depuis le 18 juin 2018, nous sommes connectés en direct à Air France.
+
+Attention : Cela ne veut pas dire qu’il n’y aura plus de réservation de ces compagnies aériennes par le biais des GDS. 
+
+La gestion des réservations faites sur ce connecteur est possible sur Agents connect. Chacun dispose de codes d’accès personnels. Les réservations faites sur les connecteurs autres que Air France API ne pourront pas être gérées par cette interface.
+
+Agent connect sera relié directement au BSP ⇒ Plus besoin d’utiliser un CB.
+
+Accéder ici au tutoriel complet !!
+
+Sur le site, l’accès au système de réservation en direct est disponible sur l’onglet réservation (cf. ci-dessous) :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/06/AF-NDC.png]
+
+Ce qui change pour vous : 
+
+Par cette interface, il sera possible de :
+
++-Faire une réservation
+
+Il est possible de faire une réservation directement via l’interface d’Agent Connect, que l’on nomme également l’Agent Booking Tool.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/06/pjcheokpogdjhonaAF.png]
+
++-Émettre un billet
+
+L’émission de billet doit obligatoirement se faire via l’interface Galaxy avec le bouton “Emission de billet”. Elle peut également, au besoin, se faire via SpeedTravel.
+
+Une fois l’émission effectuée, nous recevons dans Booking@ une confirmation de réservation par mail avec l’image billet. Ce dernier indiquera la référence de réservation du dossier avec laquelle nous pourrons ressortir la réservation sur l’interface Agent Connect.
+
+Les billets émis sous le connecteur AF, apparaissent dans le BSP Link sous un délai de 48h après la réservation. Ils apparaissent dans une rubrique qui s’ appelle WEBLINK SALES, vous pouvez y voir apparaître les billets émis, mais aussi les EMDs divers et les documents voidés
+
++-Voider une réservation
+
+Pour voider une réservation, il faut :
+
+1-  Ressortir le dossier sur l’Agent Booking Tool via agent connect avec la référence de réservation
+
+2- Cliquer sur “Rembourser“, puis “Confirmé”
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/06/gcefclhhgdbkhjciAF.png]
+
+3- La réservation est bien voidé
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/06/opmaoocdgjocbhhg.png]
+
+Attention, si des EMD bagages/sièges ont été émis avant le void, envoyer un mail à mail.steamndc@airfrance.fr ou par tel au 09 69 39 98 57 pour faire annuler le(s) EMD Bagages/sièges.
+
++-Réserver des prestations additionnelles (sièges, bagages...)
+
+L’ajout de prestations additionnelles comme un bagage ou un siège ne peut momentanément par se faire sur l’Agent Booking Tool directement. Cependant, il est possible de ressortir la réservation avec la référence, et de cliquer sur “Lien Site Web“(cf. ci-dessous)
+
+Vous serez redirigé directement sur le site d’Air France, sur la réservation du client pour procéder à l’ajout de prestation.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/06/lgogkigmgnkpnnha.png]
+
++-Rembourser un billet
+
+Ressortir le dossier sur l’Agent Booking Tool et cliquer sur le bouton “Rembourser”. Le nom du bouton est identique au remboursement ou au VOID. En cliquant sur ce bouton, le remboursement se fera selon les conditions du billet.
+
+Dans le cas où le remboursement serait en dehors du périmètre, le système affichera un message d’ erreur vous indiquant qu’il faut passer par le bsp link.
+
+Pour toutes autres actions (modifications de billet, réémission suite SC, réservation de bagages spéciaux…) il faudra directement contacter un support dédié au numéros ci-dessous. Ces coordonnées ont été ajoutés sur Galaxy. Attention de bien utiliser les coordonnées de Air France API – BSP.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/06/AF-NDC-2.png]
+
+Cas particuliers: 
+
+- Les états de caisses : seront envoyés chaque jour sur l’adresse Booking@ et devront être placées dans l’onglet “Facturer à rattacher”
+
+- Les queues : Les irrégularités sont à vérifier chaque jour sur Agent connect, dans la rubrique ” Vos notifications”
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/06/AF-QUEUES.png]
+</section>
+</article>
+</body>
+</html>

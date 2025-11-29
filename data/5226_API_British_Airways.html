@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="5226">
+    <meta name="date" content="2018-11-05T17:38:30">
+    <meta name="modified" content="2024-03-21T15:34:13">
+    <meta name="slug" content="api-british-airways">
+    <meta name="categories" content="Fournisseurs/Connectivité">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/api-british-airways/">
+    <title>API British Airways</title>
+</head>
+<body>
+<article>
+<h1>API British Airways</h1>
+<section class="excerpt"></section>
+<section class="content">
+Dernière mise à jour : 07/11/2018
+
+A partir du 06 novembre 2018, nous serons connecter en direct à British Airways.
+
+Attention : Cela ne veut pas dire qu’il n’y aura plus de réservation de ces compagnies aériennes par le biais des GDS. 
+
+La gestion des réservations faites sur ce connecteur est possible sur le site BA.com.
+
+Quelques règles importantes :
+
++-Faire une réservationIl est possible de faire une réservation via SpeedTravel en utilisant le connecteur British Airways BSP via le canal “Repro”.
+
+Attention, pour que le paiement soit pris en charge par BSP, il faut exclusivement passer par STRA.
+
+Il est également possible de faire une réservation sur le site de BA, solution à n’utiliser qu’en dernier recours (paiement CB)
+
++-Emettre un billet
+
+L’émission de billet doit obligatoirement se faire via l’interface Galaxy avec le bouton « Emission de billet ». Elle peut également, au besoin, se faire via SpeedTravel.
+
+Une fois l’émission effectuée, nous recevons dans Booking@ une confirmation de réservation par mail avec les détails du billet et un lien pour accéder a la réservation sur l’espace agence de voyage
+
+Les billets émis sous le connecteur BA, apparaissent dans le BSP Link sous un délai de 48heures.
+
++-Voider une réservation
+
+Le void d’une réservation est possible sur le site BA.com. Il faut suivre le lien “manage booking” sur le mail de confirmation de réservation reçu par mail dans la boite Booking@.
+
+En cas de void, les addons bagages sont remboursés automatiquement.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/Manage-booking-2.png]
+
+Attention, il peut y avoir des problèmes pour le void des dossiers en code share avec American Airlines. Si c’est le cas, le void devra se faire en contactant le Help Desk de BA. Enfin, si le cas se présente après 18h ou le samedi lorsque le Help Desk de BA est fermée, il faut envoyer immédiatement un mail au service transport. 
+
+&gt;&gt; Se référer à l’onglet “Rembourser un billet” pour connaitre la procédure.
+
++-Réserver des prestations additionnelles La réservation de prestation additionnelle doit se faire directement sur le site BA grand public ici, via l’onglet “Gérer ma réservation”. (sièges, bagages, repas…)  
+
++-Réservation d'une assistance médicale La réservation d’une assistance médicale doit se faire directement sur le site grand public de BA. 
+
++-Rembourser un billet L’annulation et le remboursement d’une réservation est possible sur le site BA.com.
+
+1 – Il faut suivre le lien “manage booking” sur le mail de confirmation de réservation reçu par mail dans la boite Booking@.
+
+2 – Cliquer sur Cancellation options for this booking
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/choisir.png]
+
+3- Entrer le code IATA
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/iata.png]
+
+4 – Un masqué apparait , le montant du remboursement est déjà calculé. Cliquer sur “Continuer”
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/annul-1.png]
+
+5 – Le dossier est remboursé
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/annul-2.png]
+
++-Modification du vol 
+
+1 – Il faut suivre le lien “manage booking” sur le mail de confirmation de réservation reçu par mail dans la boite Booking@.
+
+2 – Cliquer sur Change date/time of my flight
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/choisir.png]
+
+3- Entrer le code IATA
+
+4 – Sélectionner le vol a changé :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/change-1.png]
+
+5 – Choisir le nouveau vol :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/Change-2.png]
+
+6 – On obtient un devis dans un premier temps.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/11/Price.png]
+
+Important : Dans le cadre d’un devis, il faut s’arrêter à cet étape et ne pas passer à l’étape suivante. 
+
+Sinon, passez à l’étape suivante.
+
+7 – Infos et paiement par CB de la modification
+
+Attention, les modifications devront être payées exclusivement par CB.
+
++-Autres modificationPour toutes autres modifications, comme par exemple le changement de nom, de prénom ou encore la gestion d’une repro suite à une irrégularité de la compagnie aérienne, il faut directement contacte le support Help Desk BA-IB
+
+Cas particuliers: 
+
+- Les états de caisses : il n’y aura pas d’état de caisse pour ce fournisseur. Dès qu’une réservation est confirmée, nous recevons un mail de confirmation sur la boite booking@. (Gestion idem low-cost)
+
+- Les queues : pas de système de queues, les modifications horaires arriveront par mail sur l’adresse booking@ et devront être traités comme le process Low-cost.
+</section>
+</article>
+</body>
+</html>

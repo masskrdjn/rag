@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="4369">
+    <meta name="date" content="2017-07-07T15:18:11">
+    <meta name="modified" content="2025-11-21T09:19:18">
+    <meta name="slug" content="api">
+    <meta name="categories" content="ADV, Commercial">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/api/">
+    <title>API Resaneo</title>
+</head>
+<body>
+<article>
+<h1>API Resaneo</h1>
+<section class="excerpt">Dernière mise à jour : 02/07/2018</section>
+<section class="content">
+Dernière mise à jour : 02/07/2018
+
+Il n’y a pas de communication client autour de notre API car ce modèle correspond à des agences qui ont un volume importants, une équipe de développeur et qui peuvent donner des garanties bancaires importantes. Les contrats sont fait au cas par cas et à la demande de l’agence. l’API s’adresse aux agences qui souhaitent gérer directement leurs ventes web et/ou celles qui veulent proposer du package dynamique sur leurs sites.
++-Schéma technique
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2018/01/Schéma-API.png]
+
++-Modèles économique
+
+Avant août 2017, nous demandions à nos agences de voyages clientes de signer un avenant au contrat principal souscrit lors de la création de l’agence sur Resaneo. Depuis cette date un contrat de prestations de service distinct a été rédigé. Le forfait de mise en oeuvre (3000€ avant août 2017) a augmenté à cette occasion, passant à 5000€ HT en septembre 2017 puis à 25 000€ HT en janvier 2018.
+
+ 
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/07/Modèle-economique-API.png]
+
+NB : Assistance technique à l’intégration : au delà des 4 heures incluses, 150€ HT/heure seront facturés par SpeedMedia à Resaneo, qui refacturera cette somme au client.
+
++-Modèles techniques et Liste des agences disposant d'une API
+
+Depuis septembre 2016, la connectivité se fait entre le site Resaneo et le site du client. Avant cette date, la connectivité se faisait entre SpeedTravel et le site du client (voir le SpeedTravel du client quand celui-ci utilise ce logiciel). Les API SpeedTravel sont des clients SpeedMedia (avec contrat SpeedMedia). Les API Resaneo sont des clients VLC Travel (avec contrat VLC)
+
++-Codes agences
+
+Contrairement à une marque blanche Resatravel, notre agence client peut disposer de deux codes agences pour l’API : un code pour ses réservations effectuées manuellement, un autre pour les résas via l’API. Le mode de règlement peut différer dans les deux cas. Certains clients ne voient pas de soucis à utiliser le même mode de règlement dans les deux cas, auquel cas un seul code agence est créé.
+
+Un utilisateur nommé “agent API” doit être créé par Resaneo afin de permettre la connectivité.
+
++-Ancien modèle technique : API STRA
+
+Client
+Codes Agences
+Connectivité
+Nom dans GX
+
+Autour du voyage
+R03033
+Active
+AUTOUR DU VOYAGE – Web
+
+Havas Voyages
+100860
+Active
+CWT – HAVAS Voyages WEB
+
+101862
+Active
+CWT – HAVAS Voyages WEB – Aéroport de Nantes
+
+102289
+Active
+CWT – HAVAS Voyages WEB – AISC Airbus Staff Council
+
+102065
+Active
+CWT – Havas Voyages WEB – KALIDEA
+
+101861
+Active
+CWT DISTRIBUTION WEB – comparateurs
+
+102000
+Interrompue
+Havas Voyages La Dépèche – WEB
+
+Hexative
+41234
+Active
+HEXATIVE TRAVELSHOP
+
+Prêt à partir
+161232
+Active
+Pret à Partir Bar Le Duc WEB
+
+Printemps Voyages
+212616
+Active
+Printemps Voyages
+
+Cap 5 Voyages*
+352581
+Active
+SA CAP 5*
+
+Sembat Tourisme*
+182294
+Active
+Sembat Tourisme*
+
+Salaün Holidays
+322047
+Active
+SN AGENCE QUIMPER WEB
+
+Voyage Paris Normandie
+150550
+Active
+VPN Rouen
+
+Travelys
+R03768
+Active
+Travelys
+
+Resaneo Italie
+RN_ITALIA
+Active
+VLC TRAVEL
+
+* a également une marque blanche
+
++-Nouveau modèle : API Resaneo+-Contrat spécifique : Showroom privé
+
+Showroom =  canal dédié “airpricer” – Contrat spécifique
+
+Client
+Codes Agences
+Connectivité
+Nom dans GX
+
+ENW TRAVEL
+R03565
+Active
+ENW TRAVEL
+
+Voyage privé
+R03695
+Active
+VOYAGE PRIVE Belgique
+
+ R03694
+Active
+VOYAGE PRIVE Espagne
+
+ R03653
+Active
+VOYAGE PRIVE France
+
+ R03692
+Active
+VOYAGE PRIVE Italie
+
+R04020
+Active
+VOYAGE PRIVE Pays Bas
+
+R03696
+Active
+VOYAGE PRIVE Pologne
+
+R03697
+Active
+VOYAGE PRIVE Suisse
+
+R03693
+Active
+VOYAGE PRIVE UK
+
+R03765
+Active
+VPG France (cache GDS =&gt; résa impossible)
+
+R03764
+Active
+VPG France (cache low cost =&gt; résa impossible)
+
+R03807
+Active
+VPG France backup
+
+Travel Event
+R04228
+Active
+Travel Event – WEB
+
+La Corse Travel
+R04295
+Active
+ONLINE SMART TRAVEL – WEB
+
+Misterfly
+ R04464
+Active
+Misterfly – Web
+
+Karavel
+R04317
+Active
+Karavel – Web
+
+## Gestion du contrat initial
+
+Avant août 2017, nous demandions à nos agences de voyages clientes de signer un avenant au contrat principal souscrit lors de la création de l’agence sur Resaneo. Depuis cette date un contrat de prestations de service distinct a été rédigé.
++-Etape 1 - Gestion des demandes d'API (Commercial)
+
+En cas de demande de la part d’une agence, celle-ci est redirigée vers François.
+
+L’envoi et la signature du contrat est géré par un membre du Comité de Direction. Le modèle du contrat est disponible sur un serveur spécifique.
+
+Le contrat signé est transmis en interne du service administratif sur le mail compta@vlctravel.com. S’il existe une version papier, celle-ci est remise en main propre au service administratif qui dispose d’un classeur pour regrouper ceux-ci.
+
++-Etape 2 - Réception du contrat signé et facturation frais initiaux (Administratif &amp; White Label Manager)
+
+Un contrat signé par Yannick n’est renvoyé qu’en cas de demande de l’agence.
+1.S’assurer que toutes les pages du contrat sont bien paraphées et que celui-ci est signé.
+
+2.S’assurer que nous disposons bien du contact de la personne ou de l’équipe qui sera en charge de l’intégration technique de l’API (voir étape 1). Si ce n’est pas le cas, demander cette information en interne, à la personne qui a géré la signature du contrat ou à l’agence de voyage directement, si cette information est inconnue.
+
+3. Si la création d’un nouveau code agence est nécessaire, le faire sur Resaneo et sur Galaxy
+
+NB : Ce cas de figure est possible si l’agence fait déjà des résas manuelles sous un autre mode de règlement. Dans ce cas là le nouveau code agence aura pour nom “Nom de l’agence – Web”. 
+
+4. Créer d’un dossier Galaxy caché :
+
+- Statut « en demande »
+
+- Etiquette « Contrat API », sous le code agence créé à l’occasion.
+
+5. Enregistrer le contrat dans le suivi Galaxy via l’action “ajouter un document”, en pdf (.doc non accepté par GX).
+
+NB : Si le contrat est trop lourd (message d’erreur “format non supporté”), utiliser le logiciel pdf Sam pour découper le contrat (1 fichier par page) et insérer ensuite toutes les pages du contrat dans GX.
+
+6. Facturer à l’agence les frais de mise en oeuvre (en TTC, attention montant contractuel hors TVA) + alerte administrative” à J+7 “Relancer AGV pour frais API”
+
+- Prestation: add-on –&gt;WL et API–&gt;WebServices – API
+
+- Vente :
+
+- libellé “API Resaneo”
+
+- première ligne : base /”Frais API Resaneo”/Montant hors taxe
+
+- deuxième ligne : Taxe /”TVA 20%”/Montant TVA
+
+- Mettre une alerte pour le service commercial : “API : compléter et envoyer bon de commande de préproduction à SpeedMedia”
+
+7. Après réception du paiement et du contact de l’équipe technique de l’agence : (White Label Manager)
+
+- Compléter puis envoyer le bon de commande de préproduction à SpeedMedia, en mettant le service qualité en copie. Bon de commande de préproduction à resaneo-api@speedmedia.fr. Ce bon de commande est mis en pièce jointe du dossier agence sur Galaxy.
+
+- Envoyer le template de mail “API – Réception des éléments” à l’agence.
+
+8.  Le White Label Manager met une alerte à J+7 pour demander à SpeedMedia la confirmation de l’envoi du mail.
+
+9. Mettre une alerte “API – Si dossier non confirmé, faire un point avec le White Label Manager” à 6 mois plus tard
+
++-Etape 3 - phase d'intégration (SpeedMedia)
+
+L’agence de voyage dispose de 6 mois pour procéder à l’intégration de notre API. Au delà de ce délais, SpeedMedia informera le service administratif, qui a son tour contactera le signataire du contrat chez Resaneo pour qu’une décision soit prise sur la suite à donner au contrat.
+A réception du bon de commande, SpeedMedia va se charger de mettre à disposition de notre client, les éléments suivants, nécessaire pour l’intégration de l’API :
+
+- Documentation technique
+
+- Accès à la Sandbox Resaneo (version test)
+
+- Code agence de préproduction (test)
+
+- Jeu de test (sur Excel)
+
+- Explications sur les différentes étapes pour obtenir les accès de production : développement / jeu de test à renvoyer / nous fournir les accès à l’environnement de test pour vérification / tests par nos soins / envoi des accès de production.
+
++-Etape 4 - validation de l'intégration (White Label Manager)
+
+Cette partie nécessite d’avoir des accès à la Sand Box de SpeedTravel, dédiée aux développement des API.
+Cette partie est gérée via Planio. Une fois ses développements effectués, l’agence de voyage prendra contact avec le White Label Manager, via le planio de SpeedMedia.
+
+1 – L’agence devra nous renvoyer le jeu de test complété dont voici la Trame, ainsi que des accès à leur environnement de pré-prod, relié à notre Sandbox Resaneo.
+
+2 – Le White Label Manager vérifiera que les dossiers tests créés par l’agence lors de ces tests sont bien conformes à notre contenu.
+
+3 – Après validation de ces tests par le White Label Manager, un Bon de commande de mise en production est complété et envoyé à resaneo-api@speedmedia.fr, depuis la boîte compta@vlctravel.com, par le White Label Manager. Ce bon de commande est mis en pièce jointe du dossier agence sur Galaxy.
+
+4 – Créer un utilisateur “agent API” sur Resaneo, en se connectant sur le compte Responsable de l’agence (possible par TL admin, le White Label Manager, Yannick ou Raphael).
+
+5 – Le White Label Manager s’assure que SpeedMedia communique les accès de production au client.
+
+Le White Label Manager :
+
+- informe le service qualité de l’intégration de la nouvelle API
+
+- met une alerte administrative sur le dossier GX disant « Nouvelle API en production »
+
+- met sur le dossier GX la date d’anniversaire dans le champ « Libellé » de l’onglet « infos »
+
+6 – Le service qualité :
+
+- informe l’ensemble de l’entreprise, par mail, de l’intégration de la nouvelle API.
+
+- met à jour la liste des API sur Gravity
+
++-Etape 5 - Suivi du client (Service administratif)
+
+A réception de l’alerte “Nouvelle API en production”, le service administratif
+
+- passe le dossier GX en statut confirmé
+
+- Alerte admin “API : éditer et envoyer relevé de passager”  à la prochaine échéance prévue (voir paragraphe ci-après « Relevés de passagers et date anniversaire »)
+
+- Alerte Admin : « API : Facturer frais de maintenance» à N+1 de la date anniversaire.
+
+- Renseigne la date anniversaire dans la partie “Libellé’ de l’onglet info (date anniversaire ) en se basant sur la date d’envoi des codes d’accès de production.
+
++-Schéma des échanges avec SpeedMedia
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/07/Echanges-RN-SMS-API-Resaneo.png]
+
+## Relevés de passagers et date anniversaire
+
++-Date anniversaire
+
+La date anniversaire est la date à laquelle les codes d’accès définitifs ont été envoyés à l’agence.
+
+Celle-ci est spécifiée dans le champ “Libellé” de l’onglet “infos”
+
++-Relevés de passagers
+
+Fréquence d’envoi : mensuelle, comme pour tous les PME.
+
+## Maintenance informatique (demandes de SAV)
+
+En cas de demande de maintenance, renvoyer le client vers SpeedMedia. Voir contacts mails.
+
+## Problème de contenu/tarifs sur notre site
+
+Si le client nous remonte des problèmes lié à notre contenu (disponibilités, tarifs etc ) : transport@vlctravel.com
+
+## Résiliation de contrat
+
+Toute demande de résiliation de contrat de la part d’une agence doit être envoyée à Jean-Pol et Yannick, copie compta@vlctravel.com.
+
+Il n’existe pas de trame de courrier à ce jour.
+
+## Gestion des dossiers
+
+Les dossiers sont gérés de la même manière que ceux réservés par des personnes physiques sur notre site Resaneo.
+</section>
+</article>
+</body>
+</html>

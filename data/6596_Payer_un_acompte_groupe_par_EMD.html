@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="6596">
+    <meta name="date" content="2024-07-25T15:53:39">
+    <meta name="modified" content="2024-08-02T10:55:02">
+    <meta name="slug" content="payer-un-acompte-groupe-par-emd">
+    <meta name="categories" content="Groupe">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/payer-un-acompte-groupe-par-emd/">
+    <title>Payer un acompte groupe par EMD</title>
+</head>
+<body>
+<article>
+<h1>Payer un acompte groupe par EMD</h1>
+<section class="excerpt"></section>
+<section class="content">
+Dernière mise à jour : 02/08/2024
+
++-Galileo
+
+Tout d’abord, il faut charger la fiche compagnie (fact sheet) dans MyTravelport qui va nous aiguiller sur le code RFISC à insérer dans le format d’EMD &gt; ici
+
+1- Créer un dossier :
+
+Format : N.G/[nb de pax]RESANEO/Nom du groupe
+
+Exemple : N.G/45RESANEO/GRP PAR
+
+Ici 45 est le nombre de pax de la cotation.
+
+Puis faire format pour insérer les infos de l’agence (tel/mail) : CM/ 
+
+ 
+
+2 – Faire le format d’EMD :
+
+Format : NSVC[CIE]EK1[VILE DEPART][DATE DEPART]-NG/D/[CODE RFISC]/GROUP DEPOSIT/[MONTANT]
+
+Exemple :  NSVCAFEK1PAR17MAY-NG/D/997/GROUP DEPOSIT/1789.80
+
+Dans cet exemple, il s’agit d’un EMD pour un acompte d’un groupe AF d’un montant de 1789.80€
+
+ 
+
+3- Une fois le ligne d’EMD présente dans le PNR, signer et faire ER. 
+
+ 
+
+4- Emission de l’EMD : 
+
+- Pour une émission simple :
+
+Format : EMDI/SM1/FCK
+
+1 = segment de la ligne EMD
+
+ATTENTION : certains compagnies (ex : UA) n’accepte pas la forme de paiement FCK. Dans le cas où la forme de paiement bloque, remplacer par “cash” FS.
+
+- Pour une émission avec insertion d’un message en ENDO (tourcode; remarque.. )
+
+EMDI/SM1/ER TEXTE LIBRE
+
+ 
+
+5- Une fois l’EMD émis, communiquer à la compagnie aérienne le numéro de l’EMD.
+
+ATTENTION : pour AF, l’EMD est à insérer dans TIGRE/Agent connect.
+
+Vous pouvez également mettre dans SR dans le PNR  :
+
+Exemple :
+
+SI.AF*EMD PAID 03DEC 45pax
+
+code compagnie
+
+SI.AF*EMD 00000000000000 (mettre le num d’EMD à 13 chiffres)
+
+ 
+
+6- Une fois toutes ces étapes effectuée : Mettre à jour Galaxy
+
+- Insérer dans les prestations une ligne “acompte groupe” ainsi que l’achat qui lui est relié (le montant de l’acompte payé)
+
+- Mettre dans le suivi galaxy le numéro de PNR que vous avez créé sur Galileo pour émettre votre acompte ainsi que le numéro de l’EMD d’acompte.
+
+- Mettre une note une fois à une date après l’émission prévue pour prévoir de rembourser l’acompte. Type de note : “Rembourser acompte 0570000000000”
+
++-Amadeus
+
+A VENIR
+
+ 
+</section>
+</article>
+</body>
+</html>

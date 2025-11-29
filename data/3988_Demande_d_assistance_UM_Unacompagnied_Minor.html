@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="3988">
+    <meta name="date" content="2017-03-27T14:43:08">
+    <meta name="modified" content="2024-03-22T10:04:31">
+    <meta name="slug" content="demande-dassistance-um-unacompagnied-minor">
+    <meta name="categories" content="Alertes, RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/demande-dassistance-um-unacompagnied-minor/">
+    <title>Demande d’assistance UM (Unacompagnied Minor)</title>
+</head>
+<body>
+<article>
+<h1>Demande d’assistance UM (Unacompagnied Minor)</h1>
+<section class="excerpt">Dernier mise à jour le 12/04/17</section>
+<section class="content">
+Dernier mise à jour le 12/04/17
+
+## Compagnies Low-Cost
+
++-Hey click meSe renseigner sur le site de la compagnie aérienne pour savoir si il est possible de transporter un UM ou non. (dans les conditions générales de vente très souvent).
+
+Attention : Certaines compagnies n’acceptent pas les UM.
+
+Faire le devis sur le site internet de la compagnie ou par téléphone.
+
+## Compagnies régulières (Galileo)
+
+Vérifier que la compagnie aérienne accepte les UM sur ses vols. Exemple : Attention, BA n’accepte plus les UM sur ses vols.
+
+En fonction de l’âge du passager, déterminer si le passager est un UM optionnel ou obligatoire.
+
++-UM Obligatoire
+
+Une fois toutes ces informations rassemblées, avant de faire la recherche de disponibilité, rechercher l’affichage tarifaire en précisant que que nous souhaitons un tarif UM :
+
+FDPARLYS10JUN/AF*UNN
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/03/UM1.png]
+
+Mémoriser les classes quand lesquelles il est possible de réserver un UM. Dans cette exemple, classes : V, R, N,E, T, H…
+
+Faire ensuite une recherche de disponibilité et créer un PNR dans les classe disponibles, où le tarif UM est accessible.
+
+Insérer les noms/prénoms du passager :
+
+N.NOM/PRENOM*P-U10 (âge de l’enfant)
+
+Une fois le PNR terminé, tarifer :
+
+FQ*U10 ou FQ*U10/FXD
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/03/UM2.png]
+
+L’UM est maintenant tarifier en U10.
+
+Dans *FF, la tarification enregistrée indique bien que c’est un tarif UM.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/03/UM3.png]
+
+Demander l’autorisation à la compagnie :
+
+Insérer une SI.AF*U10
+
++
+
+Demander l’autorisation de la compagnie aérienne via le crayon (en bas à gauche) &gt; Créer/Modifier les demandes de services
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/03/UM4.png]
+
+Une fois sauvegardée, l’autorisation se range dans *SI, en « PN » dans un premier temps (« pending »).
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/03/UM5.png]
+
+Puis si tout va bien, en « KK » dans un second temps.
+
+Si l’autorisation reste en « PN », il est tout de même possible d’envoyer la cotation au client. Il faut simplement veiller à ce que l’autorisation soit confirmée si nous confirmons le dossier.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/03/UM6.png]
+
+Faire @ALL pour passer l’assistance UM en « HK ».
+
+Dernière étape, il faut insérer les informations des personnes qui accompagnent et qui récupèrent l’enfant à l’aéroport..
+
+SI.AF*DEP CDG DUPONT MARIE MERE 16 IMP DES TILLEULS PARIS 6 TEL 0605050505
+
+SI.AF*ARR LYS DUPONT DENIS GRAND PERE 6 RUE DU CHATEAU 69000 LYON TEL 06004040050
+
+SI.AF*DEP LYS DUPONT DENIS GRAND PERE 6 RUE DU CHATEAU 69000 LYON TEL 06004040050
+
+SI.AF*ARR CDG DUPONT MARIE MERE 16 IMP DES TILLEULS PARIS 6 TEL 0605050505
+
+Les notes se rangent dans *SI sur le PNR Galileo. Insérer une note par départ et arrivée.
+
+Le dossier est prêt, nous pouvons envoyer le devis aux clients.
+
++-UM Optionnel
+
+Pour les UM optionnel, le principe est le même. Tout va dépendre de la compagnie aérienne. Certaines compagnies demandent à ce que le passager soit tarifé en CHD ou en ADT, et prennent ensuite des frais fixes par trajet, à payer soit par EMD par nos soins, soit directement à l’aéroport par le client.
+
+D’autres compagnies permettent encore de tarifer le dossier de la même façon que les UM obligatoires.
+
+Il faut donc bien se renseigner auprès de la compagnie afin de construire correctement le dossier du passager UM et donc bien informer l’agence. Ce sont, en général, des informations disponibles sur les sites B2B des compagnies aériennes.
+
+Attention, en cas de paiement du service UM par EMD, ne pas oublier d’émettre l’EMD lors de la confirmation du dossier. En cas de paiement de ce service directement à l’aéroport, ne pas oublier d’indiquer les frais aux clients sur la cotation.
+</section>
+</article>
+</body>
+</html>

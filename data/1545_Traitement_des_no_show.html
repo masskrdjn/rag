@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="1545">
+    <meta name="date" content="2015-05-22T13:55:05">
+    <meta name="modified" content="2024-03-22T11:23:52">
+    <meta name="slug" content="traitement-des-no-show">
+    <meta name="categories" content="Alertes, RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/traitement-des-no-show/">
+    <title>Traitement des no show</title>
+</head>
+<body>
+<article>
+<h1>Traitement des no show</h1>
+<section class="excerpt">Dernière mise à jour : 22/03/2024</section>
+<section class="content">
+Dernière mise à jour : 22/03/2024
+
+## 
+
+## No show signalé par une agence avec demande de modification.
+
+Discours client B2B et B2C: le passager doit demander à la compagnie aérienne de l’assister à l’aéroport. Si le passager n’est plus à l’aéroport : demander l’annulation du dossier en cours et faire une nouvelle réservation sur notre site (proposer son aide à l’agence ou le client à trouver son vol).
+
+Réponses standard si difficultés :
+
+- Client B2C est à l’aéroport ou ne trouve pas de vols sur notre site car le départ est trop proche —-&gt; lui dire de réserver auprès de la compagnie.
+
+- La compagnie dit qu’elle ne peut pas gérer la modification car c’est un tarif TO/négocié (compagnie ne voit ni le tarif ni les conditions du billets) —-&gt; répondre au pax qu’il s’agit d’un tarif privé, qui nous permet pas toujours de modifier le billet. Faire éventuellement une proposition de modification au client, si le billet le permet. (bien vérifier la fare basis)
+
+/!\ Ne jamais employer le terme “Tarif TO” auprès de nos clients. Utiliser le terme tarif privé.
+
+## No show constaté en interne
+
+Nous n’avons pas à informer notre agence de voyage cliente en cas de no-show des passagers.
+1 – Sur le dossier GX, mettre une note en statut normal pour notifier le no show (quel pax, quel vol, et mettre les numéros de billet du passager qui à fait no-show)
+
+2 – Demander ou non un remboursement, selon le fournisseur :
+
++-GDS
+
+Vérifier dans la VR et sur l’image billet si le pax a demandé la modification du vol à l’aéroport:
+
+- Oui : ne pas demander de remboursement. Il n’est plus nécessaire de suivre le dossier.
+
+- Non : mettre une alerte RESA  “Demander remboursement aux conditions du billet suite no-show” 10 jours avant le fin de validité du billet (à vérifier dans la farebasis) ou faire la demande de remboursement de taxes si nous sommes déjà à cette échéance.
+
+Appliquer les conditions tarifaires pour la demande de remboursement. Faire une demande de remboursement de taxes si le billet n’est pas remboursable.
+
++-Low Cost et charter
+
+Mettre une alerte RESA “Demander remboursement aux conditions du billet suite no-show” à J+1 du dernier vol ou faire la demande de remboursement de taxes si nous sommes déjà à cette échéance.
+
+Dans le cas où le fournisseur nous demande si le retour doit être maintenu : dire que nous n’arrivons pas à joindre le client et ne pas proposer au client le maintien du retour.
+
+3 – Une fois la demande de remboursement de taxes effectuée, programmer une alerte administrative en fonction du fournisseur.
+
++-GDS
+
+1. Faire un remboursement automatique en priorité sur le GDS ou une DAR sur le BSP si cela n’est pas possible.
+
+2. Mettre une note sur le dossier GX indiquant s’il s’agit d’une DAR ou d’un remboursement auto
+
+3. Mettre une alerte administrative « vérifier remboursement, DAR n°(N) de la DAR) pour (montant) € »le 5 du mois suivant la demande. (ex. remboursement demandé le 11 mai, alerte le 5 juin)
+
+/!\  le remboursement automatique est obligatoire. Les compagnies facturent des frais pour le traitement des DAR lorsque le remboursement automatique était possible. /!\
+
++-Low Cost
+
+Programmer une alerte administrative  « vérifier remboursement de (montant) euros » le 5 du mois suivant l’échéance communiquée par la compagnie (ex. le 26 juillet, la compagnie indique remboursement sous 1 semaine, soit le 2 août : alerte au 5 septembre)
+
++-Charter 
+
+Programmer une alerte admin à J+1 « vérifier le remboursement de (montant) euros »
+</section>
+</article>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="2870">
+    <meta name="date" content="2016-06-24T15:33:46">
+    <meta name="modified" content="2018-01-09T09:51:10">
+    <meta name="slug" content="facturation-client-et-fournisseurs">
+    <meta name="categories" content="ADV">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/facturation-client-et-fournisseurs/">
+    <title>Facturation client et fournisseurs</title>
+</head>
+<body>
+<article>
+<h1>Facturation client et fournisseurs</h1>
+<section class="excerpt">Dernière mise à jour : 09/01/2018</section>
+<section class="content">
+Dernière mise à jour : 09/01/2018
+
+## 
+
+## Traitement des factures clients : réservations initiales ou interventions sur un dossier confirmé.
+
++-Comment identifier un dossier à facturer?
+
+Ceux-ci sont visibles dans Gravity grâce au statut de facturation et au statut du dossier
+
+Les statuts de facturation signalant que le dossier doit être facturé sont :
+
+- Dossier confirmé avec statut de facturation “non facturé”
+
+- Dossier confirmé avec statut de facturation “en cours de modification”
+
+Pour identifier ces dossiers, il suffit de filtrer les dossier « Confirmé» avec le statut de facturation « Non facturé » puis cliquer sur « Rechercher » (reproduire la même chose en mettant “en cours de modification” à la place de “Non facturé”).
+
++-Facturation automatique et facturation manuelle : explications
+
+- Réservation initiale
+- Intervention sur un dossier confirmé
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2016/06/Schéma-facturation-à-création-dun-dossier.jpg]
+
+Aucune intervention sur un dossier (modification, annulation, rajout de prestation), n’est traité automatiquement, peut importe le mode de règlement ou le type de dossier.
+
+Traiter un dossier qui n’est pas facturé automatiquement :
+
++-Dossiers jamais facturés
+
+Un dossier n’est pas facturé automatiquement et est en statut de facturation “non facturé” pour:
+
+- Une première réservation
+
+- Une confirmation de réservation KO ou pré réservée ou une VDM
+
+- Une demande d’émission IATA Galileo ou Sabre
+
+- Un dossier groupe
+
+- Une erreur technique sur Galaxy (Problème de synchronisation)
+
+Un dossier n’est pas facturé automatiquement et est en statut de facturation “en cours de modification”pour: 
+
+- Une réservation à la carte, UM ou tour du monde.
+
+- Canal Resaneo (B2B)
+- Autres canaux (B2C)
+
+L’action à effectuer dépend du mode de règlement de l’agence.
+
+En compte (Virement tous les 5 ou 10 ou 15, Virement quinzaine, Chèque)
+
+Action :  Facturer le dossier
+
+En prélèvement bancaire (jour de la réservation, prélèvement par quinzaine, prélèvement mensuel)
+
+Vérifier si un prélèvement non lettré existe en allant dans l’onglet « Règlements » de Galaxy, sélectionner le mode de règlement « Prélèvement automatique » puis cocher la case « Non lettré » puis cliquer sur « Rechercher » :
+
+- Un prélèvement non lettré existe pour ce dossier :  facturer le dossier puis lettrer le règlement.
+
+- Le prélèvement n’existe pas, créer le prélèvement pour l’agence concernée du montant du dossier (si l’agence appartient à un réseau, ajouter un règlement au centre payeur), puis facturer le dossier et lettrer le règlement.
+
+En carte bancaire :
+
+Vérifier si un règlement par carte bancaire existe (même procédé que pour le prélèvement mais sélectionner le mode de règlement « Carte Bancaire »)
+
+- Si un règlement par carte bancaire existe pour ce dossier : facturer le dossier puis lettrer le règlement
+
+- Si le règlement n’existe pas dans Galaxy  : vérifier s’il existe un règlement ok dans Ogone, si le règlement est en statut « Autorisé ».
+
+–&gt; Le règlement existe dans Ogone: Ajouter le règlement dans Galaxy, dans l’onglet « Règlements » en cliquant sur « Nouveau règlement », sélectionner l’agence concernée, renseigner le montant du dossier, renseigner la date du règlement (date du règlement +3 jours), mettre en référence le n° du dossier puis valider, ajouter les éléments Ogone dans « Commentaire ». Une fois le règlement créé, facturer le dossier et lettrer le règlement.
+
+–&gt; Le règlement n’existe pas dans Ogone: signaler sur le forum Help Desk qu’il nous manque un paiement. Une fois le règlement passé, facturer et lettrer le règlement.
+
+En paiement comptant par virement (Porte Monnaie Electronique) :
+
+Aller dans le back office Resaneo et vérfier si l’agence est en porte-monnaie électronique (PME), vérifier l’historique du PME
+
+–&gt; le débit apparaît : Facturer le dossier et lettrer le paiement.
+
+–&gt; le débit n’apparaît pas : signaler sur le forum commercial qu’il nous manque un paiement. Une fois le règlement passé, facturer et lettrer le règlement.
+
+Agence n’a pas de règlement configuré : 
+
+Vérifier son mode de règlement dans Resaneo Administration, configurer son règlement dans sa fiche agence Galaxy, puis facturer le dossier et suivre la procédure énoncée ci-dessus, selon son mode de règlement.
+
+Vérifier qu’il existe un règlement Carte bancaire au nom du client du dossier dans l’onglet Règlements » de Galaxy
+
+OUI : Facturer le dossier
+
+NON : Vérifier qu’il existe dans Ogone, créer le règlement dans Galaxy, facturer le dossier, puis lettrer le règlement.
+
+/!\ le débit n’apparaît pas : signaler sur le forum Help Desk qu’il nous manque un paiement. Une fois le règlement passé, facturer et lettrer le règlement.
+
++-Modifications à facturer
+
+Une modification à facturer peut résulter d’une demande de modification B2B ou B2C.
+
+NB : Les dossiers confirmés / en cours de modification avec une modification à facturer se présentent lorsqu’une prestation est ajoutée et qu’elle n’est pas encore rattachée à la vente.
+
+- Canal Resaneo (B2B)
+- Autres canaux (B2C)
+
+Aller dans l’onglet « Suivi » du dossier :
+
+1 – Vérifier la proposition envoyée à l’agence.
+
+2 – Vérifier que la confirmation de modification ait bien été envoyée à l’agence et que l’achat soit renseigné dans l’onglet « Achat » du dossier.
+
+/!\ Dans le cas où aucun achat est renseigné, se baser sur la note récapitulant la proposition de modification. Si l’achat était prévu à 0€ lors de l’envoi de la proposition, facturer le dossier (créer la prestation “modification” au besoin). Si l’achat prévu était supérieur à 0€, demander la saisie du prix d’achat sur le forum technique.
+
+3 – Facturer la modification selon le mode de règlement de l’agence.
+
+En compte (Virement tous les 5 ou 10 ou 15, Virement quinzaine, Chèque) :
+
+Facturer la modification
+
+En prélèvement bancaire : 
+
+Créer le prélèvement pour l’agence concernée du montant de la modification (si l’agence appartient à un réseau, créer le règlement sur le centre payeur), puis facturer la modification et lettrer le règlement
+
+/!\ La date de règlement se crée automatiquement pour les prélèvements : ne pas modifier !
+
+En Carte bancaire :
+
+Vérifier si un règlement par carte bancaire non lettré existe (même procédé que pour le prélèvement mais sélectionner le mode de règlement « Carte Bancaire ») :
+
+- OUI :  facturer le dossier puis lettrer le règlement.
+
+- NON: Vérifier s’il existe un règlement ok (statut autorisé) dans Ogone
+
+–&gt; Règlement ok : Ajouter le règlement dans Galaxy, dans l’onglet « Règlements » en cliquant sur « Nouveau règlement », sélectionner l’agence concernée, renseigner le montant du dossier, renseigner la date du règlement (date du règlement +3 jours), mettre en référence le n° du dossier puis valider, ajouter les éléments Ogone dans « Commentaire ». Une fois le règlement créé, facturer le dossier et lettrer le règlement;
+
+–&gt; Règlement pas ok :  signaler sur le forum commercial qu’il nous manque un paiement. Une fois le règlement passé, facturer et lettrer le règlement.
+
+En paiement comptant par virement :
+
+Vérifier dans le suivi de dossier GX si un débit du PME est renseigné :
+
+- OUI : facturer la modification.
+
+- NON : vérifier dans l’historique du Porte-monnaie électronique (PME)
+
+–&gt; Règlement ok : Mettre une note sur le dossier pour le spécifier et facturer le dossier.
+
+–&gt; Règlement pas ok : signaler sur le forum commercial qu’il nous manque un paiement. Une fois le règlement passé, facturer et lettrer le règlement.
+
+1 – Vérifier qu’il existe un règlement associé à la modification à facturer soit :
+
+- Dans le suivi du dossier une alerte du type : Débit CB effectué (1557673685) – Règlement N°43339 créé – Lettrage effectué.
+
+- Dans l’onglet règlement, un règlement Carte bancaire non lettré du montant de la modification.
+
+2 – Si la prestation n’a pas été créée, créer la prestation à facturer, tarifer la vente (et l’achat si il n’est pas égal à 0)
+
+3 – Facturer le dossier (cliquer sur valider)
+
+4 – Lettrer le règlement, s’il n’est pas déjà lettré
+
++-Les modifications de dossier non liées à une facturation 
+
+Le process est le même pour le B2B et le B2C.
+
+Cela peut concerner un dossier ayant eu :
+
+- Modification horaires de vol / du n° de vol de la part de la compagnie
+
+- Mise à jour du PNR dans les prestations
+
+- Ajout de prestation non facturable (repas spécial, assistance etc…)
+
+- Vol charter
+
+- Add-on réservé sur Resaneo par l’agence – dans ce cas, il existe une alerte du type : « Addon “Vol(s) Air France : 1 bagage en soute de 23kg par passager ” à réserver »
+
+Actions à effectuer
+
+Changer le statut de facturation à “Facturé ” et indiquer pourquoi on a changé le statut de facturation (en recopiant l’alerte d’addon, en mettant MO horaires s’il s’agit d’une modification compagnie, en mettant « Vol Charter » s’il s’agit de vol charter…) dans le commentaire obligatoire.
+
++-Groupes et IATA
+
+Ces dossiers ne peuvent concerner que le canal Resaneo
+
+- Resa IATA
+- Groupes
+
+Pour la facturation de dossiers IATA, il faut toujours vérifier dans le suivi du dossier, la note qui concerne le règlement des frais dans le cas où le dossier n’a jamais été facturé. 
+
+Ex : Règlement des frais (3 x 8EUR) par Porte-monnaie électronique 
+
+Paiement par Porte-Monnaie électronique : 
+
+1 – Vérifier que la confirmation d’émission ait bien été envoyée
+
+2 – Vérifier que le mode de règlement de l’agence soit bien « Paiement comptant par Virement »
+
+3 – Facturer le dossier
+
+Paiement par Carte Bancaire :
+
+1 – Vérifier que la confirmation d’émission ait bien été envoyée
+
+2 – Vérifier que le mode de règlement de l’agence soit bien « Carte Bancaire »
+
+3 – Facturer le dossier
+
+4 – Dans l’onglet Règlement de Galaxy : modifier le règlement de l’agence en ajoutant la date de règlement (+3 jours) puis Lettrer le règlement
+
+Dans le cas de modification de dossier à facturer, procéder comme une modification à facturer mais toujours s’assurer que le mode de règlement de l’agence corresponde au mode de règlement utilisé pour le règlement de la modification et s’assurer que l’agence ait bien été débitée pour la modification (PME ou CB).
+
+S’assurer dans un premier temps que la vente et l’achat soient à jour, dans le cas d’acompte, vérifier que l’acompte soit correctement renseigné : se référer au contrat signé par l’agence pour avoir le montant de l’acompte.
+
+Vérifier également que l’agence ait le bon mode de règlement sur sa fiche (carte bancaire ou Paiement comptant par virement : les 2 seuls modes de règlement autorisés pour les groupes – sauf accord de la direction), si l’agence est associée à un centre payeur, enlever le centre payeur de la fiche agence pour facturer le dossier (sauf accord de la direction).
+
+Facturer le solde du groupe à 1 semaine de la date d’échéance indiquée sur le contrat en sélectionnant comme mode de règlement “Virement pour Groupes (à modifier)”.
+
+Remettre le mode de règlement initial de l’agence et quitter le dossier.
+
+## Traitement des factures fournisseurs.
+
++-Import des factures et mails de confirmation fournisseurs dans Galaxy via Webmail = Fournisseurs avec paiements par CB
+
+ Webmail rassemble à ce jour les mails de confirmation et les factures des fournisseurs issus du dossier FACTURES A RATTACHER de la boite mail booking@vlctravel.com qui n’ont pas été rattachés automatiquement aux dossiers Galaxy. Tous les matins les mails de la veille sont synchronisés manuellement par le service administratif. Cette synchronisation permet de lettrer les mails reconnus par Galaxy au dossier correspondant. Les mails non-lettrés aux dossiers par cette synchronisation (suite à une modification de la trame du mail par le fournisseur par exemple) sont présents dans l’onglet Webmail dans Galaxy. Le traitement de l’onglet Webmail est effectué quotidiennement.
+
+1 – Tous les matins, s’assurer que toutes les factures/confirmations de réservation de la veiller soient bien dans le dossier « Factures à rattacher » afin de pouvoir faire une synchronisation du Webmail (Vérifier dans la corbeille de la boite booking@vlctravel.com qu’il n’y ait pas de confirmation de réservation ou de modification)
+
+2 –  Dans l’onglet Webmail de Galaxy, cliquer sur le bouton vert à côté de Boite de réception, insérer la date de début et la date de fin (date de la veille, si nous sommes un lundi, faire une synchronisation jour par jour du vendredi au dimanche), puis Valider : « Synchronisation en cours… » apparaît. Patienter jusqu’à ce qu’un tableau de rapport de synchronisation apparaisse.
+
+3 – Faire une capture d’écran du rapport et l’enregistrer dans M:\Service Administratif\Fournisseurs\Rappro factures fournisseurs\Synchro Webmail avec le nom « rapport synchro booking-GX DDMMYYYY »
+
+5 –  Pour les dossiers non rattachés automatiquement, consulter le mail ou la pièce jointe du mail et contrôler le tarif de l’achat qui doit être identique à l’achat du fournisseur dans le dossier GX :
+
+- Tarif identique =  créer une facture en rattachant selon le cas l’email ou la facture.
+
+- Tarif différent = contrôler la facture, réajuster l’achat du dossier GX si besoin et créer une facture en rattachant selon le cas l’email ou la facture.
+
+6 – Affecter la facture à l’achat du dossier sous l’onglet Fournisseurs/Factures.
+
++-Traitement des factures fournisseurs autre qu'en paiement par CB
+
+On édite un relevé fournisseur afin de cibler les achats pour lesquels aucune facture n’est encore associée. Les factures sont nécessaires et obligatoires à la tenue correcte de la comptabilité fournisseur de l’entreprise.
+
+1 – Edition du relevé. Dans l’onglet Relevés/Fournisseurs, afficher un relevé selon les critères suivants :
+
+- Réservation effectuée entre le ” ” et le ” ” : remplir selon la période à traiter.
+
+- Statut facturation : Facturé.
+
+- Cocher “Prestations non rapprochées seulement”.
+
+2 – Analyse du relevé. La colonne Montant rappelle le montant de l’achat dans le dossier . La colonne « Non rappr. » représente la différence entre l’achat dans le dossier et le montant de la facture lettrée à cet achat (si le montant de l’achat est égal au montant non rapproché, alors la facture est manquante).
+
+3 – Agir selon le cas : 
+
+- Facture est manquante :
+
+- vérifier sur le site du fournisseur la possibilité d’obtenir la facture ou la confirmation de la réservation mentionnant le montant de l’achat. Si cet élément est indisponible,
+
+- contacter le fournisseur pour en demander l’envoi.
+
+- chercher dans le dossier du fournisseur sur la boite mail booking@vlctravel.com
+
+- Montant non-rapproché est différent du montant de l’achat du dossier, vérifier la facture lettrée à l’achat :
+
+- Si la prestation achetée auprès du fournisseur a été effectuée par le client (un pré-seating ou un bagage par exemple), supprimer la facture.
+
+- Si le montant de la facture est différent de l’achat, contrôler la facture et réajuster l’achat du dossier si besoin.
+
+Après avoir traité les factures d’achats, il faut gérer les règlements d’achats et le lettrage. Voir fiche ici.
+
+## Remontées comptables Resaneo/MB3M
+
+Certains clients utilisent un logiciel de comptabilité développé par la société MB3M et souhaitent que les informations de facturation soient envoyées automatiquement dans ce système informatique.
+
+Cette fonctionnalité existe sur Galaxy. A la demande de MB3M, il suffit d’activer celle-ci sur la fiche agence puis de donner les codes agences à MB3M :
+
+- Cocher “autoriser exports messages comptables”
+
+- Choisir “MB3M” dans “format message comptable”
+
+- Choisir mb3m en mode d’envoi
+</section>
+</article>
+</body>
+</html>

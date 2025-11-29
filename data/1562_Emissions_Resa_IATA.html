@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="1562">
+    <meta name="date" content="2015-05-28T16:57:43">
+    <meta name="modified" content="2025-02-17T16:47:35">
+    <meta name="slug" content="emissions-resa-iata">
+    <meta name="categories" content="Alertes, RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/emissions-resa-iata/">
+    <title>Emissions Resa IATA</title>
+</head>
+<body>
+<article>
+<h1>Emissions Resa IATA</h1>
+<section class="excerpt">Dernière mise à jour : 17/02/2025</section>
+<section class="content">
+Dernière mise à jour : 17/02/2025
+
+Rappel : si l’agence rencontre une difficulté technique pour nous basculer le dossier, le tarifer ou autre avant que nous récupérions la propriété du dossier … elle doit contacter le Help Desk de son GDS et/ou de la compagnie aérienne. Si elle souhaite que Resaneo s’occupe de tout, il suffit de réserver en ligne sur notre site, ou de faire une demande à la carte qu’elle validera par la suite.
+
+## Procédure d’émission standard
+
++-Amadeus (1A)
+
+ Nous ne faisons pas d’émissions partielles des dossiers. . En cas de dossier de ce type : annuler la demande d’émission (via le bouton “annulation Resa IATA)
+
+1- Vérifier que la tarification ne soit pas manuelle. Format : TTH 
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2015/05/colmfdeokpnhclem.png]
+
+Nous avons sur cette écran un visuel des tarifications faites par l’agence. Il faut vérifier la tarification existante : sur l’écran ci-dessus, c’est la T4.
+
+-&gt; TTH/T4 : nous amène dans l’historique de la tarification 4, il faut chercher la ligne FC/.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2015/05/deilmnhecokiemdc.png]
+
+Si il est écrit : NEGOTIATED RATES USED ou AUTOMATIC FARE USED, il s’agit bien d’une tarification automatique. On peut donc passer à l’étape suivante.
+
+Si il est écrit : MANIPULATED FARE, ne surtout pas émettre voir paragraphe ci-après “émission impossible” et prévenir votre Team Leader.
+
+2 – Vérifier que le prix d’achat du dossier GX est conforme au prix d’achat du PNR.  Format : TQT
+
+Particularité : Accord EK – Pour les tarifs FR1 uniquement , retarifier le dossier (FQ) et émettre (si le tarif affiché n’est pas FR2, voir service transport) et mettre à jour l’achat sur GX.
+
+3 – N’émettre le dossier que si le prix total de l’achat sur le PNR est identique à celui renseigné sur GX (ou est inférieur). Dans le cas contraire, voir paragraphe “Emission impossible”.
+
+Format d’émission : TTP/FPEC
+
+4 – Envoyer mail « Resa IATA – Confirmation émission » depuis le dossier GX
+
+5 – Rebasculer le PNR à l’agence (voir procédure ci-après)
+
+6– Passer le dossier en statut « confirmé »
+
+7– Passer en traité l’alerte « Réservation IATA à émettre »
+
+NB : le service administratif facturera le dossier dans la journée ou au plus tard le matin suivant.
+
++-Sabre (1S)
+
+ Nous ne faisons pas d’émissions partielles des dossiers.  En cas de dossier de ce type : annuler la demande d’émission (via le bouton “annulation Resa IATA)
+
+1- Vérifier que le prix d’achat du dossier GX est conforme au prix d’achat du PNR.  Format : *PQSB (*PQ1 pour consulter uniquement tarification n°1)
+
+Particularité : Accord EK – Pour les tarifs FR1 uniquement , sabre émet automatiquement au meilleur tarif FR2. Mettre à jour le prix d’achat sur GX.
+
+2 – N’émettre le dossier que si le prix total de l’achat sur le PNR est identique à celui renseigné sur GX (ou est inférieur). Dans le cas contraire, voir paragraphe “Emission impossible”. On ne prévient pas l’agence si c’est moins cher, mais on met à jour le prix d’achat dans GX.
+
+Format d’émission : W‡PQ(numéro de la tarification)‡A(code compagnie, selon tarification)‡FCK puis ER
+
+/!\ Attention : Émettre toutes les tarifications du dossier, une par une et ne pas oublier de taper le format ER, sans quoi les numéros de billets ne remontent pas sur le dossier et il faudra contacter le Help Desk de Sabre.
+
+3 – Vérifier que les numéros de billets sont bien remontés pour tous les paxs. Format : *T
+
+4 – Sur le dossier GX renseigner dans « passagers » les civilités, noms, prénoms et typologies de pax.
+
+5 – Sur le dossier GX renseigner dans « prestations » tous les vols associés (pas de bagages en soute à mettre).
+
+6 – Envoyer mail « Resa IATA – Confirmation émission » depuis le dossier GX
+
+7 – Rebasculer le PNR à l’agence (voir procédure ci-après)
+
+8– Passer le dossier en statut « confirmé »
+
+9– Passer en traité l’alerte « Réservation IATA à émettre »
+
+NB : le service administratif facturera le dossier dans la journée ou au plus tard le matin suivant.
+
++-Galileo (1G)
+
+ Nous ne faisons pas d’émissions partielles des dossiers. En cas de dossier de ce type : annuler la demande d’émission (via le bouton “annulation Resa IATA)
+
+1 -Vérifier que la tarification ne soit pas manuelle : il faut vérifier le statut de la tarification.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2015/05/mnnfhjfhedfadgaf.png]
+
+Les lettres G et A signifient que la tarification est automatique et garantie par Galileo. Si il y a une autre lettre (M ; P ; B…) , la tarification n’est alors plus garantie : ne surtout pas émettre voir paragraphe ci-après “émission impossible” et prévenir votre Team Leader.
+
+2 – Vérifier que le prix d’achat du dossier GX est conforme au prix d’achat du PNR.  Format : *FF
+
+3 – N’émettre le dossier que si le prix total de l’achat sur le PNR est identique à celui renseigné sur GX (ou est inférieur). Dans le cas contraire, voir paragraphe “Emission impossible”. On ne prévient pas l’agence si c’est moins cher, mais on met à jour le prix d’achat dans GX.
+
+Format d’émission : TKPFCK/DTDAD
+
+4 – Rebasculer le PNR à l’agence (voir procédure ci-après)
+
+5– Passer le dossier en statut « confirmé »
+
+6– Passer en traité l’alerte « Réservation IATA à émettre »
+
+Si besoin envoyer le mail de l’itinéraire à l’agence : MT.adressemail@agence.com
+
+NB : le service administratif facturera le dossier dans la journée ou au plus tard le matin suivant.
+
+## Emission impossible
+
++-Message d'erreur Amadeus, émission impossible Frais 0B autonomes
+
+Retarifer le dossier, en conservant les classes et la base tarifaire.
+
+Ce message signifie que la compagnie n’autorise pas Resaneo à émettre une tarification faite sur l’Office ID d’une autre agence.
+
++-Problème d’émission de notre responsabilité
+
+Exemple : plaque non autorisée.
+
+Signaler le problème à un/une Teamleader, les frais de gestion ne seront pas facturés à l’agence.
+
++-Toute autre cause imputable à l’agence
+
+Agir en fonction du mode de règlement de l’agence :
+
+- Débit immédiat par CB
+- Paiement comptant par virement (Porte Monnaie électronique)
+
+Nous annulons la demande d’émission d’office et l’agence sera facturées des frais d’émission et de traitement :
+
+1. Copier/coller le PNR, tarification incluse, en note dans Galaxy afin de garder une trace
+
+2. Utiliser le process Galaxy « annuler dossier IATA »
+
+3. Renvoyer le PNR sur GDS de l’agence si nous l’avions reçu
+
+4. Traiter l’alerte “Réservation IATA à émettre”
+
+Nous laissons à ces agences 1 chance pour rectifier leur dossier.
+
+NB : S’il est toujours impossible d’émettre le dossier lors de notre seconde tentative ou si nous n’avons pas de nouvelle de l’agence à 19h30 : crasher le dossier GX en utilisant le process Galaxy “annuler dossier IATA”
+
+1. Rebasculer le dossier à l’agence
+
+2. Contacter l’agence par téléphone :
+
+- lui expliquer pourquoi nous ne pouvons pas émettre
+
+- Si l’agence ne peut pas solutionner le dossier en direct : l’informer quand sans retour de sa part par téléphone, son dossier sera annulé et les frais de gestion Resaneo automatiquement facturés (19h30, dernier délais).
+
+3. Mettre une note résumant la conversation téléphonique sur le dossier GX
+
+4. Programmer une alerte exec’ “IATA – Vérifier réception PNR et émettre” en date du jour.
+
+5. Traiter l’alerte “Réservation IATA à émettre”
+
+## Rebasculer un PNR
+
++-Amadeus
+
+RP/PCC de l’agence (exemple de PCC : LYSA12135)
+
+Pour trouver le PCC de l’agence : RH
+
+NB : si vous rencontrez le message “TK DE BUREAU LIMITE” lors de la bascule, utilisez le format suivant :
+
+RP/PCCagv/TK
+
++-Galileo
+
+QEB/PCC de l’agence (exemple de PCC : 5D4X)
+
+Pour trouver le PCC de l’agence : *H
+
++-Sabre
+
+6¤TA/PCC de l’agence (exemple de PCC : 6ABG)
+
+Pour trouver le PCC de l’agence : *P6
+
+## Après-vente : Modifications et Annulations 
+
++-Modification volontaire
+
+Si une agence souhaite modifier son dossier IATA, même si nous sommes l’émetteur, nous ne sommes pas le propriétaire du dossier.
+
+De ce fait, c’est à l’agence de préparer son PNR pour une réémission :
+
+- L’agence doit réserver les nouveaux vols dans le PNR
+
+- Le masque d’échange doit être prêt pour la réémission.
+
+- L’agence doit faire ensuite une demande de modification via le suivi de commande puis nous renvoyer le PNR sur notre Office ID.
+
+Une fois que nous avons réceptionné son PNR et sa demande de modification voici les étapes à suivre :
+
+- Nous devons ouvrir le PNR et contrôler le masque d’échange.
+
+- Envoyer une proposition de modification à l’agence via Galaxy, sur le dossier concerné qui comprend : Le tarif total de la modification + nos frais de traitement.
+
+- Dès validation de l’agence, nous pouvons faire le nécessaire sur le PNR sans oublier de le renvoyer à l’agence une fois effectué
+
+- Mettre à jour le dossier Galaxy comme un process normal (achat/vente) afin que l’ADV puisse faire la facturation.
+
++-Modification involontaire
+
+En cas de SCHEDULE CHANGE sur un dossier et de réémission :
+
+- L’agence doit réserver les nouveaux vols dans le PNR
+
+- Le masque d’échange doit être prêt pour la réémission.
+
+- L’agence doit faire ensuite une demande de modification via le suivi de commande puis nous renvoyer le PNR sur notre Office ID.
+
+Une fois que nous avons réceptionné son PNR et sa demande de modification voici les étapes à suivre :
+
+- Nous devons ouvrir le PNR et contrôler le masque d’échange.
+
+- Envoyer une proposition de modification à l’agence via Galaxy, sur le dossier concerné qui comprend nos frais de traitement. En effet, même si coté transporteur la réémission est gratuite, nous faisons payer la réémission.
+
+- Dès validation de l’agence, nous pouvons faire le nécessaire sur le PNR sans oublier de le renvoyer à l’agence une fois effectué
+
+- Mettre à jour le dossier Galaxy comme un process normal (achat/vente) afin que l’ADV puisse faire la facturation.
+
++-Annulation volontaire
+
+Si l’agence souhaite annuler son dossier, elle doit :
+
+- Faire une demande d’annulation sur le suivi de commande, pour le dossier concerné
+
+- Nous renvoyer le PNR sur nos office ID
+
+Dès réception de la demande, il faudra de notre coté  :
+
+- Vérifier la note tarifaire et envoyer une proposition qui prends en compte les frais de la note tarifaire + nos frais d’intervention.
+
+- dès validation de l’agence : effectuer l’annulation aux conditions prévues dans notre proposition
+
+- Renvoyer le PNR à l’agence
+
+- Mettre à jour le dossier Galaxy comme un process normal afin que l’ADV puisse faire la facturation.
+
++-Annulation involontaire
+
+En cas d’irrégularité, si l’agence souhaite annuler son dossier, elle doit :
+
+- Faire une demande d’annulation sur le suivi de commande, pour le dossier concerné
+
+- Avoir vérifier au préalable de son coté si son dossier était bien éligible à l’annulation sans frais du fait de l’irrégularité.
+
+- Nous renvoyer le PNR sur nos office ID
+
+Dès réception de la demande, il faudra de notre coté  :
+
+- Envoyer une proposition qui prends comprends nos frais d’intervention.
+
+- Dès validation de l’agence : effectuer l’annulation aux conditions prévues dans notre proposition
+
+- Renvoyer le PNR à l’agence
+
+- Mettre à jour le dossier Galaxy comme un process normal afin que l’ADV puisse faire la facturation.
+
++-Vols Annulés 
+
+Même si le PNR est renvoyé à l’agence, il arrive parfois que nous soyons au courant en queues d’une annulation et d’un remplacement de vol pour un dossier IATA.
+
+Pour ces cas là : merci de prendre contact avec l’agence par téléphone et de s’assurer qu’elle dispose bien de son PNR sur son office ID.
+
+Attention de bien consigner votre appel en note dans le dossier GX.
+
+Dans le cas où l’agence ne serait pas joignable, lui envoyer un mail lui demandant de prendre connaissance de son PNR et de revenir vers nous via le suivi de commande si une action est à faire sur son PNR.
+
+En fonction de l’action à effectuer, se référer aux cas précédents pour la procédure.
+
+ 
+
+## Erreur de synchronisation dossier Resa IATA / alerte “Demande d’émission billet IATA sur dossier déjà existant”
+
+Définition : une erreur de synchronisation signifie que l’agence a complété le formulaire de demande d’émission sur notre site Internet, et a payé cette demande d’émission, mais qu’aucun dossier n’a été créé sur Galaxy.
++-Identifier un dossier en erreur de synchronisation
+
+Nous sommes informés d’une erreur de synchronisation Resa IATA de trois façons :
+
+- Sur l’onglet “alerte technique” de Galaxy
+
+- Par e-mail, sur booking@vltravel.com. Intitulé : “Resaneo – erreur réservation iata
+
+- Une alerte sur dossier, uniquement dans le cas où l’agence a complété une seconde fois le formulaire de demande d’émission, alors que nous avions déjà un dossier sur Galaxy.
+
+Traitement :
+
++-J'ai trouvé le dossier car il y avait une alerte sur Galaxy
+
+/!\ L’agence a complété une seconde fois le formulaire, alors que nous avons déjà un dossier GX pour le PNR. L’agence a donc été débitée deux fois sur son PME ou par CB, pour le même dossier.
+
+1 – Contacter l’agence par tel pour identifier :
+
+- si il s’agit d’une simple erreur
+
+- si celle-ci souhaite que nous intervenions de nouveau sur son dossier (demande de modification, de revalidation …) : si c’est le cas, l’assister pour qu’elle formule sa demande depuis le suivi de commande. Lui expliquer que le formulaire de demande d’émission ne doit être utilisé que pour la première émission de billets.
+
+2 – Classer le mail dans booking (fichier “alertes internes”).
+
+3 – Mettre une alerte au service administratif pour qu’ils remboursent l’agence sur son PME ou annulent sa CB.
+
++-J'ai trouvé le dossier car il y avait un mail sur booking uniquement
+
+/!\ Il s’agit d’une première demande d’émission. L’agence a mal renseigné le formulaire de demande d’émission. Le débit sur le PME ou sur la CB a été bien effectué.
+
+1. Rechercher le dossier sur GDS
+
+2. Aller sur l’onglet technique et synchroniser le dossier en corrigeant la ou les informations incorrectes.
+
+L’agence a pu se tromper sur l’une des infos suivantes :
+
+- Le GDS
+
+- Le PNR
+
+- Le nom de famille du passager n°1
+
+3. Aller sur l’onglet “Dossier” pour vérifier que le dossier s’est bien créé
+
+4. Traiter l’alerte technique une fois que le dossier est bien remonté et reprendre le traitement normal du dossier
+
+Pour toute question concernant le suivi de commande, se référer à la fiche Gravity “Modification ou ajout de prestation (hors demandes médicales)” en cliquant ici.
+</section>
+</article>
+</body>
+</html>

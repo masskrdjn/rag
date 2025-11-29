@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="3345">
+    <meta name="date" content="2016-08-02T13:05:49">
+    <meta name="modified" content="2024-05-06T14:38:45">
+    <meta name="slug" content="accords-et-refus-dintervention">
+    <meta name="categories" content="Alertes, RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/accords-et-refus-dintervention/">
+    <title>Accords et refus d’intervention</title>
+</head>
+<body>
+<article>
+<h1>Accords et refus d’intervention</h1>
+<section class="excerpt">Dernière mise à jour : 06/05/2024</section>
+<section class="content">
+Dernière mise à jour : 06/05/2024
+
+Lorsque nous envoyons une proposition contenu le lien d’acceptation (ou accept_link), le client a la possibilité, au choix :
+
+- D’accepter la proposition. Ce qui donne lieu à une alerte RESA automatique “Accord pour intervention – vérifier paiement”
+
+- De refuser la proposition. Ce qui donne lieu à une alerte RESA  automatique “Refus d’intervention”
+
+Le traitement de ces alertes dépend du cas de figure.
+
+ 
+
+## Accord pour intervention
+
++-Dossier en demande : KO, inconnues, pré-résa
+
+Agir du mode de règlement :
+
+- CB
+- Paiement comptant par virement (PME)
+- Autre : AGV en compte
+
+Un débit complémentaire doit être effectué (voir onglet récapitulatif).
+
+Si le client n’a pas effectué le paiement via le lien de paiement de la proposition :
+
+1. Envoyer un lien de paiement en utilisant l’action “Générer lien de paiement” sur Galaxy en faisant bien attention de mettre le bon montant à débiter.
+
+2. Doubler l’envoi d’un appel afin de prévenir qu’un lien de paiement a été envoyé et qu’il est préférable de procéder au règlement rapidement pour que nous puissions procéder à la confirmation de la réservation.
+
+3. Dès le paiement sera effectué sur le lien, une alerte à traiter nous préviendra sur le dossier : “Accès lien de paiement – VERIFIER paiement”.   Traiter l’alerte et passer à l’étape suivante.
+
+4. Mettre une alerte RESA en date du jour “****Dossier à confirmer et à émettre” (disponible dans les modèles d’alerte RESA)
+
+Un débit complémentaire doit être effectué (voir onglet récapitulatif).
+
+1. Débiter le PME de l’agence sur le back office en précisant la référence dossier dans « commentaires ».
+
+2. Si crédit insuffisant : contacter AGV par tel pour proposer un débit CB
+
+3. Après paiement, mettre une alerte RESA en date du jour “***Dossier à confirmer et à émettre”
+
+4. Passer l’alerte “accord pour intervention” en traitée.
+
+1. Utiliser le modèle d’alerte RESA en date du jour “***Dossier à confirmer et à émettre”
+
+2. Passer l’alerte “accord pour intervention” en traitée.
+
++-Proposition d'annulation
+
+1. Utiliser le modèle d’alerte RESA « Annulation totale à effectuer » ou “Annulation partielle à effectuer”
+
+2. Traiter l’alerte « Accord pour intervention »
+
+Si annulation totale :
+
+3. Cliquer sur l’action “Annulation de dossier” sur GX : cette action passe le dossier en statue annulé et mets en place les alertes pour l’ADV pour facturer l’annulation.
+
++-Proposition de modification
+
+Agir en fonction du canal de vente et du mode de règlement :
+
+- B2C - CB
+- B2B - CB
+- B2B - Paiement comptant par virement (PME)
+- B2B - Autre : AGV en compte
+
+Si le client n’a pas effectué le paiement via le lien de paiement de la proposition :
+
+1. Envoyer un lien de paiement en utilisant l’action “Générer lien de paiement” sur Galaxy en faisant bien attention de mettre le bon montant à débiter.
+
+2. Doubler l’envoi d’un appel afin de prévenir qu’un lien de paiement a été envoyé et qu’il est préférable de procéder au règlement rapidement pour que nous puissions procéder à la confirmation de la modification.
+
+3. Dès le paiement sera effectué sur le lien, une alerte à traiter nous préviendra sur le dossier : “Accès lien de paiement – VERIFIER paiement”. Traiter l’alerte et passer à l’étape suivante.
+
+4. Mettre une alerte RESA en date du jour “***Modification à effectuer [CIE]” (disponible dans les modèles d’alerte RESA)
+
+Si le client n’a pas effectué le paiement via le lien de paiement de la proposition :
+
+1. Envoyer un lien de paiement en utilisant l’action “Générer lien de paiement” sur Galaxy en faisant bien attention de mettre le bon montant à débiter.
+
+2. Doubler l’envoi d’un appel afin de prévenir qu’un lien de paiement a été envoyé et qu’il est préférable de procéder au règlement rapidement pour que nous puissions procéder à la confirmation de la modification.
+
+3. Dès le paiement sera effectué sur le lien, une alerte à traiter nous préviendra sur le dossier : “Accès lien de paiement – VERIFIER paiement”. Traiter l’alerte et passer à l’étape suivante.
+
+4. Mettre une alerte RESA en date du jour “***Modification à effectuer [CIE]” (disponible dans les modèles d’alerte RESA)
+
+1. Débiter le PME de l’agence sur le back office en précisant la référence dossier dans « commentaires ».
+
+2. Si crédit insuffisant : contacter AGV par tel pour proposer un débit CB
+
+3. Après paiement, mettre une alerte RESA en date du jour “***Modification à effectuer”.
+
+4. Passer l’alerte “accord pour intervention” en traitée.
+
+1. Mettre une alerte RESA en date du jour “***Modification à effectuer”.
+
+2. Passer l’alerte “accord pour intervention” en traitée.
+
++-Devis à la carte
+
+Agir du mode de règlement :
+
+- CB
+- Paiement comptant par virement (PME)
+- Autre : AGV en compte
+
+Si le client n’a pas effectué le paiement via le lien de paiement de la proposition :
+
+1. Envoyer un lien de paiement en utilisant l’action “Générer lien de paiement” sur Galaxy en faisant bien attention de mettre le bon montant à débiter.
+
+2. Doubler l’envoi d’un appel afin de prévenir qu’un lien de paiement a été envoyé et qu’il est préférable de procéder au règlement rapidement pour que nous puissions procéder à la confirmation de la réservation.
+
+3. Dès le paiement sera effectué sur le lien, une alerte à traiter nous préviendra sur le dossier : “Accès lien de paiement – VERIFIER paiement”.  Traiter l’alerte et passer à l’étape suivante.
+
+4. Mettre une alerte RESA en date du jour “****Dossier à confirmer et à émettre” (disponible dans les modèles d’alerte RESA)
+
+ 
+
+1. Débiter le PME de l’agence sur le back office en précisant la référence dossier dans « commentaires ».
+
+2. Si crédit insuffisant : contacter AGV par tel pour proposer un débit CB
+
+3. Après paiement, mettre une alerte RESA en date du jour “***Dossier à confirmer et à émettre”
+
+4. Passer l’alerte “accord pour intervention” en traitée.
+
+1. Mettre une alerte RESA en date du jour “***Dossier à confirmer et à émettre”
+
+2. Passer l’alerte “accord pour intervention” en traitée.
+
++-Proposition commerciale (geste co - réclamation)
+
+Basculer l’alerte au service commercial.
+
++-Cotation groupe
+
+En cas d’accord pour intervention suite à une cotation groupe, l’accord pour intervention arrivera directement au service ADV. Cet accord sera donc traité par le service ADV selon le process disponible ici en étape 4.
+
+Dans le cas d’une proposition de modification/d’annulation ou encore d’ajout de prestation, l’accord pour intervention arrivera en catégorie RESA : il faudra donc basculer l’alerte en catégorie Groupe
+
+Ci-dessous un schéma qui récapitule la marche à suivre selon les cas  :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2016/08/Schema-accord-pour-intervention-B2C-B2B-maj.png]
+
+## Refus pour intervention
+
++-Dossier en demande : KO, inconnues, pré-résa
+
+1. Passer l’alerte en “traitée”.
+
+2. Utiliser le bouton “annulation de dossier non confirmé”
+
+3. Envoyer le template de mail “Dossier sans suite”
+
+Attention si nous avons un paiement (pour les clients réglant en CB ou PME), mettre une alerte catégorie Administratif “XX CB” en à traiter. 
+
++-Proposition d'annulation
+
+Agir selon le cas :
+
+- Annulation suite à une modification horaire ou annulation de vol du fait du transporteur
+- Proposition de Void
+- Autre type d'annulation
+
+1. Contacter agence par téléphone pour recueillir sa demande.
+
+2. Mettre une note résumant la conversation téléphonique
+
+3. Mettre une alerte RESA résumant la demande de l’agence
+
+4.Traiter l’alerte “refus d’intervention”
+
+Émettre le billet si cela n’a pas été fait.
+
+Traiter l’alerte. Pas de suite au dossier.
+
++-Proposition de modification
+
+Vérifier si la proposition a été effectuée suite à une modification de plan de vol du fait de la compagnie :
+
+OUI : Contacter l’agence par téléphone et lui demander soit
+
+- de confirmer la MO horaire
+
+- de formuler via notre site une autre demande
+
+NON : Passer l’alerte en statut « Traitée »
+
++-Devis à la carte
+
+1. Passer l’alerte en “traitée”.
+
+2. Utiliser le bouton “annulation de dossier non confirmé”
+
+Attention, ne pas oublier d’annuler le PNR si un PNR a été créé. Si besoin, mettre alerte XX PNR après avoir procédé à l’annulation du dossier GX. 
+
++-Proposition commerciale (geste commercial - réclamation)
+
+Basculer l’alerte au service commercial.
+
++-Cotation groupe
+
+Basculer l’alerte en catégorie groupe.
+</section>
+</article>
+</body>
+</html>

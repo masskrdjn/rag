@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="3282">
+    <meta name="date" content="2016-07-25T10:27:16">
+    <meta name="modified" content="2017-12-19T14:37:28">
+    <meta name="slug" content="mise-en-production-nouveau-connecteur">
+    <meta name="categories" content="Fournisseurs/Connectivité">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/mise-en-production-nouveau-connecteur/">
+    <title>Mise en production nouveau connecteur</title>
+</head>
+<body>
+<article>
+<h1>Mise en production nouveau connecteur</h1>
+<section class="excerpt"></section>
+<section class="content">
++-Etape 1 - Développement technique (François)
+
+La partie développement est gérée par l’équipe SpeedMedia Services basée à Saint Etienne (spécialistes de SpeedTravel). François est leur seul interlocuteur et se charge de faire le lien avec notre fournisseur métier.
+
+Des tests, supervisés par François, sont systématiquement réalisés. En cas d’indisponibilité de celui-ci Elodie prend le relais.
+
+Avant la mise en production : il est impératif de préparer le terrain (voir étape 2). La mise en prod ne peut être faite sans cette seconde étape.
+
++-Etape 2 - Mise en place dans l'opérationnel (Transport) 
+
+1. Récupérer les informations suivantes auprès de François :
+
+- Code fournisseur SpeedTravel
+
+- Où tombent les résas : site B2B ou B2C? Récupérer les codes d’accès.
+
+- Numéro de téléphone et adresse e-mail de contact (Help Desk).
+
+- Mode de règlement fournisseur.
+
+- Quels mails reçus à confirmation de la résa (mail de confirmation et/ou facture).
+
+- Type de document de voyage : e-ticket ou convocation aéroport.
+
+2. Créer une fiche fournisseur sur Galaxy comme suit :
+
+- “Nom” : Nom du fournisseur. Si déjà existant pour du Low Cost par exemple, créer une seconde fiche en précisant qu’il s’agit d’une API. Voir vueling en exemple).
+
+- “Code” et  “Référence SpeedTravel” : code fournisseur SpeedTravel
+
+- Activation CB virtuelle : Non
+
+- Condition de règlement : à configurer. Voir avec admin si question.
+
+- Coordonnées : Mettre Téléphone et mail du Help Desk au minimum.
+
+3. Tester les codes d’accès B2B et les enregistrer dans Titan. Si ceux-ci impliquent que des codes d’accès nominatifs soient créés, contacter le service qualité.
+
+4. Envoyer un mail aux services Exec, admin et qualité pour prévenir que la mise en prod est imminente et donner toute la liste d’informations récupérées (voir n°1).
+
+5. Identifier si le connecteur permet de proposer la réservation des bagages supplémentaires et/ou des sièges en ligne. Si ce n’est pas le cas :
+
+- Obtenir le tarif du premier et second bagage
+
+- Obtenir la grille de prix des sièges
+
+- Communiquer ces informations au service qualité ou à Raphael pour mise en place d’un addon Resaneo
+
++-Etape 3 - Mise en production
+
+Prévenir toute l’entreprise lorsque le connecteur est en prod.
+</section>
+</article>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="6755">
+    <meta name="date" content="2024-12-05T10:39:02">
+    <meta name="modified" content="2025-08-06T12:43:54">
+    <meta name="slug" content="ancv-connect-les-particularites-de-traitement">
+    <meta name="categories" content="ADV, RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/ancv-connect-les-particularites-de-traitement/">
+    <title>ANCV Connect – Les particularités de traitement</title>
+</head>
+<body>
+<article>
+<h1>ANCV Connect – Les particularités de traitement</h1>
+<section class="excerpt">Dernière mise à jour : 06/08/2025</section>
+<section class="content">
+Dernière mise à jour : 06/08/2025
+
+ 
+
+La paiement en ANCV Connect permet aux particuliers de règler une partie ou la totalité de leur réservation en chèque vacances dématérialisés.
+
+En interne, le suivi de ces règlements se fait via l’interface Thunes. Vous trouverez ICI le guide d’utilisation de l’interface.
+
+## Processus de réservation
+
+Voici les différentes étapes du processus de réservation avec un paiement en ANCV connect :
+
+- Le client choisit de payer en ANCV Connect : il sélectionne ce mode de paiement sur notre site au moment de payer sa réservation
+
+- Redirection vers Thunes : Il est dirigé vers le site sécurisé de Thunes pour confirmer son paiement en insérant ses informations personnelles.
+
+- Validation chez Thunes : Le client valide le paiement avec Thunes
+
+- Retour sur le site de réservation : Le client revient sur notre site pour une confirmation dans l’attente de la confirmation de son dossier.
+
+- Notification à notre système : Thunes informe notre système que le paiement est validé (ou non). C’est cette étape qui peut parfois causer problème. En effet, la notification peut mettre du temps à arriver. Si la notification est trop tardive, cela génère une anomalie. (Voir plus bas, partie “Cas Particuliers”).
+
+- Débit et confirmation : Une fois que nous avons bien reçu la notification nous informant que le paiement est bien autorisé coté Thunes, notre système débite le client et confirme la réservation.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2024/12/processus-ANCV-Connect-1.png]
+
++-Les différents statuts et leur signification 
+
+– Created : son premier statut. la paiement est créé dès que l’on va/redirige chez Thunes | On ne reçoit pas de notification.
+
+– Payment_In_Progress : client a saisi sa CB, le paiement est en cours chez Thunes | On ne reçoit pas de notification.
+
+– Authorised : Thunes a validé le paiement, on va pouvoir le débiter. | On reçoit une notification.
+
+– Authorizing : Thunes est en train de débiter le paiement | On ne reçoit pas de notification.
+
+– Aborted : Paiement abandonné. Le client est parti / ne veut plus payer / session expiré. | On ne reçoit pas de notification
+
+– Refused : Paiement n’est pas validé par Thunes. | On reçoit une notification.
+
+– Error : Soucis divers | On reçoit une notification.
+
+– Cancelled : Paiement annulé. Au lieu de confirmer un paiement, on l’annule. Ça on ne le fait pas par MT, mais il est possible de le faire via le BO Thunes | On reçoit une notification.
+
+– Refunded : Le paiement a été remboursé par le BO Thunes. | On reçoit une notification.
+
+– Charged : Le paiement a été débité, tout est OK sur ce dernier | On reçoit une notification.
+
+Ces différents statuts vont apparaître dans les mails alertes mails ci-dessous.
+
+## Les différentes alertes mails que nous recevons
+
++-Cas 1 | Paiement reçu côté Thunes mais non réception notification Thunes ou réception trop tardive 
+
+Statut paiement dans BO Thunes : Autorisé
+
+Objet du mail (envoyé par le MT) :
+
+–&gt; Resatravel : THUNES MT, Le paiement du dossier *RT123456* a échoué
+
+Contenu du mail  :
+
+Problème paiement. Statut du paiement : Autorisé
+
+Référence de paiement : *référence transaction Thunes*
+
+————
+
+Action à mener : Voir rubrique “cas particuliers”
+
++-Cas 2 | Paiement reçu côté Thunes mais problème de réception notification Thunes puis VLC débite le client via BO Thunes suite confirmation client et dossier : 
+
+Statut paiement dans BO Thunes : Débité
+
+Objet du mail (envoyé par le MT) :
+
+–&gt; Resatravel : THUNES MT, Le paiement du dossier *RT123456*  a échoué
+
+Contenu du mail  :
+
+Problème paiement. Statut du paiement : Charged
+
+Référence de paiement : *référence transaction Thunes*
+
+————
+
+Action à mener : Voir rubrique “cas particuliers”
+
++-Cas 3 | Toute réception de notification Thunes dont on autorise pas l’IP 
+
+Statut paiement dans BO Thunes : il n’y en a pas, on est dans le cas d’une vérification d’IP (on ne cherche pas à regarder le paiement) : si on a reçu une notification d’une IP qu’on autorise pas, on bloque.
+
+Objet du mail  :
+
+–&gt; Resatravel  : THUNES MT, Le paiement du dossier *RT123456*  a échoué
+
+Contenu du mail  :
+
+Tentative de hacking
+
+Reference de paiement : *référence transaction Thunes*
+
+————
+
+Action à mener : Aucune action à mener de notre coté
+
++-Cas 4 | Paiement reçu côté Thunes mais réception trop tardive de la notification Thunes 
+
+Statut paiement dans BO Thunes : Charged
+
+Pour info : à partir du moment où Thunes nous informe que le paiement est OK chez eux, on lance le charge (= débit du paiement).
+
+Objet du mail  :
+
+–&gt; Resatravel / Resavoyage : THUNES MT, Le paiement du dossier *RT123456*  a échoué
+
+Contenu du mail  :
+
+Problème paiement. Statut du paiement : Charged
+
+Reference de paiement : *référence transaction Thunes*
+
+————
+
+Action à mener : Voir rubrique “cas particuliers”
+
++-Cas 5 | Tout paiements/notifications pour lesquels Thunes a refusé le paiement 
+
+Statut paiement dans BO Thunes : Refused
+
+Objet du mail  :
+
+–&gt; Resatravel : THUNES MT, Le paiement du dossier *RT123456*  a échoué
+
+Contenu du mail  :
+
+Problème paiement. Statut du paiement : Refused
+
+Reference de paiement : *référence transaction Thunes*
+
+————
+
+Action à mener : Aucune action à mener, mail à supprimer
+
++-Cas 6 | Erreur à la réception de la notification que l’on a pas su comprendre 
+
+Statut paiement dans BO Thunes : ce cas ressemble à un test ou un souci temporaire chez eux, peu probable.
+
+Objet du mail  :
+
+–&gt; Resatravel  : THUNES MT, Le paiement du dossier *RT123456*  a échoué
+
+Contenu du mail  :
+
+API Charge – Opération échouée – Code d’erreur 3000
+
+Reference de paiement : *référence transaction Thunes*
+
+————
+
+Action à mener : Prévenir OPM pour faire un ticket support Penguin
+
++-Cas 7 | Abandon du paiement par le client 
+
+Soit le client a fermé la fenêtre ou est parti plus d’une heure par exemple.
+
+Statut paiement dans BO Thunes : Aborted
+
+Objet du mail  :
+
+–&gt; Resatravel : THUNES MT, Le paiement du dossier *RT123456*  a échoué
+
+Contenu du mail  :
+
+Problème paiement. Statut du paiement : Aborted
+
+————
+
+Action à mener : Aucune action à mener, mail à supprimer
+
+## Cas particuliers et anomalies
+
++-Paiement OK &gt; Dossier Pré-réservé
+
+Nous avons reçu un mail (Cas 1 ; 2 ou 4) qui nous informe que nous avons un règlement pour ce dossier.
+
+Que faire ?
+
+Il faut trouver dans un premier temps le dossier initial concernée, sur SpeedTravel, puis le faire remonter dans Galaxy. Si pas de dossier, passer au cas suivant.
+
+Puis :
+
+- Pré-résa avec paiement pouvant encore être annulé
+- Pré-résa avec paiement ne pouvant plus être annulé
+
+Information importante : Nous avons un délai 4h pour annuler le paiement via Thunes. Passé ce délai, le débit ne peut plus être annulé.
+
+1- Vérifier le tarif. Si GDS, essayer de bloquer les places sur Stra, si ça ne fonctionne pas, demander à un BM de créer un PNR.
+
+- Si on est hors vente ou tarif/vol plus dispo : On annule immédiatement le dossier, on met une alerte pour XX le paiement avant la deadline de XX (ex : ***16h XX CB ANCV CONNECT), on prévient l’ADV, on envoie un mail au pax pour l’aviser qu’il va être re-crédité.
+
+- Si on est dans la vente : on continue le process ci-dessous
+
+2- Appeler le client pour lui demander s’il souhaite confirmer ou non la résa
+
+3- Doubler l’appel d’un mail : envoyer le template “Pré-Résa – Resa KO / Paiement OK”
+
+- Si le client souhaite confirmer la résa : s’assurer que ce dernier clique bien sur le lien du mail, puis confirmer la réservation en réservant les prestations auprès du fournisseur.
+
+- Si le client ne réponds pas/nous n’arrivons pas le joindre dans le délai imparti pour annuler le paiement ANCV Connect et que nous arrivons au moment limite pour annuler : il faut annuler le dossier et demander au service ADV l’annulation immédiate du paiement ANCV Connect. (ex : ***16h XX CB ANCV CONNECT – et on prévient l’ADV sur le forum.)
+
+Attention : le dossier doit être suivi et nécessite des relances téléphoniques si jamais le client manque de réactivité dans la confirmation de son dossier.
+
+- Si le client ne souhaite pas confirmer la résa : lui demander de refuser le lien prévu dans le mail préalablement envoyé. Une fois le refus d’intervention réceptionné, envoyer le template : Dossier sans suite et CB annulée et faire annuler le paiement après du service ADV. (ex : ***16h XX CB ANCV CONNECT – et on prévient l’ADV sur le forum.)
+
+1- Vérifier le tarif. Si GDS, essayer de bloquer les places sur Stra, si ça ne fonctionne pas, demander à un BM de créer un PNR.
+
+- Si on est hors vente : nous pouvons absorber une perte de 50€ maximum sur le dossier. En cas de dépassement plus important, se rapprocher d’un responsable.
+
+- Si vol et/ou tarif plus dispo : tenter de rattraper la vente en proposant un nouveau tarif avec une différence tarifaire.
+
+- Si on est dans la vente : on continue le process ci-dessous
+
+2- Appeler le client pour lui demander s’il souhaite confirmer ou non la résa
+
+3- Doubler l’appel d’un mail : envoyer le template “Pré-Résa – Resa KO / Paiement OK”
+
+Si le client souhaite confirmer la résa : s’assurer que ce dernier clique bien sur le lien du mail, puis confirmer la réservation en réservant les prestations auprès du fournisseur.
+
+Attention : le dossier doit être suivi et nécessite des relances téléphoniques si jamais le client manque de réactivité dans la confirmation de son dossier.
+
+Si le client ne souhaite pas confirmer la résa : lui demander de refuser le lien prévu dans le mail préalablement envoyé. Une fois le refus d’intervention réceptionné, envoyer le template : Dossier sans suite et CB annulée.
+
+Enfin, si nous n’arrivons pas joindre le client dans les 2 jours, considérer que ce dernier ne donne pas suite à la réservation.
+
++-Paiement OK &gt; Pas de dossier en face (TL/OPM) 
+
+Nous avons reçu un mail (Cas 1 ; 2 ou 4) qui nous informe que nous avons un règlement pour ce dossier et n’avons aucune trace de la réservation dans SpeedTravel.
+
+Que faire ?
+
+1 – Utiliser la référence RT00000 et rechercher la réservation dans le Megatunnel (Accès sur Syspass) et récupérer les infos de réservations.
+
+2 – Vérifier si nous pouvons toujours confirmer le dossier (dispo ; dates etc.)
+
+3 – Si oui, créer un dossier Galaxy manuellement pour faire remonter le dossier. Attention de bien veiller à le faire sur le bon canal de réservation, et il faudra au préalable créer une nouvelle fiche client dans l’onglet “particulier” de Galaxy.
+
+Si non, créer tout de même un dossier Galaxy et voir avec le service ADV pour le remboursement du client à prévoir.
+
+4 – Appeler le client pour lui demander s’il souhaite confirmer ou non la résa
+
+5 – Doubler l’appel d’un mail : envoyer le template “Pré-Résa – Resa KO / Paiement OK”
+
+Si le client souhaite confirmer la résa : s’assurer que ce dernier clique bien sur le lien du mail, puis confirmer la réservation en réservant les prestations auprès du fournisseur.
+
+Attention : le dossier doit être suivi et nécessite des relances téléphoniques si jamais le client manque de réactivité dans la confirmation de son dossier.
+
+Si vol et/ou tarif plus dispo : tenter de rattraper la vente en proposant un nouveau tarif avec une différence tarifaire.
+
+Si le client ne souhaite pas confirmer la résa : lui demander de refuser le lien prévu dans le mail préalablement envoyé. Une fois le refus d’intervention réceptionné, envoyer le template : Dossier sans suite et CB annulée.
+
+Enfin, si nous n’arrivons pas joindre le client dans les 2 jours, considérer que ce dernier ne donne pas suite à la réservation.
+
+Information importante : Nous avons un délai 4h pour annuler le paiement via Thunes. Passé ce délai, le débit ne peut plus être annulé.
+
+ 
+</section>
+</article>
+</body>
+</html>

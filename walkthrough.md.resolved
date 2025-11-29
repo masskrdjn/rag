@@ -1,0 +1,71 @@
+# RAG System Walkthrough
+
+## Overview
+We have successfully built a local RAG system using **Ollama**, **LangChain**, and **ChromaDB**.
+The system runs entirely on your machine (CPU-only mode) to ensure stability on your hardware.
+
+## Components
+- **LLM**: Llama 3.2 (via Ollama)
+- **Embeddings**: nomic-embed-text (via Ollama)
+- **Vector Store**: ChromaDB (local folder `chroma_db`)
+- **Orchestration**: LangChain
+- **API**: FastAPI (for enterprise deployment)
+
+## Local Usage (Windows)
+1. **Ensure Ollama is running**: Check the tray icon.
+2. **Run the main script**:
+   ```powershell
+   python main.py
+   ```
+3. **Ask questions**:
+   - "Quelle est la hauteur de la Tour Eiffel ?"
+   - "Qui a créé Python ?"
+
+## Enterprise Deployment (Linux)
+
+For production deployment on Ubuntu servers, we've created a complete guide:
+
+### Files Created
+- [DEPLOYMENT.md](file:///c:/coding/rag/DEPLOYMENT.md) - Complete step-by-step guide
+- [server.py](file:///c:/coding/rag/server.py) - FastAPI REST API server
+- [deploy.sh](file:///c:/coding/rag/deploy.sh) - Automated installation script
+- [rag-api.service](file:///c:/coding/rag/rag-api.service) - Systemd service template
+
+### Quick Start (Server)
+```bash
+# 1. Run automated deployment
+sudo bash deploy.sh
+
+# 2. Copy code files to server
+scp -r * user@server:/home/ragapp/rag-system/
+
+# 3. Setup systemd service
+sudo cp rag-api.service /etc/systemd/system/
+sudo systemctl enable rag-api
+sudo systemctl start rag-api
+
+# 4. Test API
+curl -X POST http://server-ip:8000/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Your question here"}'
+```
+
+### Key Features
+- ✅ CPU and GPU support
+- ✅ Systemd service for auto-start
+- ✅ REST API with FastAPI
+- ✅ Security hardening options
+- ✅ Nginx reverse proxy setup
+- ✅ HTTPS with Let's Encrypt
+
+## Troubleshooting
+- If it crashes, make sure no other heavy apps are running.
+- We forced CPU usage (`num_gpu=0`) to prevent video memory crashes.
+- For server issues, check logs: `sudo journalctl -u rag-api -f`
+
+## Next Steps
+1. Add your own documents to `data/` folder
+2. Customize the chunking strategy in [rag_pipeline.py](file:///c:/coding/rag/rag_pipeline.py)
+3. Add authentication to the API (see DEPLOYMENT.md)
+4. Set up monitoring and metrics
+

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="6568">
+    <meta name="date" content="2024-05-16T15:02:43">
+    <meta name="modified" content="2024-05-17T11:24:43">
+    <meta name="slug" content="alertes-verifier-operation-vol-vol-introuvable">
+    <meta name="categories" content="RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/alertes-verifier-operation-vol-vol-introuvable/">
+    <title>Alertes Vérifier opération vol / Vol Introuvable</title>
+</head>
+<body>
+<article>
+<h1>Alertes Vérifier opération vol / Vol Introuvable</h1>
+<section class="excerpt"></section>
+<section class="content">
+Dernière mise à jour : 16/05/2024
+
+Chaque jour, Galaxy interroge OAG, une base de donnée de vol, afin de vérifier si les horaires que nous avons sur nos dossiers sur Galaxy sont conformes à la base de données.
+
+Cette vérification est très importante : Elle permet en majeure partie d’éviter les risques de passagers plantés à l’aéroport, en raison d’une notification de modification que nous n’aurions pas traité ou encore d’une information qui ne nous serait jamais parvenue.
+
+Galaxy va interroger OAG à deux reprises :
+
+- 4 jours avant le départ du vol
+
+- 1 jour avant le départ du vol
+
+En cas d’anomalie, une alerte sera mise sur le dossier.
+
+Il y a deux types d’alertes :
+
++-Vérifier opération vol
+
+Exemple d’alerte : Vérifier opération vol : [ GX ] 16MAY Q4470 SCU MAD 04h25 18h45 —&gt; [ OAG ] 16MAY Q4470 SCU MAD 03h36 19h11
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2024/05/Gravity.png]
+
+Cette alerte signifie que l’horaire qui se trouve dans OAG n’est pas le même que celui que nous avons dans GX et qu’une vérification s’impose :
+
+- Ouvrir le dossier transporteur : ouvrir le PNR si c’est un dossier GDS ou entrer dans la réservation sur le site du transporteur. Pour les réservations Low-cost, si la réservation n’est pas accessible (Ex: Ryanair), il faut faire une recherche de vol sur le site de la compagnie afin de vérifier les horaires.
+
+- Une fois les vérifications effectuées :
+
+- Je constate que l'horaire a été modifié :
+- Je ne constate aucun changement
+
+Je mets à jour le dossier Galaxy en utilisant l’action “modifier un horaire de vol” et j’envoie une notification de changement au client. Si le vol est proche, je double le mail d’un appel sortant. 
+
+Si lorsque vous ressortez le PNR en GDS, vous ne constatez aucun changement, par mesure de sécurité, il est recommandé de pousser la recherche un peu plus loin afin d’écarter tout risque d’une mauvaise synchro du PNR avec la compagnie. Afin de pousser la recherche :
+
+- Faire une simulation de disponibilité sur le GDS
+
+- Essayer de retrouver la réservation directement sur le site du transporteur
+
+- Vérifier l’horaire du vol par le biais du format suivant (Galileo) : TT[codecie][N°vol]/[date de depart]
+
+- Contacter le fournisseur pour vérifier l’horaire avec lui si les 3 premières tentatives n’ont rien donné.
+
+Si toutes les étapes ci-dessus n’ont pas confirmé le changement horaire, laisser le dossier tel quel et ne rien changer. Traiter l’alerte et mettre une note dans le suivi de dossier pour indiquer les recherches que vous avez mené.
+
+En cas de doute, notamment pour les cas où l’horaire est avancé d’une heure par exemple, il est préférable d’alerter un Team-Leader sur les suites à donner à un dossier.
+
++-Vol introuvable
+
+Exemple d’alerte : [ GX ] 02OCT XC7602 AYT BRU 11h35 14h40 —&gt; [ OAG ] Vol introuvable
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2024/05/Gravity2.png]
+
+Cette alerte signifie que le vol que nous avons dans GX n’a pas été trouvé sur OAG. Pour écarter toute suspicion d’annulation de vol, une vérification s’impose :
+
+- Ouvrir le dossier transporteur : ouvrir le PNR si c’est un dossier GDS ou entrer dans la réservation sur le site du transporteur. Pour les réservations Low-cost, si la réservation n’est pas accessible (Ex: Ryanair), il faut faire une recherche de vol sur le site de la compagnie afin de vérifier si le vol existe toujours.
+
+- Une fois les vérifications effectuées :
+
+- Je constate que le vol a été annulé :
+- Je ne constate pas d'annulation
+
+Je préviens le client que son vol est annulé en utilisant l’action “Vol annulé” et en sélectionnant le vol annulé dans l’action.
+
+Si lorsque vous ressortez le PNR en GDS, vous ne constatez aucun changement, par mesure de sécurité, il est recommandé de pousser la recherche un peu plus loin afin d’écarter tout risque d’une mauvaise synchro du PNR avec la compagnie. Afin de pousser la recherche :
+
+- Faire une simulation de disponibilité sur le GDS
+
+- Essayer de retrouver la réservation directement sur le site du transporteur
+
+Si toutes les étapes ci-dessus n’ont pas confirmé l’annulation du vol, laisser le dossier tel quel et ne rien changer. Traiter l’alerte et mettre une alerte dans le suivi de dossier pour indiquer les recherches que vous avez mené.
+
+Attention : parfois cette alerte apparaît pour les vols charters qui ne sont pas captés par OAG. Si c’est un vol charter, il est inutile de pousser plus loin la recherche. 
+</section>
+</article>
+</body>
+</html>

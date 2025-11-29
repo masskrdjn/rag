@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="1107">
+    <meta name="date" content="2015-03-18T12:42:46">
+    <meta name="modified" content="2017-09-27T16:00:33">
+    <meta name="slug" content="emissions-dossiers-gds">
+    <meta name="categories" content="Alertes, RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/emissions-dossiers-gds/">
+    <title>Émissions dossiers GDS</title>
+</head>
+<body>
+<article>
+<h1>Émissions dossiers GDS</h1>
+<section class="excerpt"></section>
+<section class="content">
+## Emissions dossiers confirmés
+
+Les alertes demandant l’émission d’un dossier confirmés, prennent la forme suivante : “Dossier à émettre – Ref. Z7WNMI”. Si le robot d’émission n’a pas réussi l’émission, une alerte ” auto ticketing failed : verifier PNR et émettre” demande l’émission du dossier.
++-Code couleur du robot
+
+Un logo en forme de robot permet de savoir si le dossier est éligible à l’émission automatique ou non (visible depuis la liste des alertes et le pop-d’action “émission des billets”). Il y a un code couleur :
+
+- gris : non éligible à l’émission auto –&gt; faire une émission manuelle via GX (ou le GDS si dossier de la veille)
+
+- bleu : éligible à l’émission auto —&gt; ne pas prendre la main sur le dossier.
+
+- vert : émis automatiquement avec succès
+
+- rouge : émis automatiquement avec erreur —&gt; faire émission manuelle
+
+Les émissions manuelles interviennent lorsque le dossier n’est pas éligible à l’émission automatique.
+
++-Emissions automatisées
+
+- Règles d’exécution du robot
+- Dossiers éligibles à l'émission automatique
+- Échec de l'émission automatiques
+
+Un robot permet l’émission automatique de la plupart des dossiers. Ce robot passe sur les dossiers selon les conditions suivantes :
+
+- Entre 00h00 et 23h30 : les dossiers créés entre les 30 et 90 dernières minutes sont traités en dehors des horaires d’ouvertures ou toutes les 15 minutes pendant les horaires d’ouvertures.
+
+- Entre 23h30 et 00h00 : les dossiers créés dans les 90 dernières minutes sont traités
+
+Il n’y a qu’une seule tentative d’émission par dossier. En cas de succès :
+
+- L’alerte “dossier à émettre” passe en “traité”
+
+- Le document de voyage est envoyé automatiquement
+
+Les conditions actuelles d’émission sont :
+
+- Canal est Resaneo ou Look ou ResaTravel ou AirDispo
+
+- Au moins un fournisseur d’achat est Galileo ou Sabre obligatoire
+
+- Scoring inférieur à 100 (si existant)
+
+- Présence d’une référence STRA obligatoire
+
+- Présence de la note “Dossier à émettre” en statut “A traiter” obligatoire
+
+- Aucun message entrant sur le dossier ou de note à traiter (hors “Dossier à émettre” si créée dans la minute après la création du dossier)
+
+- Dossier confirmé et complet (dossiers en erreur de synchronisation exclus).
+
+- Personne n’a la main sur le dossier.
+
+Une alerte ” auto ticketing failed : verifier PNR et émettre” est crée en date du jour. Celle-ci précise la raison pour laquelle l’émission à échouée (si info disponible). L’émission se fait alors manuellement via le GDS (voir paragraphe suivant).
+
++-Emissions manuelles
+
+- Procédure
+- Dossier avec changement de tarif en achat
+- Dossier avec d'autres alertes actives
+
+Sur Galaxy, cliquer sur le bouton action “Emission de billet” :
+
+- Message “Emission effectuée avec succès” : Vérifier dans “Voir les détails de l’émission” que le montant total correspond bien à l’achat dans GX : si non, vérifier si l’émission est bien effectuée pour tous les passagers sur Galileo directement et émettre si besoin.
+
+- Message  d’erreur: se reporter au paragraphe suivant “Emissions manuelles”.
+
+- Prix d’achat égal ou inférieur au prix de vente : émettre
+
+- Prix d’achat supérieur au prix de vente : alerter immédiatement un(e) responsable d’équipe, ou la personne d’astreinte (samedi).
+
+/!\ Dans tous le cas : mettre à jour le prix d’achat sur Galaxy
+
+“Vérifier tarif YTH pour le passager: MRS. DUPOND MARIE”
+
+- Tarif jeune dispo et moins cher : Spliter si nécessaire (changement de classe), puis émettre avec le tarif jeune. Mettre à jour l’achat sur GX.
+
+- Pas de meilleur tarif : émettre via GX (bouton “émettre un billet”)
+
+“Aucun adulte sur cette réservation”
+
+Cette alerte s’affiche quand tous les passagers du dossier ont moins de 18 ans.
+
+Déterminer si mineur accepté sans service accompagnement, selon transporteur(s) :
+
+- oui : mettre une note sur le dossier expliquant que la compagnie autorise le pax à voyager seul et émettre le dossier via GX (bouton “émettre un billet”).
+
+- non : Appeler l’agence pour l’informer des conditions (possible ou non) et de la faisabilité de son dossier (UM, autre, coût, etc). Si le dossier donne lieu à un supplément, lui envoyer une proposition de modification explicitant le coût supplémentaire. Nous devrons encaisser la différence. Dossier doit être finalisé le jour même.
+
+Si notre client refuse de réserver le service UM pourtant obligatoire, proposer annulation sans frais dans la journée.
+“add-on bagage en soute à réserver”
+
+Voir fiche Gravity consacrée à ce sujet en cliquant ici
+
+“ATTENTION (…) VERIFIER horaire du vol”
+
+Exemple : “ATTENTION : vol AC1871 du 18/08/2015 – départ à 12h25 iso 12h15 – arrivée à 15h37 iso 15h27. VERIFIER horaire du vol avant envoi du document de voyage”
+
+1. sur le dossier en cours vérifier si horaires sur le dossier GX conformes aux horaires de la compagnie (cela devrait être le cas. Si non : contacter un/une Teamleader)
+
+2. Émettre le dossier normalement
+
+3. Aller sur l’onglet “produit”, ressortir tous les autres dossiers sur vol concerné, mettre une alerte en faisant un copier/coller du message “”ATTENTION : vol AC1871 du 18/08/2015 – départ à 12h25 iso 12h15 – arrivée à 15h37 iso 15h27.” Ces alertes seront traitées par une personne ayant les compétences nécessaires.
+
++-Traiter un dossier ou l'emission est impossible
+
+Informer un responsable de service (téléphone d’astreinte le samedi) pour demander prise de décision.
+
+Si nous décidons d’annuler sans frais :
+
+- Informer client par téléphone
+
+- Mettre une alerte “facturer annulation sans frais (émission impossible)” au service administratif, au jour J.
+
+## Emissions dossiers en devis ou en demande
+
+Les alertes demandant l’émission d’un dossier en devis ou en demande, prennent la forme suivante : “Dossier à émettre et à confirmer”.
++-Procédure
+
+1. Retarifier le dossier sur GDS. Pour vérifier si un meilleur tarif disponible est applicable : FQBB*ITX++-AB pour Galileo ou WPNCB pour Sabre.
+
+/!\ Pour les dossiers à la carte, faire une tarification standard (FQ pour 1G / WP pour 1S) si nous avons proposé un billet modifiable ou avec des conditions spécifiques (tarifs jeune, senior, UM …) et vérifier que les conditions tarifaires restent inchangées.
+
+2. Émettre depuis le GDS (TKPFCK/DTDAD pour Galileo W‡PQ‡A(code compagnie, selon tarification)‡FCK pour Sabre).
+
+3. Enregistrer le nouveau tarif sur Galaxy le cas échéant (onglet achat).
+
+4. Envoyer le document de voyage.
+
+5. Envoyer le template de mail “Confirmation de réservation”.
+
+6. Passer le dossier en statut “confirmé”.
+
+7. Traiter l’alerte “dossier à émettre”.
+
++-Dossier avec changement de tarif en achat
+
+- Prix d’achat égal ou inférieur au prix de vente : émettre (en cas de baisse, on garde la différence).
+
+- Prix d’achat supérieur au prix de vente : ne pas émettre, mettre à jour l’achat, supprimer la vente, envoyer une contre proposition par mail en utilisant le bouton cotation (préciser “contre proposition” dans l’intitulé et appeler l’agence pour lui expliquer ce qu’il se passe.
+
+## Emissions dossiers Resa IATA
+
+Voir fiche consacrée à ce sujet ici.
+</section>
+</article>
+</body>
+</html>

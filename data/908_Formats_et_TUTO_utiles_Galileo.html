@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="908">
+    <meta name="date" content="2014-08-21T09:56:27">
+    <meta name="modified" content="2024-04-25T13:54:48">
+    <meta name="slug" content="galileo-formats-utiles">
+    <meta name="categories" content="RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/galileo-formats-utiles/">
+    <title>Formats et TUTO utiles Galileo</title>
+</head>
+<body>
+<article>
+<h1>Formats et TUTO utiles Galileo</h1>
+<section class="excerpt">Cette rubrique contient quelques formats utiles, n’hésitez pas à en proposer de nouveaux par e-mail! Dernière mise à jour : 25/04/2024</section>
+<section class="content">
+Cette rubrique contient quelques formats utiles, n’hésitez pas à en proposer de nouveaux par e-mail!
+
+Dernière mise à jour : 25/04/2024
+
+## Les formats 
+
++-Faire une cotation de tarif avec ou sans bagage
+
+Pour avoir le tarif sur les mêmes classes, bag inclus : FQ:N
+
+Pour visualiser les différentes Fare Basis applicables sur une classe : FQA
+
+Autres formats généraux : FQ/BAG  ou FQBB/BAG
+
+## Particularités : 
+
+Exception Groupe Lufthansa (Branded Fares), cie OS, SN, LH :
+
+FQ-:BIZ
+
+FQ-:FLEX
+
+ FQ-:CLASSIC
+
+ FQ-:LIGHT
+
+Le détail des tarifs Flex se trouve sur le site pro Expert
+
+Exception pour la TAP Portugal :
+
+FQ-BASIC:P (tarif le moins cher avec une pièce)
+
+FQ-CLASSIC:P (tarif modifiable avec une pièce/ 2 pièces pour ACC et CKY)
+
+FQ-PLUS:P (tarif flex avec une pièce)
+
+Exception pour Air France/Iberia : 
+
+FQ/FXD 
+
+FQBB/FXD
+
+Exception pour Air Serbia, Air Austral, Corsair, Air Caraïbes :
+
+FQ*:BF2
+
+FQP2*:BF2*C04 pour un CHD
+
+Exception pour Tarifs PVT Air Canada 2 bagages en soute inclus
+
+FD10JUNPARYUL/AC-PRI-EDU20:P
+
+Tarif Tour désignateur TD : YSFR
+
+Tarification : FQ-:EDU20:P 
+
+Exception pour ITA  (CAI ; ALG ; TLV) :
+
+FQ**LBR
+
++-Format de tarification spécifique/tarif spécial
+
+Tarif  FAMILLE Air Algérie (OSRA) : FQ-FAMILLE
+
+ 
+
++-Vérifier la propriété d'un dossier avant/après émission
+
+- A réception du PNR
+- Après émission
+
+Sur Galileo, à réception du PNR il faut signer et faire ER :
+
+- Si nous avons toujours accès au PNR : nous avons bien la propriété du dossier
+
+- Si nous n’avons plus accès au PNR : nous n’avions pas la propriété du dossier
+
+Lorsqu’un dossier arrive chez nous, le PCC et le nom de l’agence apparaît en première ligne.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/02/Capture-1G_3.jpg]
+
+Après avoir fait ER et si l’agence nous a donné la propriété du dossier, cette information disparaît.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2017/02/Capture-1G_4.jpg]
+
+Consulter l’historique du dossier (*H) pour identifier quel est le format utilisé par l’agence lorsque celle-ci nous a basculé son dossier :
+
+- QEB/FLK/Y –&gt; l’agence nous a donné la propriété. “FLK” correspond à notre PCC de consolidation.
+
+- QEB/5D4X –&gt; l’agence a conservé la propriété et nous a basculé le dossier en queues.
+
++-FQBB selon type de cabine
+
+FQBB++-FIRST
+ Recherche du meilleur tarif première classe
+
+ FQBB++-PREMF
+ Recherche du meilleur tarif Premium First class
+
+ FQBB++-PREME
+ Recherche du meilleur tarif Premium Economy
+
+ FQBB++-BUSNS
+ Recherche du meilleur tarif Affaire
+
+ FQBB++-ECON
+ Recherche du meilleur tarif économique
+
+ FQBB++-AB
+ Recherche du meilleur tarif par type de cabine réservéPar exemple : Si un segment est réservé en économique et un autre segment en business, le système ira rechercher le meilleur tarif disponible sur ces vols dans le type de cabine correspondant.
+
++-Dupliquer un dossier
+
+Signer avant d’utiliser le format :
+
+REALLSALL : recrée un dossier avec les mêmes segments, mêmes pax
+
+RESALL : recrée un dossier avec les mêmes segments
+
+REALL : recrée un dossier avec les mêmes pax
+
++-Splitter un dossier
+
+DP 2 (pax n°2 à splitter)
+
+Signer
+
+F
+
+Signer
+
+ER
+
+ER
+
+*DV –&gt; donne le dossier splité
+
+Bien penser à renseigner les référence Gal et compagnies sur GX
+
++-Lier 2 dossiers
+
+Pour indiquer à la compagnie que 2 dossiers sont liés (ADT et CHD sur PNR séparés par exemple)
+
+SI.AF*LKRL.HK1-numéro de VL
+
+(AF : code IATA compagnie)
+
+Attention à bien utiliser la VL compagnie et PAS le PNR Galileo en référence
+
++-Trouver une compagnie éligible à l'émission des EMD
+
+Le format suivant permet de voir les compagnies sur lesquelles nous pouvons émettre des EMD : EMDP/M
+
+Ce format ne permet pas de faire la distinction EMD-A /EMD-S.
+
+Seul le fichier excel “Airline EMD FactSheet – Master”, téléchargeable sur Ask et mis à jour régulièrement par Galileo, le permet (pour trouver le fichier, faire une recherche par mot clé avec le nom du document).
+
++-Image Billet et EMD
+
+Image billet  : *TE / 0570123456789 (num EMD)
+
+Image EMD (sans avoir accès au PNR) : EMDD 0570123456789 (num EMD)
+
++-Gestion des Signatures (accès niveau 2)
+
+Depuis le passage sur le service bureau, les sign-on Galileo ne peuvent plus être créés  ou supprimés par nous. Il faut en faire la demande (en anglais) à TISSC@travelport.com, copie Thomas Pillet Thomas.Pillet@travelport.com.
+
+Il faut par contre autoriser le QSORT (trier les queues par ordre de date de départ) en faisant le format STD/{Signon}/** puis passer QSORT en N/Y
+
+Même chose pour la listes des compagnies qui nous ont donnée la plaque STD/{Signon}/** puis passer QSAATV en N/Y
+
++-Anciennes infos
+
+Création : voir process sur ask
+
+Suppression :  voir process sur ask
+
+Débloquer un loggin : voir process sur ask
+
+Après création, autoriser le QSORT (trier les queues par ordre de date de départ) en faisant le format STD/Z5D4X/{ED}/** puis passer QSORT en N/Y
+
++-Configuration des printers Galileo - Impossible d'émettre
+
+Pour vérifier les statuts des printer, le format est HMLM
+
+- Configurer les printers
+- Relancer les impressions web Galileo - Printers down
+
+Afin de finaliser la configuration d’une session Galileo, il faut faire le “linkage printers” c’est à dire de relier nos imprimantes virtuelles de Galileo à la nouvelle session.
+
+Chaque printer dispose d’une référence (en noir dans les formats ci-dessous).
+
+Nous avons 3 printers par PCC.
+
+1 – Émulation sur 5D4X  :
+
+HMLMB7A4F3DT
+
+HMLMB70B8BDI
+
+HMLMB7A4F4DA
+
+–&gt; Galileo doit à chaque fois dire que l’imprimante est “Up” si elle est “down”, il faudra la repasser en “Up”
+
+Ex : si le premier format ne marche pas HMOMB7A4F3-U
+
+2 – Émulation sur 3T4N :
+
+Même chose.
+
+HMLMC03B2BDT
+
+HMLMC03094DI
+
+HMLMC03B2ADA
+
+3 – Émulation sur 8U8N:
+
+Même chose.
+
+HMLMB86BAADT
+
+HMLMB7B1A1DI
+
+HMLMB7B1A2DA
+
+Les impressions Travelport sont envoyées par email sur booking@vlctravel.com
+
+Si les e-mails n’arrivent plus, vérifier que les imprimantes sont bien actives.
+
+Pour cela, il faut faire HMLD
+
+qui affichera :
+
+[Image: 1GHMLD | http://gravity.vlctravel.com/wp-content/uploads/2014/08/1GHMLD.jpg]
+
+Avec un ou plusieurs statuts sur « D » (Down)
+
+Pour remettre en état actif :
+
+HMOM[GTID]-U (Up)
+
+Le GTID est l’identifiant Galileo dans l’imprimante, composé de 6 caractères (ne pas utiliser le D à la fin)
+
+ainsi si B7A4F4 était en statut Down, pour le remettre Up : HMOMB7A4F4-U
+
+Refaire ensuite un HMLD pour vérifier que l’imprimante est bien Up
+
+Si cela ne fonctionne pas, contacter le service technique Travelport.
+
++-Loggin bloqués
+
+A ) Lorsque le message “sign on locked see authoriser” s’affiche, vous devez débloquer votre signature comme suit.
+
+1 – Ouvrir Galileo Hub et se connecter.
+
+2 – Menu Liens/Signon Reset
+
+3 – compléter le formulaire et réceptionner l’e-mail de Galileo sur votre boîte nominative.
+
+4 – Faire le format SON/{sign on}. Exemple pour Marie Dupont : SON/ZMD
+
+5 – Le texte suivant apparaît : &gt; KEYWORD? Taper votre Keyword à la suite et taper sur entrée.
+
+NB : Le keyword est votre date de naissance en format JJMMAA
+
+6 – Mettre votre nouveau de mot de passe (ne pas être en insert) et taper enter.
+
+B) Dans le cas d’un problème d’émulation, on peut basculer sur le PCC :
+
+SEM/PCC/AG
+
++-Formats de queues
+
+Savoir dans quelle(s) file d’appel(s) se trouve le dossier : QW
+
+accéder à un dossier, directement en mode queues : Q/{n° queue}+*RL-{PNR} ex : Q/16+*RL-47GD6
+
+Regarder l’horaire d’origine : *HI
+
++-Ajouter services spéciaux
+
+Ajouter un Kite Surf : SI.P1/SPEQ*KITE
+
++-Afficher un taux de change ROE à une date passée
+
+&gt;FZSCHF500EUR.19APR17 ( date d’emission du billet)
+
+RATES LAST UPDATED 19APR 09:45 AM
+
+EQU EUR469.00
+
+BANK SELLING RATE  1CHF EQUALS  0.936891    EUR
+
++-Affichage tarifaire avec un minimum XX% de pénalité
+
+FD30SEPPARLON/PE25
+
+&gt; Affichage tarifaire Paris/Londres avec au minimum 25% de pénalité
+
+FD30SEPPARLON/PE10
+
+&gt; Affichage tarifaire Paris/Londres avec au minimum 10% de pénalité
+
++-Insérer une carte de fidélité dans le PNR
+
+→ Afficher les cartes de fidélité d’un dossier
+
+*MM
+
+→ Insérer une carte de fidélité dans un PNR où il n’y a qu’un seul passager
+
+M.UA123456789
+
+→ Associer la carte de fidélité à un passager précis 
+
+M.P2/BA123456789
+
+→ Associer une carte de fidélité à un passager et un vol précis
+
+M.P2/AF123456789/DL  (introduction d’une carte AF pour un vol DL) 
+
+→ Annuler les cartes de fidélité d’un dossier
+
+M.@
+
+M.P1@
+
+Attention, il ne faut pas confondre carte de fidélité et carte d’abonnement : pour insérer une carte d’abonnement, ce ne sont pas les mêmes formats. (cf. ci-dessous)
+
++-Insérer une carte d'abonnement dans le PNR
+
+C.FD/AF123456789
+
+→ Associer la carte d’abonnement à un passager bien précis 
+
+C.FD/P2/AF123456789
+
++-Insérer une SR FOID dans le PNR
+
+SI.P[1]/SSRFOID[AF]HK1/PP[num passeport]
+
+SI.P[1]/SSRFOID[AF]HK1/NI[num de carte d’identité]
+
+ 
+
++-Tarification pour un tarif sans restriction (modifiable et/ou remboursable)
+
+Pour tarifer le PNR avec une FAREBASIS non restrictive, faire les formats suivants :
+
+FQA*ITX/FXD/PX10
+
+ou
+
+FQBB*ITX/FXD/PX10 (meilleur tarif non restrictif) 
+
+Bien vérifier la note tarifaire tout de même une fois la tarification effectuée.
+
++-Emission impossible - Cas particuliers
+
+Si vous rencontrez un problème d’émission avec les compagnies TK ou PC, il est fort probable que votre souci d’émission soit lié aux informations pax à insérer dans le PNR.
+
+Pour émette, insérer donc le contact mail et téléphone avec les formats suivants :
+
+TK :
+
+SI.P1/SSRCTCETKHK1/booking//vlctravel.com
+
+SI.P1/SSRCTCMTKHK1/nr téléphone
+
+PC :
+
+SI.P1/SSRCTCEPCHK1/booking//vlctravel.com
+
+SI.P1/SSRCTCMPCHK1/nr téléphone
+
+Dans la majorité des cas, il suffit de le faire pour 1 seul pax. Parfois, ça ne passe pas : essayez donc d’insérer pour chaque pax (Dans le format, remplacer P1 par P2 ou P3 et ainsi de suite) 
+
+## Les TUTO
+
++-Faire un devis de modification volontaire
+
+Tuto ici
+
++-Faire un devis de modification en point demi-tour
+
+Tuto ici
+
++-Confirmer une modification (alerte modification à effectuer)
+
+Cas 1 :  sans pénalité avec différence tarifaire sur le HT, sans différence de taxes.
+
+Autres cas à venir
+
+ 
+
+ 
+</section>
+</article>
+</body>
+</html>

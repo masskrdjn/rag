@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="6194">
+    <meta name="date" content="2023-04-06T15:47:11">
+    <meta name="modified" content="2024-11-18T16:15:04">
+    <meta name="slug" content="connecteur-sncf-77">
+    <meta name="categories" content="Fournisseurs/Connectivité">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/connecteur-sncf-77/">
+    <title>Réservation train via le Connecteur SNCF (77)</title>
+</head>
+<body>
+<article>
+<h1>Réservation train via le Connecteur SNCF (77)</h1>
+<section class="excerpt"></section>
+<section class="content">
+Dernière mise à jour : 18/11/2024
+
+## Généralités
+
+- City code (code client SNCF) : J410
+
+- Canal de vente : Resaneo uniquement
+
+- Connecteur et fournisseur sur GX : SNCF (77)
+
+- Produits vendus : TER, TGV InOUI, Ouigo
+
+## Traitement d’une réservation 
+
++-En cas de KO/Inconnue
+
+Il n’est pas possible de faire une repro via STRA. En cas d’échec de réservation (résa KO) il faut reprendre sur Amadeus Rail ou directement sur le site du transporteur. 
+
+Une partie des recherches faites auprès de la SNCF (connecteur SNCF 77) sont effectuées à l’aide d’un cache (afin de réduire le ratiolook2book.)
+
+Le souci est que ce cache est parfois incorrect au niveau des horaires des trains. Jusqu’à présent, si une réservation était tentée sur un train dont l’horaire n’était pas correct, la réservation tombait KO (train plus dispo).
+
+Une mise a jour a été effectuée afin d’accepter une variation de 15min entre le départ proposé au client lors de sa recherche et l’horaire de départ réel obtenu lors de la résa.
+
+Si un tel cas survient, la réservation est effectuée auprès de la SNCF, mais la presta tombera en statut INCONNU et la résa s’interrompt. Le client a un dossier Resaneo “En cours”.
+
+Le dossier sera enregistré dans STRA tel que le client l’a vu/réservé. Le message d’alerte vous indiquera les horaires réellement obtenus lors de la réservation auprès de la SNCF. Vous avez une référence dossier sur le dossier STRA.
+
+Exemple :
+
+Ce que le client à vu
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2023/04/Image1.png]
+
+Les horaires réels
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2023/04/Image2.png]
+
+Vous devrez alors reprendre/finaliser le dossier manuellement et faire les émissions nécessaires va Galaxy.
+
+Il faudra notamment modifier l’horaire du train pour y renseigner l’horaire réel (puisque la synchro se fera sur les horaires de STRA : ceux vu par le client et non pas les horaires confirmés)
+
+Attention pour les cas ou les trajets sont autonomes (deux PNR).
+
+Il est impératif que l’émission se fasse via Galaxy (pour la récupération des E-Billet). Pour que cela fonctionne, il faut passer la prestation transport STRA en OK, sans quoi Galaxy vous enverra un message d’erreur dès que vous utiliserez l’action “Emission de billet”. Cela peut être fait après ou avant la synchro avec GX, ça n’a pas d’importance.
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2023/04/sncf4.png]
+
+ 
+
++-Acte d'Après vente sur le dossier : Annulation, Modification
+
+- Demande d'annulation
+- Demande de modification
+- Modification/Annulation involontaire: Grève
+
+## Le client demande l’annulation de sa réservation
+
+En cas d’annulation volontaire, vous pouvez utiliser l’action “Annulation Train” sur Galaxy.
+
+L’action consulte “en temps réel” le dossier SNCF. Les infos affichées sont alors “live” et à l’image de ce qui a été réservé sur le dossier.
+
+Cliquer pour ouvrier l’action :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2023/04/sncf1.png]
+
+Puis tarifer l’annulation :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2023/04/sncf2.png]
+
+Si ce n’est que pour un devis d’annulation, vous pouvez cliquer sur annuler, aucune action n’a été faite sur le dossier SNCF.
+
+Pour valider l’annulation du dossier auprès de la SNCF, cliquer sur “Lancer l’annulation”.
+
+L’annulation est effectuée.
+
+Si vous obtenez un message d’erreur, alerter un responsable (TL;OPM)
+
+## Le client demande la modification de sa réservation
+
+Nous n’avons pas d’interface permettant d’effectuer un devis de modification.
+
+Néanmoins, afin de calculer le coût de la modification, vous pouvez calculer le coût d’annulation du dossier initial (via l’action annulation train), et d’un rachat de billet (via Amadeus Rail ou le site transporteur directement).
+
+Le delta restant correspond à la différence tarifaire à payer par le client, à insérer dans votre devis de modification.
+
+Cas particulier : OUIGO. Les réservations OUIGO peuvent être modifiée sur le site OUIGO directement, par nous ou pas le client directement. Devis possible sur le site. 
+
+## La réservation est impactée par une irrégularité
+
+Le client a reçu l’information par SMS de l’annulation de son train et demande l’annulation de sa réservation : utiliser l’action “annulation train” (CF process “Demande d’annulation). L’action consulte en temps réel le dossier et prendra en compte l’annulation du train, et donc l’annulation sans frais du dossier. Si l’action prends des frais : prévenir un responsable. (TL; OPM)
+
+Si le client souhaite modifier son train : nous ne pouvons pas modifier sans frais son train. Nous pouvons lui faire un devis (Cf process plus haut “demande de modification”) qui comprendra une éventuelle différence tarifaire. Pour une modification sans frais suite annulation de train : la modification doit être faite en gare, soit à un guichet, soit en borne SNCF).
+
+Dans le cas d’un retard de plus de 3 heures, le client peut bénéficier d’un dédommagement. Le client doit s’adresser directement à la SNCF. Nous ne pouvons pas faire cette démarche à la place du client.
+
++-Changements d'horaires, d'itinéraire, grèves ou évènements spéciaux
+
+Il n’y a pas de système de queues sur le Rail. En cas de changement horaire ou autre intervenant sur un train, le passager est directement prévenu par SMS, les coordonnées du passager étant renseignés au moment de la réservation.
+
+Un mail est également envoyé sur booking@vlctravel.com, mais pas de traitement spécifique de ce mail qui peut être placé dans la corbeille directement.
+
+## Spécificités du produit train
+
++-Carte de réduction
+
+Les cartes de réductions sont acceptés et peuvent être prises en compte au moment de la réservation si et seulement si elles sont précisées.
+
+Sur le site de Resaneo, sur le moteur de recheche, il est possible d’indiquer avec quelle carte de réduction le client voyage :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2023/04/sncf3.png]
+
++-Placement dans le train
+
+Le choix du placement est possible au moment de la réservation sur notre site.
+
+Les sièges ne sont plus modifiables une fois la réservation effectuée.
+
++-E-billet/Cas particulier OUIGO
+
+Une fois l’émission effectuée sur Galaxy, un E-billet est automatiquement généré et inséré dans le suivi Galaxy. Ce document doit impérativement être envoyé au client.
+
+Le client peut également retrouver sa réservation en borne SNCF.
+
+Cas particulier : OUIGO. L’E-billet doit obligatoirement être présenté au moment d’embarquer à bord du train. C’est pourquoi, une fois la réservation effectuée, nous envoyons au client la procédure afin qu’il puisse récupérer lui même ses billets. Les E-billets sont disponibles à partir de 4 jours avant départ. Plus d’info ici
+
++-Bagage(s)
+
+Vous trouverez via les liens ci-dessous la réglementation des bagages en fonction du transporteur :
+
+Eurostar; Thalys : ici
+
+TGV Inoui : ici
+
+Ouigo : ici 
+
+/!\ Il n’y a que sur Ouigo que nous pouvons ajouter un bagage supplémentaire sur la réservation. (sur le site de Ouigo directement) 
+
+ 
+
+## Demandes spéciales
+
++-Demandes ALC/UM
+
+Nous ne faisons pas de propositions ALC ou UM. Les réservations doivent être effectuées sur notre site Internet directement.
+
++-Personnes en fauteuil roulant
+
+La SNCF a un site Internet dédié à cette question : accessibilite.sncf.com
+Les personnes ayant un taux d’incapacité de + 80% doivent obligatoirement être accompagnées par un autre voyageur.
+
+Ce service est gratuit, si le passager est éligible au service.
+
+Les assistances pour personnes à mobilité réduite ne sont pas disponibles dans toutes les gares.
+
+- Personnes éligibles
+- Détail du service accès plus
+- Gare proposant le service d'assistance personnes à mobilité réduite
+
+Les pax peuvent en bénéficier sous certaines conditions :
+
+- Titulaire d’une carte d’invalidité civile, de priorité ou de stationnement.
+
+- Titulaire d’une carte « réformé/pensionné de guerre ».
+
+- Pax utilise un fauteuil roulant dans sa vie quotidienne et se présentera en gare avec son propre fauteuil.
+
+Cette prestation s’appelle le “Service Accès Plus” pour les TGV et inter-cités.
+
+Le service inclus : 
+
+- Départ : l’accueil en gare 30 minutes avant le départ du train l’agent de la gare conduit le pax jusqu’au siège dans le train.
+
+- En route : Le chef de bord est prévenu au bon déroulement du voyage
+
+- Arrivée : Un agent vient chercher le pax à sa place et conduit celui-ci jusqu’à la sortie de la gare. En cas de correspondance, un agent vient chercher le pax pour l’accompagner jusqu’à son siège dans le train suivant.
+
+- Portage d’un seul bagage de 15kg maximum.
+
+La liste des gares est disponible sur le site accessibilité.sncf.com
+
++-Velo
+
+Deux solutions s’offrent au pax :
+
+- plié ou démonté et rangé dans une housse, le vélo* est accepté gratuitement, dans la limite des places disponibles, à bord de tous les trains. Considéré comme un bagage à main, le vélo sous housse doit être étiqueté et ne doit pas excéder les dimensions maximales autorisées : 120 cm de hauteur pour 90 cm de largeur
+
+- à bord de la plupart des trains, des espaces dédiés “VEP” repérables par un pictogramme vélo vous permettent, dans la limite des places disponibles, de voyager avec votre vélo*
+
+Réservation auprès de la SNCF directement par le client.
+
+*Seuls les vélos standards sont acceptés à bord des trains. Le transport des vélos couchés, des tricycles, des tandems et des remorques de toute nature n’est pas autorisé.
+
+Pour plus d’infos, cliquez ici
+
+Cas particuliers : Pour Thalys, Eurostar, Ouigo, voir directement sur les sites concernés
+
++-Chiens et petits animaux domestiques
+
+- Le chien ou animal de compagnie transporté en cage
+- Chien en laisse
+- Chien guide d'aveugle ou d'assistance
+
+Condition de transport : sac ou un panier (45 cm x 30 cm x 25 cm maximum) obligatoire.
+
+Tarif :  7€ (TGV, Intercités)
+
+Process : La réservation ne peut se faire qu’auprès de la SNCF directement par le client.
+
+Plus d’infos ici
+
+Plusieurs animaux de petite taille dans un même contenant si le poids total n’excède pas 6 kilos (ex : plusieurs poissons dans un bocal). On ne taxe alors qu’un seul contenant.
+Cas particuliers : Pour Thalys, Eurostar, Ouigo, voir directement sur les sites concernés
+
+Condition de transport : Animal doit être muselé tout au long du trajet.
+
+Tarif :  à vérifier en fonction du type de train.
+
+Process : La réservation ne peut se faire qu’auprès de la SNCF directement par le client.
+
+Plus d’infos ici
+
+Cas particuliers : Pour Thalys, Eurostar, Ouigo, voir directement sur les sites concernés
+
+Il peut voyager gratuitement au pieds de la personne qui voyage et sans billet à bord de tous les trains SNCF.
+
++-Services additionnels SNCF non gérés par Resaneo
+
+Nous ne traitons pas les demandes suivantes : Auto Train, Junior &amp; Cie (UM), Les Espaces de jour avec Espace Family, Espace Calme,Sens de la marche, Espace enfant (Intercités de jour uniquement), Bagages à domicile
+
+## Informations pratiques 
+
+Pour suivre l’avancée de nos demandes de détaxes : c’est ici
+
+ 
+
+ 
+</section>
+</article>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="2977">
+    <meta name="date" content="2016-06-30T11:44:15">
+    <meta name="modified" content="2020-12-04T10:27:13">
+    <meta name="slug" content="faire-une-dar">
+    <meta name="categories" content="RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/faire-une-dar/">
+    <title>Faire une DAR</title>
+</head>
+<body>
+<article>
+<h1>Faire une DAR</h1>
+<section class="excerpt"></section>
+<section class="content">
+Dernière mise à jour : 04/12/2020
+
+Attention : Si un billet a déjà été échangé, il faut toujours faire la DAR sur le dernier numéro de billet émis, soit, le billet où les segments de vols sont OPEN. Concernant les taxes, il suffira simplement de reprendre les taxes du billet initial. 
+
++-Faire une DAR manuellement
+1. Afficher l’image billet :
+
+- Sur le BSP link, aller dans “consultations document” / “document de renseignement”.
+
+- Saisir le numéro de billet, sans le code compagnie. (ex : billet AF 057-123456789, ne saisir que 123456789. )
+
+- Cliquer sur “consultation détaillée” : l’image billet d’affiche.
+
+2. En bas de page, cliquer sur “Émettre les demandes / autorisations de remboursements”afin d’afficher le masque de DAR Préremplis.
+
+3. Remplir le cadre “reason for refund” :
+
+- choisir l’objet “predefined reason” correspondant à notre demande.
+
+- Compléter le texte pré-défini en précisant le dossier GX et la ref PNR compagnie (voir exemple ci-dessous)
+
+[Image: DAR 1 | http://gravity.vlctravel.com/wp-content/uploads/2016/06/DAR-1.png]
+
+4. Si nous avons un code d’autorisation (ou waiver code), l’insérer dans l’encadré “waiver code”, situé à droite du numéro de billet sur lequel on demande le remboursement. Voir exemple ci-dessous :
+
+[Image: DAR 2 | http://gravity.vlctravel.com/wp-content/uploads/2016/06/DAR-2.png]
+
+5. Remplir le détail des montants à rembourser, taxes et pénalités. Pour pouvoir valider la DAR il faut que :
+
+- Le montant « cash amount » soit égal au montant « refund to passenger ». Si ce n’est pas le cas, corriger le montant « cash amount».
+
+- En cas de demande de remboursement de taxes, cliquer sur « équiper », sélectionner les taxes remboursables et cliquer sur « populate selected ».
+
+/!\ Si le billet a été échangé, il est possible que les montants des taxes ne soient pas renseignés. Dans ce cas, il faut les remplir manuellement, en allant chercher les taxes sur l’image du premier billet (accessible en BSP link si plus en GDS) et ajouter également la balance de taxes effectuée lors de l’échange.  Le montant du hors taxes doit être celui du dernier billet émis, sauf si c’était un échange à zéro, auquel cas, prendre le HT du premier billet.
+
+6. Vérifier le masque et cliquer sur “Issue”. Cela génère le message ci-dessous.
+
+/!\ Si nous avons eu un accord commercial écrit mais pas de « code d’autorisation », il est préférable de joindre le mail reçu. Pour se faire, cliquer sur le lien « You can now attach files to the document » et télécharger le mail.
+
+[Image: DAR 4 | http://gravity.vlctravel.com/wp-content/uploads/2016/06/DAR-4.png]
+
++-Utiliser le DARBOT via Galaxy
+
+Le DARBOT est une nouvelle action disponible afin de simplifier et de rendre plus rapide l’action de faire une DAR.
+
+Pour faire une DAR avec DARBOT :
+
+- Cliquer sur le bouton “Remboursement billet”
+
+- Remplir le formulaire :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2016/06/DARBOT-1.png]
+
+Si le système n’a pas rempli automatiquement la partie “numéro de billet”, cliquez sur “Ajouter un billet” pour ajouter les numéros de billet à rembourser.
+
+Attention, si remboursement partiel, pensez à bien retirer les numéros de billet qu’il ne faut pas rembourser.
+La partie “Message” et “Waiver Code” est également à compléter en fonction du dossier : remboursement exceptionnel avec Waiver code, remboursement d’un trajet seulement…etc.
+
+3. Une fois que le formulaire est complété en sa totalité, cliquez sur “Valider”.
+
+Une fois cette étape effectuée, le robot va s’occuper lui même de faire la demande de remboursement via BSP puis laisser une trace sur le dossier avec les numéros de billet, numéro de DAR, les montants HT et de taxes ainsi que le statut de la demande :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2016/06/DABORT-retour.png]
+
+Il se peut toutefois que la DAR ne soit pas généré, dû à un problème technique, ou refuser par le transporteur. Dans ce cas, Galaxy va générer l’alerte suivante :
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2016/06/DARBOT-2.png]
+
+ Il faut reprendre le dossier et analyser pourquoi il y a eu échec :
+
+- Soit refaire la dar manuellement
+
+- Soit utiliser de nouveau le DARBOT en veillant bien à utiliser les bons numéros de billet (qui sont en OPEN et non les billets EXCH si il y a eu revalidation au prélable)
+
+- Soit revoir avec le transporteur sous quelle forme nous pouvons demander le remboursement : DAR ou remboursement automatique.
+
+- Ne pas hésiter à solliciter l’aide du service transport si le dossier se trouve dans une impasse.
+
++-Je fais une DAR manuelle ou j'utilise le DARBOT ?
+
+Dans la majorité des cas, le DARBOT peut et doit être utilisé.
+
+Toutefois, il y a quelques cas particuliers où le DARBOT ne peut pas être utilisé et qu’il est impératif de passer par une DAR manuelle :
+
+- Demander le remboursement d’un EMD-S Ancillaries (Bagages, sièges…)
+
+- Demander le remboursement d’un EMD d’Avoir
+
+- Le billet a déjà été réémis une fois (suite SC ou autre ….)
+</section>
+</article>
+</body>
+</html>

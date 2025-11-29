@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="2914">
+    <meta name="date" content="2016-06-29T09:02:23">
+    <meta name="modified" content="2023-05-11T14:29:44">
+    <meta name="slug" content="pointage-financier">
+    <meta name="categories" content="ADV">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/pointage-financier/">
+    <title>Pointage financier</title>
+</head>
+<body>
+<article>
+<h1>Pointage financier</h1>
+<section class="excerpt">Dernière mise à jour : 11/05/2023</section>
+<section class="content">
+Dernière mise à jour : 11/05/2023
+
+## 
+
+## Traitement du BSP Link
+
+Afin de contrôler les remboursements des billets et les demandes de remboursement des taxes aéroport, le service ADV exploite le rapport communiqué quatre fois par mois par le BSP via BSPlink. Cette tâche est effectuée les 4, 11, 19 et 27 de chaque mois.
+
++-Accès au rapport L’accès au rapport s’effectue via BSPlink (les accès sont à demander à ADV ) à partir de FICHIERS/Télécharger, se nomme « Agent Billing Analisys » et est disponible selon les décades suivantes :
+
+- Le 11 pour la décade du 01-07
+
+- Le 19 pour la décade du 08-15
+
+- Le 27 pour la décade du 16-23
+
+- Le 04 pour la décade du 24-fin du mois de M-1
+
+Le rapport est à télécharger et à enregistrer sous U:\VLC_TRAVEL\ADV\Informations Fournisseurs\BSP France\BSP Relevés dans l’année et le mois traité
+
++-Présentation du rapport
+
+L’Agent Billing Analysis est l’analyse des ventes IATA de la période. Il regroupe les ventes, les ADM (Mémos de Débit d’Agence), les DAR (Direct Automatic Refund, remboursements automatiques via GDS), les remboursements manuels et les EMD (Electronic Miscellaneous Document).
+
++-Exploitation du rapport
+
+Le service ADV vérifie les DAR et les remboursements manuels.
+
+La constatation du remboursement par la compagnie aérienne sera mentionnée sur le dossier afin de réajuster l’achat et rembourser l’agence de voyage si elle en a fait la demande.
+
+Afin de retrouver le dossier correspondant, les numéros de billets dans le rapport permettent de retrouver le nom des passagers ainsi que le PNR sous CONSULTATIONS DOCUMENT/Document de Renseignement/Consultation détaillée.
+
+Une alerte “ADV , à traiter” doit être mise dans le dossier avec les éléments suivants : Montant remboursé, période du rapport, lignes de remboursement copiées collées du relevé, par exemple : ok BSP PERIODE: 4/06/2016 R2033 02/07/16 DE 24/06/16 A 30/06/16 760 9710877629 0 12 27/06/16 372,81 0,50 372,81 RF760 9710877629 0 760 9710877630 1 12 27/06/16 372,81 0,50 372,81 RF760 9710877630 1 760 9710877631 2 12 27/06/16 372,81 0,50 372,81 RF760 9710877631 2
+
++-Relance des fournisseurs
+
+Si des remboursements sont en attente, le service ADV doit relancer les compagnies aériennes, depuis Galaxy. Si la fiche fournisseur ne contient pas le contact, le renseigner, puis envoyer le mail depuis Galaxy en sélectionnant booking@vlctravel.com comme expéditeur du mail.
+
+## Traitement de la banque
+
++-VIR SEPA RECU, REJET PRLV et IMPAYE CARTE
+
+Aller sur Exabanque, [à modifier selon process]
+
+Tous les Virements comptabilisés s’affichent, sélectionner Afficher “tous” puis cliquer sur “CSV” pour exporter le fichier à traiter, enregistrer le fichier dans  U:\VLC_TRAVEL\ADV\Relevés virements et CB pour que les agents ADV puissent traiter les virements.
+
+- Traiter les virements
+- Traiter les rejets de prélèvements 
+- Traiter les IMPAYE CARTE 
+ 1. Dans l’onglet Règlements de Galaxy, cliquer sur Ajouter un règlement, renseigner les différents champs :
+
+- Montant = Montant du virement
+
+- Client = Sélectionner une agence ou un centre payeur
+
+- Le mode de règlement se renseigne automatiquement, s’il n’est pas correct sélectionner “Virement”
+
+- La date de règlement se renseigne automatiquement –&gt; La date renseignée sera fausse car ce sera la date de la prochaine échéance ou la date du jour, il faut donc mettre la date de valeur indiquée sur le fichier
+
+- Référence : n° de factures ou de GX si cela est renseigné dans le détail du Virement
+
+- Commentaire : Libellé du Virement –&gt; S’il s’agit d’une agence en PME, copier-coller le libellé du Virement dans Référence et le texte affiché sur Resaneo, une fois le PME crédité, dans Commentaires
+
+- Valider et lettrer le règlement si celui-ci correspond à un relevé ou à un dossier –&gt; S’il s’agit d’une agence en PME, le lettrage s’effectuera plus tard (cf.Vérification des PME)
+
+2. Créer une alerte :
+
+- Dossier groupe : alerte “Groupes , à traiter” en date du jour avec un copier/coller  de tout le détail du virement dans l’alerte sur le dossier concerné.
+
+NB : Il s’agit d’un virement pour régler l’acompte ou le solde d’un groupe.
+
+- Virement fournisseur : alerte catégorie ADV en date du jour avec un copier/coller  de tout le détail du virement.
+
+/!\ S’il s’agit d’un règlement hors Galaxy, vérifier dans le tableau des refacturations (M:\Service Administratif\Refacturation prestataire\Tableau suivi refacturation prestataire_2016) quelle facture règle le virement et renseigner le tableau.
+
+Une fois tous les virements enregistrés dans Galaxy, renseigner le tableau de Suivi des Virements : M:\Service Administratif\Fichiers de suivis\Suivis Quotidien Virements BNP + Version papier
+
+ Si un rejet apparaît en banque, agir au plus vite auprès de l’agence et sur Resaneo :
+
+- Vérifier le motif du rejet : https://entreprises.bnpparibas.fr/rsc/websites/e-banking-transactionnel/documents/pdf/guide-utilisateur-sepa.pdf
+
+- Contacter l’agence pour prévenir du rejet de prélèvement et passage en CB
+
+- Mettre l’agence en paiement par CB sur Resaneo et sur Galaxy
+
+- Envoyer un mail à l’agence pour la prévenir du changement de mode de règlement
+
+- Voir avec agence comment solder les dossiers impactés par le prélèvement
+
+Sur Galaxy :
+
+- Mettre l’étiquette « Prélèvement rejeté » sur les dossiers concernés par le rejet de prélèvement
+
+- Mettre une alerte de type ADV« A traiter » sur le ou les dossiers concernés par le rejet en reprenant le détail du rejet visible en banque :
+
+REJET PRLV SEPA Date : 22/04/2016 Valeur : 22/04/2016 Introduction : 22/04/2016 Statut : Comptabilisé Au débit : -9 221,28 EUR REJET PRLV SEPA MAHALA ECH/210416 MOTIF/AM04 MDT/9204 CORE REF/20160414092134-63921 SEQ/RCUR »
+
+- Dans l’onglet Règlements de Galaxy, aller sur le règlement concerné par le rejet, supprimer le lettrage existant de ce règlement
+
+- Créer un règlement négatif sur Galaxy :
+
+- Ajouter un règlement
+
+- Sélectionner l’agence concernée par le rejet
+
+- Sélectionner mode de règlement « Virement »
+
+- Renseigner la date de valeur du REJET
+
+- Dans commentaire, renseigner le détail du rejet de prélèvement
+
+- Valider
+
+- Facturer 40€ de frais sur un des dossiers concernés par le rejet de prélèvement
+
+- Si règlement en CB : appeler agence pour procéder au règlement des dossiers concernés par le rejet (montant rejeté + 40€ de frais de rejet)
+
+- Si règlement en pvt (suite accord direction) : créer un nouveau règlement en prélèvement (montant rejeté + 40€ de frais de rejet)
+
+- Si règlement en virements : créer des alertes sur Galaxy pour vérifier la bonne réception des virements, relancer l’agence par tel et/ou par mail pour lui rappeler de payer selon les dates convenues (prévenir la direction si pas de nouvelles et/ou pas de réponses)
+
+- Lettrer les factures avec le nouveau règlement
+
+- Traiter l’alerte
+
+Si le rejet n’est pas régularisé dans les 7 jours ouvrés, il faut passer sur le process recouvrement ici.
+ Vérifier tous les jours en banque : Si un IMPAYE CARTE SUR REMISE C.B. apparaît :
+
+- Trouver le dossier correspondant
+
+- Mettre une alerte à traiter catégorie « ADV» comme suit :
+
+Date : 22/04/2016 Valeur : 22/04/2016 Introduction : 22/04/2016 Statut : Comptabilisé Au débit : -295,58 EUR IMPAYE CARTE SUR REMISE C.B. DU 1604 N.200304 N.COM.4129934010 N.CART.497202092
+
+- Mettre l’étiquette « Prélèvement rejeté » sur le dossier et enregistrer
+
+- Délettrer le règlement CB dans Galaxy
+
+- Créer un règlement négatif (Virement) du montant de l’impayé
+
+- Appeler le client, vérifier si Fraude
+
+- Si fraude avérée (n° non attribué) :
+
+- Mettre une alerte “RESA, A traiter” : Urgent – XX PNR suite fraude
+
+- Mettre l’étiquette Fraude avérée et enregistrer
+
+- Si client de « bonne foi » lui demander de débiter sa carte à nouveau
+
++-Pointer les autorisations débits CB
+
+OGONE :  Faire un relevé tous les jours pour la veille (le lundi faire pour le vendredi, samedi et le dimanche), sélectionner Autorisées, Demandés, En attente et télécharger la liste pour l’enregistrer dans M:\Service Administratif\Relevés virements et CB.
+
+Renseigner le fichier de suivi des CB version papier
+
+Galaxy :  Générer un relevé de Règlements, onglet Relevés / Règlements de Galaxy, en sélectionnant comme Mode de règlement “Carte bancaire” et en renseignant Règlement entre le ” ” et le ” ”  à J+3 de la date renseignée dans Ogone et Générer le relevé.
+
+Renseigner le tableau de suivi des CB avec les informations obtenues (+ version papier) + les informations Ogone  et vérifier si des écarts existent avec Ogone, trouver les règlements concernés :
+
+- Paiement client OK mais dossier non présent sur GX (A faire uniquement sur les Pré réservées. Pour les KO ou Inconnues : relancer le plateau via le forum des Booking Manager et/ou via un(e) TeamLeader du plateau) : synchroniser le dossier, passer les alertes automatiques en traité, créer et lettrer le paiement. Laisser le dossier initial STRA en pré-résa, le plateau prendra le relais.
+
+1 fois par semaine le teamleader ADV met à jour le tableau de suivi des CB suite aux annulations de CB qui ont pu être faites après la vérification jour / jour, sur la semaine passée
++-Traiter CB débitées sans facture éditée
+
+Ces tâches doivent être exécutées après le pointage des autorisations CB sur Ogone.
+
+- Matin : reporting plateau
+- Après-midi : annulation des CB
+ 1. Générer un relevé de Règlements, onglet Relevés / Règlements de Galaxy
+
+- Mode de règlement “Carte bancaire”
+
+- Effectué entre J-2 (J-3 le lundi) et le jour même.
+
+- Non lettrés
+
+2. Envoyer le relevé “CB à relancer” aux Teamleaders du service RESA à l’adresse : TL.LYS@vlctravel.com 1. Générer un relevé de Règlements, onglet Relevés / Règlements de Galaxy
+
+- Mode de règlement “Carte bancaire”
+
+- Cocher “non lettré”
+
+- Effectué entre J-3 et le jour même. Si à 17h00, les dossiers ne sont pas solutionnés : annuler les CB.
+
+2. Annuler les paiements 3. Mettre une note sur le dossier GX pour préciser que l’annulation de CB a été effectuée 4. Envoyer le relevé “CB annulées” aux Teamleaders du service RESA à l’adresse : TL.LYS@vlctravel.com
+
+## Vérification des PME (Porte Monnaie électroniques)
+
+Le lettrage des règlements par PME (Porte-Monnaie Électronique) n’est pas effectué automatiquement sous GX. Il convient donc de vérifier les dossiers des réservations IATA, et de procéder au rapprochement et au lettrage des factures.
+
+1.  Sous GX, sortir tous les dossiers mis à jour la veille (pour le lundi à partir de vendredi) ayant pour étiquette « Résa IATA ».
+
+2. En relevant le code agence de ces dossiers, sous l’onglet « Règlements », rechercher les règlements de chaque agence non-lettrés.
+
+3. Contrôler le montant restant à facturer sous GX avec le montant disponible du PME de l’agence de voyage sous Resaneo. Si le montant est différent, lettrer les dossiers et recontrôler les soldes pour les équilibrer.
+
+## États de caisse
+
+ Pour rappel, les transactions financières sont régulés par le BSP (Billing and Settlement Plan). IATA propose ce service à tous ses partenaires agréés, à savoir, les compagnies aériennes, les agences de voyages, les voyagistes et autres revendeurs agréés afin de réguler et d’organiser les transactions financières entre les fournisseurs (compagnies aériennes) et les revendeurs de titres de transport aérien.
+Afin de contrôler les ventes GDS, un rapprochement de la situation des états de caisse des trois GDS (Galileo, Sabre et Amadeus) et des ventes GX est effectué quotidiennement.
+
++-Sortir les relevés à rapprocher
+
+Les deux relevés sont édités pour contrôler le total des ventes des 4 fournisseurs GDS sous Galaxy : Sabre – BSP, Amadeus – BSP, Galileo – BSP et Lufthansa API – BSP. Il sont générés pour chaque jour de la semaine.
+
+- Etat des caisses GDS (RESA)
+- Edition du relevé GX
+ Un état des caisse par GDS est édité tous les matins par le service RESA. Ces rapports sont enregistrés sous Mercure dans le dossier M:\Service Exec\Etats de caisse . Un fichier de suivi papier sera communiqué par le service Exec qui complétera sa partie, l’agent ayant traité doit parapher le fichier quotidiennement.
+
+  Depuis le menu Galaxy Relevés/Fournisseurs, générer un relevé pour chaque jour de la semaine selon les critères suivants :
+
+- Fournisseurs : Sabre – BSP, Amadeus – BSP, Galileo – BSP, Lufthansa API – BSP
+
+- Document de voyage envoyé entre le : J-1 (ou vendredi, samedi pour les relevés effectués le lundi).et le : même date que ci-dessous (attention pour rappel, les relevés sont édités jour par jour).
+
+Chaque relevé est enregistré en pdf sous M:\Service Administratif\Informations Fournisseurs\Caisses GDS vs GX
+
+NB : Le lundi, il convient d’éditer les relevés et de faire l’état de caisse pour le samedi et le dimanche précédents. Même chose pour les lendemains de jours fériés.
+
++-Rapprochement des états de caisses GDS et du relevé GX
+
+Suite à l’édition du relevé GX et des états de caisse communiqués par la RESA, un tableau xls permettant de vérifier les écarts est à renseigner sous M:\Service Administratif\Informations Fournisseurs\Caisses GDS vs GX
+
+Si une différence existe, il faut analyser les raisons de ces écarts.
+
+- Pour Amadeus, Sabre et Lufthansa API, le rapprochement s’effectue manuellement sans l’aide d’outil (peu d’écarts importants existants).
+
+- Pour Galileo, un outil développé par SMS est à disposition
+
+NB : pour l’état de caisse Galileo, copier ce dernier dans le champ DATA GDS (fichier texte) et le relevé GX pour la partie Galileo dans le champ LISTE DOSSIERS GX. En affichant les détails, l’outil rapprochera les dossiers similaires. Les ventes GDS non-rapprochées sont à contrôler manuellement.
+
++-Analyse des écarts existants
+
+Les possibilités ne sont pas nombreuses et sont majoritairement récurrentes. Une fois les écarts vérifiés et concordants, parapher la feuille de suivi des activités GDS remise par la RESA.
+
+- Écart positif
+- Écart négatif
+
+Une modification a été effectuée.
+
+Le document de voyage n’a pas été envoyé.
+
+L’achat est faux dans le dossier Galaxy (dans ce cas, réajuster l’achat dans le dossier GX après confirmation du service RESA et mettre à jour le relevé GX en l’enregistrant une nouvelle fois sous Mercure.
+
+Un acompte groupe a été réglé (à confirmer avec le service Groupe – possible sur Galileo Uniquement).
+
+Dans de plus rares cas, des dossiers pour le personnel ont été réservés.
+
+Des dossiers sont confirmés sous GX mais n’apparaissent pas dans les caisses GDS (majoritairement du fait d’un dossier émis mais dont le document de voyage n’avait pas été envoyé les jours précédents).
+
+## Vérification des règlements CB et prélèvement non lettrés
+
+Tous les jours, les règlements par CB et par prélèvement doivent être vérifiés par le service ADV afin de vérifier :
+
+- Qu’un dossier n’a pas été oublié d’être confirmé et facturé.
+
+- Qu’un débit n’a pas été effectué sans qu’il y ait de réservation ou de modification de faite.
+
++-Vérification des règlements CB non lettrés
+
+- En B2B (Canal Resaneo)
+- En B2C (Autres canaux)
+
+Vérifier quel est le dossier concerné : en cliquant sur la loupe du règlement, on voit apparaître le n° du dossier associé au règlement (pour les IATA), puis en cliquant sur le picto Lettrage pour voir si on peut lettrer le règlement. Si ce n’est pas le cas :
+
+- RESA IATA : il faut attendre que le dossier soit traité pour le facturer et lettrer le règlement.
+
+- Dossier en statut « En demande » : s’assurer qu’il y a une note sur le dossier à +48h pour XX la cb si non confirmation de la réservation.
+
+- Dossier est en statut annulé et que le dossier n’a jamais été confirmé : s’assurer que le règlement est annulé dans Ogone, si oui supprimer le règlement dans Galaxy.
+
+Vérifier quel est le dossier concerné : en cliquant sur la loupe du règlement, on voit apparaître le n° du dossier associé au règlement, puis en cliquant sur le picto Lettrage pour voir si on peut lettrer le règlement.
+
+Si ce n’est pas le cas :
+
+- Dossier en statut « En demande » : s’assurer qu’il y a une note sur le dossier à +48h pour XX la CB si non confirmation de la réservation.
+
+- Dossier en statut annulé et que le dossier n’a jamais été confirmé : s’assurer que le règlement est annulé dans Ogone, si oui supprimer le règlement dans Galaxy.
+
++-Vérification des prélèvements non lettrés Vérifier quel est le dossier
+
+- Dossier en statut “En demande” = Patienter jusqu’à ce que le dossier soit confirmé ou annulé,
+
+- Dossier Confirmé = Lettrer le règlement
+
+- Dossier annulé : mettre une note sur le dossier du type “règlement n°xxxxx XX avec la ligne du règlement” , supprimer le règlement
+</section>
+</article>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="post-id" content="5922">
+    <meta name="date" content="2021-02-05T14:34:12">
+    <meta name="modified" content="2024-03-22T09:22:26">
+    <meta name="slug" content="demande-reservation-avec-emd-externe">
+    <meta name="categories" content="RESA">
+    <meta name="tags" content="">
+    <meta name="source-url" content="https://gravity.vlctravel.com/demande-reservation-avec-emd-externe/">
+    <title>Demande réservation avec EMD externe</title>
+</head>
+<body>
+<article>
+<h1>Demande réservation avec EMD externe</h1>
+<section class="excerpt">Dernière mise à jour : 25/02/2021</section>
+<section class="content">
+Dernière mise à jour : 25/02/2021
+
+Les compagnies ont toutes un process qui leur ait propre, exemple ici avec AF –&gt; pour trouver l’information, se rendre sur les sites BtoB.
+
+Attention pour les compagnies AH, AT et TU,  les avoirs sont à utiliser en agence UNIQUEMENT. On appelle l’AGV et on la renvoi vers la compagnie. 
+
+ 
+
+- Le traitement du dossier ne doit pas prendre plus de 2 jours.
+
+- Cette procédure est réservée à l’utilisation des EMD qui ne sont pas liés à des réservations effectuées sur Resaneo. Pour toute demande concernant une réservation existante  –&gt; passer par le suivi de commandes
+
++-Vérification EMD 
+
+1. Dès réception du dossier, on envoi le template Demande en cours chez Transporteur pour faire patienter le temps de la réservation / Dossier en demande
+
+2. Se renseigner sur le numéro d’EMD : nom associé, montant, validité… Ne pas hésitez à appeler AGV si besoin.
+
+ Dans le cas d’add-on, vérifier que l’avoir est utilisable, aucun paiement par CB ne doit être réalisé (hors différence tarifaire entre l’avoir et le nouveau tarif) , si le doute persiste, contacter l’admin. 
+
+3.  : Faire la simulation sur le site compagnie / en GDS
+
+- Si le montant de l’avoir est inférieur à l’achat :
+
+- Envoi Résa KO avec Différence Tarifaire –&gt; Process KO
+
+- Dans le template : Indiquer le montant restant à régler
+
+- Prix de vente : 300€
+
+Avoir : 200€
+
+Reste à régler : 100€
+
+- Si le montant de l’avoir est égal ou supérieur à l’achat :
+
+- *** Si agence en CB/PME –&gt; Appeler AGV pour prendre paiement de la marge
+
+- On passe à la confirmation
+
+ Au même titre que les réservations habituelles : la vente DOIT être supérieure à l’achat. Si ce n’est pas le cas, ou que ce n’est pas clair –&gt; demander de l’aide à ADV 
+
+ 
+
++-Rappel Emission de l'EMD
+Procédure synthétique émission EMD - AF
+Amadeus service HUB
+Tuto EMD CDET
+
+##         1 – Création de l’EMD sur un PNR existant :
+
+IUAF NN1 CDET SXB
+
+NN1 : lancement de la demande // CDET : code de service  //  SXB : lieu / code ville où le service est délivré
+
+##         2 – Lancement du masque TSM
+
+TMC/ VAF
+
+##         3 – Introduction des données dans le masque TSM :
+
+TMI / REUR425.10/ WEUR0.00/YM/CV-425.10/FP-O/CH
+
+R EUR425.10:
+
+R pour Reissue suivi du montant du billet TTC à reporter sur l’avoir WEUR0.00 : W pour ajout du montant total (toujours 0)
+
+Y : Y pour indicateur suivi du code indicateur
+
+CV : valeur du coupon (montant du billet à reporter sur l’avoir)
+
+FP-O : ancienne forme de paiement
+
+TMI/FE – texte libre
+
+FE pour la case Endos
+
+TMI/ IC-TKT057230060170E1
+
+IC pour In Connexion With : introduction du numéro de billet à reporter sur l’avoir
+
+N.B Si billet complémentaire : TMI/IC-TKT0572300601779E1-6-TKT0572300601780
+
+##         4 – Introduction du n°du billet en FO
+
+TMI/FO-057-23006017E1PAR12JAN12/20254654
+
+FO : FO pour original issue suivi du numéro de billet à prendre en échange
+
+N.B Si billet complémentaire :  TMI/FO-057-2300601779E1-80MRS10DEC13/20345624
+
+##         5 – Introduction texte libre (121 caractères) et personnalisation du reçu passager de l’EMD :
+
+Pour donner le motif : TMI/CR-DUE CORONAVIRUS
+
+le texte libre ne doit pas comporter de caractères spécifiques : / ; *.....
+
+##         6 – Emission de l’EMD :
+
+TTM
+
++-Utilisation de l'EMD 
+
+Amadeus UNIQUEMENT
+
+- EWD/EMD057-[n°chiffresEMD_AF] : informations
+
+- Réserver et tarifer le dossier
+
+- Saisir TTI/EXCH pour passer le F (Fare) en R (Réémission) /  le X des taxes en O (Old), la forme de paiement originale en O (Old) et le montant total à 0.00
+
+- Saisir TQT/T[n°TST] pour afficher le masque de tarification (TST)
+
+-  Renseigner les champs [ NVA ] (Not Valide After) avec la date de validité maximum du tarif en vigueur
+
+- [ TOTAL ] , modifier le montant total de la tarification (TST). Le total à encaisser est le montant du billet à émettre moins la valeur de l’EMD Miscellaneous d’Air France
+
+- Saisir O/MS+/[nouvelle_Forme_Paiement] dans le champ [ FORM OF PAYMENT ]
+
+- Appuyer sur la touche Entrée du clavier
+
+- RF + ER
+
+- Saisir FO[Code_cie_numérique]- [N°EMD]M1[Ville+Date_émission_EMD]/[N°IATA_Cie_émettrice_EMD] Exemple : FO057-8220430772M1PAR17FEB12/20492916
+
+- RF + ER
+
+- TTP/P[Position_passager] pour émettre le billet électronique du  passager.
+
+A l’émission du billet électronique, le statut du coupon EMD est échangé.
+
++-Traitement Galaxy
+
+Onglet Achat : sélectionner le crayon et ajouter une ligne
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2021/01/Achat-Crayon-300x42.png]
+
+- 1ère ligne pour le montant de l’achat initial
+
+- 2ème seconde ligne « EMD AVOIR UTILISE » du montant de l’avoir utilisé
+
+[Image: image | http://gravity.vlctravel.com/wp-content/uploads/2021/01/Achat-Crayon-2-300x208.jpg]
+
+ 
+
+Dans le suivi du dossier, indiquer ce que vous avez fait :
+
+Montant de la réservation 477.76 EUR
+
+Montant total des avoirs -477.76 EUR
+
+Montant restant sur avoirs 259.12 EUR
+
+- Réservation confirmée auprès du transporteur : à vérifier sur site compagnie, boite mail…
+
+- Renseigner la référence PNR dans le dossier GX + prestations à jour
+
+- Alerte ADV : Facturer dossier avec EMD externe
+
+- Confirmation de réservation
+
+- Document de voyages
+
+ 
+
+Si un avoir est partiellement utilisé : est-il possible d’être remboursé ou d’utiliser le reste de l’avoir pour une autre réservation ?
+
+–&gt; Alerte TL – Avoir restant [code compagnie]
+</section>
+</article>
+</body>
+</html>
