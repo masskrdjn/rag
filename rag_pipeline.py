@@ -74,6 +74,12 @@ INSTRUCTIONS :
    - "[Source: ...]", "Document 1", "Document 2", noms de fichiers (.html, .pdf)
    Ces références sont internes et n'ont pas de sens pour l'utilisateur.
 5. Réponds directement à la question de manière naturelle, comme si tu avais cette connaissance.
+6. Si la question porte sur une PROCÉDURE ou un PROCESSUS (mots-clés: comment, étapes, procédure, guide):
+   - Organise ta réponse en étapes numérotées dans l'ORDRE LOGIQUE
+   - Si le contexte contient des sections numérotées (Étape 1, Étape 2, Section 1/4, etc.), RESPECTE cet ordre
+   - Présente un résumé clair avant les détails si la procédure est longue
+7. Priorise la COMPLÉTUDE : si le contexte contient plusieurs sections d'un même document, 
+   synthétise-les toutes de manière cohérente.
 
 RÉPONSE :
 """
@@ -82,36 +88,78 @@ RÉPONSE :
         
         # Créer la chaîne en utilisant LCEL (LangChain Expression Language)
         def format_docs(docs):
-            # Filtrer et classer les documents pour prioriser la qualité sur la quantité
+            """
+            Formate les documents récupérés en regroupant par source
+            et en triant par numéro de section pour préserver l'ordre logique.
+            """
             if not docs:
                 return "Aucun contexte pertinent trouvé."
             
-            # Si nous avons beaucoup de docs, préférer les plus courts et plus ciblés en premier
-            # pour éviter de submerger le contexte avec du bruit
+            # Limiter au top_k
+            docs = docs[:self.top_k]
+            
+            # Regrouper les documents par source (même fichier)
+            by_source = {}
+            for doc in docs:
+                source = doc.metadata.get('source', 'unknown')
+                if source not in by_source:
+                    by_source[source] = {
+                        'docs': [],
+                        'title': '',
+                        'filename': doc.metadata.get('filename', '')
+                    }
+                by_source[source]['docs'].append(doc)
+                
+                # Extraire le titre du document (depuis le contenu si possible)
+                if not by_source[source]['title']:
+                    content = doc.page_content
+                    if content.startswith('Document:'):
+                        first_line = content.split('\n')[0]
+                        by_source[source]['title'] = first_line.replace('Document:', '').strip()
+            
             formatted_parts = []
-            for i, doc in enumerate(docs[:self.top_k], 1):  # Limiter à top_k
-                content = doc.page_content.strip()
-                # Extraire le titre du document depuis les métadonnées ou le nom de fichier
-                source = doc.metadata.get('source', '') if hasattr(doc, 'metadata') else ''
-                title = doc.metadata.get('title', '') if hasattr(doc, 'metadata') else ''
+            
+            for source, data in by_source.items():
+                source_docs = data['docs']
+                doc_title = data['title'] or data['filename'].replace('.html', '').replace('_', ' ')
                 
-                # Utiliser le titre si disponible, sinon extraire du chemin source
-                if title:
-                    doc_label = title
-                elif source:
-                    # Extraire le nom de fichier et le nettoyer
-                    import os
-                    filename = os.path.basename(source)
-                    # Retirer l'extension et les préfixes numériques
-                    doc_label = filename.replace('.html', '').replace('_', ' ')
-                    # Retirer le préfixe numérique (ex: "1179 ")
-                    if doc_label and doc_label.split(' ')[0].isdigit():
-                        doc_label = ' '.join(doc_label.split(' ')[1:])
-                else:
-                    doc_label = "Documentation"
+                # Trier par section_num pour préserver l'ordre logique
+                source_docs.sort(key=lambda d: (
+                    # Sommaire (is_summary=True ou section_num=0) en premier
+                    0 if d.metadata.get('is_summary', False) or d.metadata.get('section_num', 999) == 0 else 1,
+                    # Puis par numéro de section
+                    d.metadata.get('section_num', 999)
+                ))
                 
-                # Ne pas inclure de référence numérique, juste le contenu
-                formatted_parts.append(f"[Source: {doc_label}]\n{content}")
+                # Formater le contenu de cette source
+                source_content = []
+                
+                # En-tête de source (juste le titre, pas le chemin)
+                if len(by_source) > 1:
+                    source_content.append(f"=== {doc_title} ===")
+                
+                for doc in source_docs:
+                    section_title = doc.metadata.get('section_title', '')
+                    section_num = doc.metadata.get('section_num', 0)
+                    total = doc.metadata.get('total_sections', 0)
+                    is_summary = doc.metadata.get('is_summary', False)
+                    
+                    content = doc.page_content.strip()
+                    
+                    # Si c'est un sommaire, l'afficher en premier
+                    if is_summary:
+                        source_content.append(content)
+                    elif section_title:
+                        # Section avec numéro
+                        if total > 0:
+                            source_content.append(f"[Section {section_num}/{total}: {section_title}]")
+                        else:
+                            source_content.append(f"[{section_title}]")
+                        source_content.append(content)
+                    else:
+                        source_content.append(content)
+                
+                formatted_parts.append("\n\n".join(source_content))
             
             return "\n\n---\n\n".join(formatted_parts)
         
