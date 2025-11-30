@@ -33,29 +33,34 @@ def get_adaptive_chunk_config(text_length, has_sections=False):
         dict: {chunk_size, chunk_overlap, description}
     """
     configs = {
+        'no_chunk': {
+            'chunk_size': 0,  # 0 signale "pas de chunking"
+            'chunk_overlap': 0,
+            'description': 'Document entier - contexte maximal'
+        },
         'very_short': {
-            'chunk_size': 400,
-            'chunk_overlap': 50,
-            'description': 'Très court - priorité au contexte complet'
+            'chunk_size': 600,
+            'chunk_overlap': 100,
+            'description': 'Très court - contexte étendu'
         },
         'short': {
-            'chunk_size': 500,
-            'chunk_overlap': 60,
-            'description': 'Court - sections complètes'
+            'chunk_size': 800,
+            'chunk_overlap': 150,
+            'description': 'Court - sections larges'
         },
         'medium': {
-            'chunk_size': 600,
-            'chunk_overlap': 80,
+            'chunk_size': 1000,
+            'chunk_overlap': 200,
             'description': 'Moyen - bon équilibre'
         },
         'long': {
-            'chunk_size': 700,
-            'chunk_overlap': 90,
+            'chunk_size': 1200,
+            'chunk_overlap': 250,
             'description': 'Long - précision élevée'
         },
         'very_long': {
-            'chunk_size': 900,
-            'chunk_overlap': 120,
+            'chunk_size': 1500,
+            'chunk_overlap': 300,
             'description': 'Très long - éviter fragmentation'
         }
     }
@@ -68,29 +73,37 @@ def get_adaptive_chunk_config(text_length, has_sections=False):
             config['chunk_overlap'] = int(config['chunk_overlap'] * 0.85)
     
     # Sélection basée sur la longueur
-    if text_length < 2000:
+    if text_length < 1500:
+        return configs['no_chunk']
+    elif text_length < 3000:
         return configs['very_short']
-    elif text_length < 5000:
+    elif text_length < 6000:
         return configs['short']
-    elif text_length < 10000:
+    elif text_length < 12000:
         return configs['medium']
-    elif text_length < 20000:
+    elif text_length < 25000:
         return configs['long']
     else:
         return configs['very_long']
 
-def extract_amadeus_sections(text, source_file):
+def extract_process_sections(text, source_file):
     """
-    Extrait les sections individuelles d'un document Amadeus
-    pour un meilleur découpage sémantique.
-    """
-    # Détecter si c'est un document Amadeus
-    if "Formats utiles Amadeus" not in text and "Formats et TUTO utiles" not in text:
-        return None
+    Extrait les sections de TOUS les documents avec markers +-
+    (pas seulement les documents Amadeus).
     
+    Cette fonction détecte les sections marquées par +- et les sépare
+    en documents individuels pour un meilleur chunking sémantique.
+    
+    Args:
+        text: Texte du document
+        source_file: Chemin du fichier source
+    
+    Returns:
+        list: Liste de sections avec contenu enrichi, ou None si aucune section
+    """
     sections = []
     
-    # Pattern pour détecter les sections Amadeus (format +- Titre)
+    # Pattern pour détecter les sections (format +- Titre)
     section_pattern = r'\+-([^\n]+)'
     
     # Trouver toutes les sections
@@ -99,7 +112,13 @@ def extract_amadeus_sections(text, source_file):
     if not matches:
         return None
     
-    print(f"  ✓ Document Amadeus détecté avec {len(matches)} sections")
+    # Détecter le type de document
+    is_amadeus = "Formats utiles Amadeus" in text or "Formats et TUTO utiles" in text
+    is_process = any(keyword in text for keyword in ["Process", "Étape", "Procédure", "Etape"])
+    
+    doc_type = "amadeus" if is_amadeus else ("process" if is_process else "structured")
+    
+    print(f"  ✓ Document {doc_type} détecté avec {len(matches)} sections")
     
     # Extraire chaque section avec son contenu
     for i, match in enumerate(matches):
@@ -116,14 +135,15 @@ def extract_amadeus_sections(text, source_file):
         
         # Enrichir avec le contexte du titre du document
         title_match = re.search(r'Titre du document : ([^\n]+)', text)
-        doc_title = title_match.group(1) if title_match else "Formats Amadeus"
+        doc_title = title_match.group(1) if title_match else "Document"
         
         enriched_content = f"Document: {doc_title}\nSection: {section_title}\n\n{section_content}"
         
         sections.append({
             'content': enriched_content,
             'title': section_title,
-            'section_num': i + 1
+            'section_num': i + 1,
+            'doc_type': doc_type
         })
     
     return sections
@@ -164,6 +184,39 @@ def extract_images_from_html(html_content, source_file):
     
     return text
 
+def extract_html_metadata(html_content):
+    """
+    Extrait les métadonnées du HTML (post-id, catégorie, date, etc.)
+    
+    Args:
+        html_content: Contenu HTML brut
+    
+    Returns:
+        dict: Métadonnées extraites
+    """
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    metadata = {}
+    
+    # Mapping des meta tags vers les clés de métadonnées
+    meta_tags = {
+        'post-id': 'post_id',
+        'date': 'created_date',
+        'modified': 'modified_date', 
+        'categories': 'category',
+        'tags': 'tags',
+        'source-url': 'source_url',
+        'slug': 'slug'
+    }
+    
+    for meta_name, key in meta_tags.items():
+        meta = soup.find('meta', attrs={'name': meta_name})
+        if meta and meta.get('content'):
+            metadata[key] = meta.get('content', '').strip()
+    
+    return metadata
+
+
 def load_html_documents_adaptive(data_path):
     """
     Charge tous les fichiers HTML avec chunking adaptatif.
@@ -181,6 +234,7 @@ def load_html_documents_adaptive(data_path):
     
     stats = {
         'amadeus_sections': 0,
+        'no_chunk': 0,
         'very_short': 0,
         'short': 0,
         'medium': 0,
@@ -193,15 +247,18 @@ def load_html_documents_adaptive(data_path):
             with open(html_file, 'r', encoding='utf-8') as f:
                 html_content = f.read()
             
+            # Extraire les métadonnées HTML
+            html_metadata = extract_html_metadata(html_content)
+            
             # Extraire texte + images
             text = extract_images_from_html(html_content, str(html_file))
             text_length = len(text)
             
-            # Tenter d'extraire les sections Amadeus
-            sections = extract_amadeus_sections(text, str(html_file))
+            # Tenter d'extraire les sections avec markers +-
+            sections = extract_process_sections(text, str(html_file))
             
             if sections:
-                # Créer un document par section pour les documents Amadeus
+                # Créer un document par section
                 for section in sections:
                     section_length = len(section['content'])
                     chunk_config = get_adaptive_chunk_config(section_length, has_sections=True)
@@ -211,18 +268,20 @@ def load_html_documents_adaptive(data_path):
                         metadata={
                             "source": str(html_file),
                             "filename": html_file.name,
-                            "type": "html_amadeus_section",
+                            "type": f"html_{section['doc_type']}_section",
                             "section_title": section['title'],
                             "section_num": section['section_num'],
+                            "doc_type": section['doc_type'],
                             "chunk_size": chunk_config['chunk_size'],
                             "chunk_overlap": chunk_config['chunk_overlap'],
-                            "text_length": section_length
+                            "text_length": section_length,
+                            **html_metadata  # Ajouter les métadonnées HTML
                         }
                     )
                     documents.append(doc)
                     stats['amadeus_sections'] += 1
                 
-                print(f"✓ {html_file.name}: {len(sections)} sections Amadeus")
+                print(f"✓ {html_file.name}: {len(sections)} sections {section['doc_type']}")
             else:
                 # Traitement normal avec chunking adaptatif
                 chunk_config = get_adaptive_chunk_config(text_length, has_sections=False)
@@ -250,7 +309,8 @@ def load_html_documents_adaptive(data_path):
                         "chunk_size": chunk_config['chunk_size'],
                         "chunk_overlap": chunk_config['chunk_overlap'],
                         "chunk_strategy": chunk_config['description'],
-                        "text_length": text_length
+                        "text_length": text_length,
+                        **html_metadata  # Ajouter les métadonnées HTML
                     }
                 )
                 documents.append(doc)
@@ -263,11 +323,12 @@ def load_html_documents_adaptive(data_path):
     print("="*80)
     print(f"\n📊 STATISTIQUES DE CHARGEMENT:")
     print(f"   • Sections Amadeus:     {stats['amadeus_sections']:3d}")
-    print(f"   • Documents très courts: {stats['very_short']:3d} (chunk=400)")
-    print(f"   • Documents courts:      {stats['short']:3d} (chunk=500)")
-    print(f"   • Documents moyens:      {stats['medium']:3d} (chunk=600)")
-    print(f"   • Documents longs:       {stats['long']:3d} (chunk=700)")
-    print(f"   • Documents très longs:  {stats['very_long']:3d} (chunk=900)")
+    print(f"   • Documents entiers:     {stats['no_chunk']:3d} (pas de chunking)")
+    print(f"   • Documents très courts: {stats['very_short']:3d} (chunk=600)")
+    print(f"   • Documents courts:      {stats['short']:3d} (chunk=800)")
+    print(f"   • Documents moyens:      {stats['medium']:3d} (chunk=1000)")
+    print(f"   • Documents longs:       {stats['long']:3d} (chunk=1200)")
+    print(f"   • Documents très longs:  {stats['very_long']:3d} (chunk=1500)")
     print(f"   • TOTAL:                 {len(documents):3d} documents\n")
     
     return documents
@@ -300,13 +361,18 @@ def chunk_documents_adaptive(documents):
         "\n# ",            # Titres markdown H1
         "\n## ",           # Titres markdown H2
         "\n### ",          # Titres markdown H3
-        "\n",              # Lignes simples
-        " ",               # Mots
-        "",                # Caractères
     ]
     
     # Appliquer le chunking par groupe
-    for (chunk_size, chunk_overlap), docs in doc_groups.items():
+    for (chunk_size, chunk_overlap), group_docs in doc_groups.items():
+        # Cas spécial : pas de chunking (documents entiers)
+        if chunk_size == 0:
+            print(f"  • Documents entiers: {len(group_docs)} docs → {len(group_docs)} chunks")
+            all_chunks.extend(group_docs)
+            continue
+            
+        print(f"  • Chunk size {chunk_size}/{chunk_overlap}: {len(group_docs)} docs", end="")
+        
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
@@ -314,10 +380,10 @@ def chunk_documents_adaptive(documents):
             add_start_index=True,
         )
         
-        chunks = text_splitter.split_documents(docs)
+        chunks = text_splitter.split_documents(group_docs)
         all_chunks.extend(chunks)
         
-        print(f"  • Chunk size {chunk_size}/{chunk_overlap}: {len(docs)} docs → {len(chunks)} chunks")
+        print(f" → {len(chunks)} chunks")
     
     return all_chunks
 
