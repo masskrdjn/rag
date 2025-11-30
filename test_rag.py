@@ -35,7 +35,7 @@ def query_rag(question: str) -> dict:
         response = requests.post(
             API_URL,
             json={"question": question},
-            timeout=30
+            timeout=120
         )
         response.raise_for_status()
         return {
@@ -75,9 +75,19 @@ def format_sources(sources: list) -> str:
     
     formatted = []
     for i, source in enumerate(sources, 1):
-        source_info = f"  [{i}] {source.get('source', 'N/A')}"
-        if 'score' in source:
-            source_info += f" (score: {source['score']:.3f})"
+        # Utiliser les bons champs retournés par l'API
+        title = source.get('title', 'N/A')
+        source_url = source.get('source_url', '')
+        category = source.get('category', 'Unknown')
+        post_id = source.get('post_id', '')
+        
+        source_info = f"  [{i}] {title}"
+        if source_url:
+            source_info += f"\n      URL: {source_url}"
+        if category and category != 'Unknown':
+            source_info += f"\n      Catégorie: {category}"
+        if post_id:
+            source_info += f" (ID: {post_id})"
         formatted.append(source_info)
     
     return "\n".join(formatted)

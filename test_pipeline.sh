@@ -4,9 +4,7 @@
 echo "Test du Pipeline RAG"
 echo "===================="
 
-sudo -u ragapp bash << 'EOF'
-cd /home/ragapp/rag-system
-source venv/bin/activate
+cd /home/rag
 
 python3 << 'PYTHON_SCRIPT'
 from rag_pipeline import SimpleRAG
@@ -41,5 +39,3 @@ elapsed = time.time() - start
 print(f"\nRéponse (en {elapsed:.2f}s):")
 print(answer)
 PYTHON_SCRIPT
-
-EOF

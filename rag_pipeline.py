@@ -14,7 +14,7 @@ class SimpleRAG:
                  retrieval_mode="similarity",
                  top_k=5,
                  score_threshold=0.6,
-                 use_hybrid=False,
+                 use_hybrid=True,  # Activé par défaut - essentiel pour trouver les mots-clés
                  hybrid_weights=None):
         """
         Initialise le pipeline RAG avec des stratégies de récupération configurables.
@@ -23,8 +23,8 @@ class SimpleRAG:
             retrieval_mode (str): "similarity" ou "similarity_score_threshold"
             top_k (int): Nombre de documents à récupérer (3-8 recommandé)
             score_threshold (float): Score de similarité minimum (0.5-0.8, uniquement pour le mode seuil)
-            use_hybrid (bool): Utiliser la recherche hybride BM25 + vectorielle
-            hybrid_weights (list): Poids pour [vectoriel, bm25] (par défaut [0.5, 0.5])
+            use_hybrid (bool): Utiliser la recherche hybride BM25 + vectorielle (recommandé)
+            hybrid_weights (list): Poids pour [vectoriel, bm25] (par défaut [0.3, 0.7] - favorise BM25)
         """
         self.persist_directory = "/home/rag/chroma_db"  # Base de données ChromaDB
         self.model_name = "mistral:7b"
@@ -36,7 +36,7 @@ class SimpleRAG:
         self.top_k = top_k  # Augmenté de 3 à 5 par défaut
         self.score_threshold = score_threshold  # Réduit de 0.7 à 0.6 pour être moins strict
         self.use_hybrid = use_hybrid
-        self.hybrid_weights = hybrid_weights if hybrid_weights else [0.5, 0.5]
+        self.hybrid_weights = hybrid_weights if hybrid_weights else [0.3, 0.7]  # Favoriser BM25 pour les mots-clés
         
         # Cache pour les documents (nécessaire pour BM25)
         self.documents = None
@@ -64,15 +64,19 @@ CONTEXTE RÉCUPÉRÉ :
 QUESTION :
 {question}
 
-INSTRUCTIONS STRICTES :
-1. Réponds UNIQUEMENT avec les informations présentes dans le CONTEXTE RÉCUPÉRÉ ci-dessus.
-2. NE JAMAIS inventer d'informations. Si tu ne trouves pas l'information dans le contexte, dis "Je n'ai pas trouvé cette information dans la documentation."
-3. Si le contexte contient des étapes numérotées (Étape 1, Étape 2, etc.), tu DOIS les reprendre TOUTES dans l'ordre.
-4. Pour une procédure, structure ta réponse avec des étapes numérotées claires.
-5. N'invente PAS de sites web, d'URLs, ou de procédures qui ne sont pas explicitement dans le contexte.
-6. Cite les outils/systèmes EXACTEMENT comme ils apparaissent (SpeedTravel, Galaxy, STRA, etc.).
+INSTRUCTIONS CRITIQUES :
+1. AVANT de répondre, vérifie si le CONTEXTE RÉCUPÉRÉ contient des informations DIRECTEMENT liées à la QUESTION.
+2. Si le contexte NE CONTIENT PAS d'information sur le sujet de la question, réponds EXACTEMENT : "Je n'ai pas trouvé cette information dans la documentation."
+3. NE JAMAIS utiliser des informations du contexte qui ne sont pas liées à la question pour "inventer" une réponse.
+4. Si le contexte mentionne explicitement le sujet (par ex: "congés", "absences", "émission", etc.), alors utilise UNIQUEMENT ces informations.
+5. Cite les ressources EXACTEMENT comme elles apparaissent (Whaller, Galaxy, STRA, etc.).
+6. Si le contexte dit de "consulter" une ressource externe, indique cette ressource dans ta réponse.
 
-RÉPONSE (basée uniquement sur le contexte ci-dessus) :"""
+VÉRIFICATION DE PERTINENCE :
+- Le contexte parle-t-il du même sujet que la question ? Si NON -> réponds "Je n'ai pas trouvé cette information dans la documentation."
+- Si OUI -> réponds en citant fidèlement le contexte.
+
+RÉPONSE :"""
         
         prompt = ChatPromptTemplate.from_template(template)
         
@@ -85,8 +89,8 @@ RÉPONSE (basée uniquement sur le contexte ci-dessus) :"""
             if not docs:
                 return "Aucun contexte pertinent trouvé."
             
-            # Enrichir avec les sections manquantes si nécessaire
-            docs = self._fetch_related_sections(docs)
+            # Note: La récupération des sections liées est désactivée pour des raisons de performance
+            # docs = self._fetch_related_sections(docs)
             
             # Regrouper les documents par source (même fichier)
             by_source = {}
@@ -262,6 +266,13 @@ RÉPONSE (basée uniquement sur le contexte ci-dessus) :"""
         
         if not missing_sections:
             return docs  # Toutes les sections sont déjà présentes
+        
+        # Limiter le nombre de sections à récupérer pour éviter les timeouts
+        MAX_SECTIONS_TO_FETCH = 5
+        if len(missing_sections) > MAX_SECTIONS_TO_FETCH:
+            # Ne récupérer que les sections les plus proches (0, 1, 2, etc.)
+            missing_sections = set(sorted(missing_sections)[:MAX_SECTIONS_TO_FETCH])
+            print(f"[RAG] Trop de sections manquantes, limitation à {MAX_SECTIONS_TO_FETCH}")
         
         print(f"[RAG] Document principal: {main_doc_key} ({info['count']} chunks)")
         print(f"[RAG] Récupération des sections manquantes: {sorted(missing_sections)}")
