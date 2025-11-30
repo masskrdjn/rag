@@ -190,7 +190,7 @@ curl -s -X POST http://localhost:8000/ask \
 |---------|--------|
 | Port API | 8000 |
 | Base ChromaDB | `/home/rag/chroma_db` |
-| Modèle LLM | llama3.2 |
+| Modèle LLM | mistral:7b |
 | Modèle Embedding | nomic-embed-text |
 | Fichier serveur | `/home/rag/server.py` |
 | Pipeline RAG | `/home/rag/rag_pipeline.py` |

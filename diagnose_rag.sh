@@ -105,10 +105,10 @@ echo ""
 echo -e "${BLUE}[6] Ollama${NC}"
 echo "----------"
 if command -v ollama &>/dev/null; then
-    if ollama list 2>/dev/null | grep -q "llama3.2"; then
-        echo -e "${GREEN}✓ llama3.2 disponible${NC}"
+    if ollama list 2>/dev/null | grep -q "mistral:7b"; then
+        echo -e "${GREEN}✓ mistral:7b disponible${NC}"
     else
-        echo -e "${YELLOW}⚠ llama3.2 non trouvé${NC}"
+        echo -e "${YELLOW}⚠ mistral:7b non trouvé${NC}"
     fi
     if ollama list 2>/dev/null | grep -q "nomic-embed-text"; then
         echo -e "${GREEN}✓ nomic-embed-text disponible${NC}"

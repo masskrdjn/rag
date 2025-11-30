@@ -308,7 +308,7 @@ curl -X POST "http://localhost:8000/ask" -H "Content-Type: application/json" -d 
 - Répertoire data : `/home/ragapp/rag-system/data/`
 - Base ChromaDB : `/home/ragapp/rag-system/chroma_db/`
 - Modèle embedding : `nomic-embed-text`
-- Modèle LLM : `llama3.2`
+- Modèle LLM : `mistral:7b`
 
 **Paramètres de chunking** :
 - Taille : 800 caractères

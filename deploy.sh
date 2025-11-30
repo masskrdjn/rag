@@ -26,7 +26,7 @@ fi
 
 # Pull models
 echo "Step 5: Downloading AI models..."
-sudo -u ragapp ollama pull llama3.2
+sudo -u ragapp ollama pull mistral:7b
 sudo -u ragapp ollama pull nomic-embed-text
 
 # Setup application directory

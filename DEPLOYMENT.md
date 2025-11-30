@@ -88,7 +88,7 @@ sudo systemctl restart ollama
 
 ```bash
 # Modèle LLM (Llama 3.2 - 2GB)
-ollama pull llama3.2
+ollama pull mistral:7b
 
 # Modèle d'embeddings (274 MB)
 ollama pull nomic-embed-text

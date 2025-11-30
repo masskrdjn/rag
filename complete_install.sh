@@ -56,7 +56,7 @@ echo ""
 echo "[2/7] Téléchargement des modèles d'IA (cela peut prendre plusieurs minutes)..."
 
 # Télécharger les modèles Ollama requis
-sudo -u ragapp ollama pull llama3.2
+sudo -u ragapp ollama pull mistral:7b
 sudo -u ragapp ollama pull nomic-embed-text
 
 echo "[2/7] Modèles d'IA téléchargés ✓"

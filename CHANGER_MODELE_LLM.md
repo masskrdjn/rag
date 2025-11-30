@@ -71,7 +71,7 @@ vim /home/rag/rag_pipeline.py
 Localiser la ligne (vers le début de la classe `SimpleRAG`) :
 
 ```python
-self.model_name = "llama3.2"
+self.model_name = "mistral:7b"
 ```
 
 Remplacer par le nouveau modèle :
@@ -91,7 +91,7 @@ Modifier `/home/rag/rag_pipeline.py` pour supporter une variable d'environnement
 self.model_name = "llama3.2"
 
 # Par :
-self.model_name = os.environ.get("RAG_LLM_MODEL", "llama3.2")
+self.model_name = os.environ.get("RAG_LLM_MODEL", "mistral:7b")
 ```
 
 Puis lancer avec :
