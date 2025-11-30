@@ -26,7 +26,7 @@ class SimpleRAG:
             use_hybrid (bool): Utiliser la recherche hybride BM25 + vectorielle
             hybrid_weights (list): Poids pour [vectoriel, bm25] (par défaut [0.5, 0.5])
         """
-        self.persist_directory = "/home/ragapp/rag-system/chroma_db"  # Emplacement canonique pour ChromaDB
+        self.persist_directory = "/home/rag/chroma_db"  # Base de données ChromaDB
         self.model_name = "llama3.2"
         self.embedding_model = "nomic-embed-text"
         self.qa_chain = None

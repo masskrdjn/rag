@@ -11,7 +11,7 @@ import shutil
 
 # Configuration
 DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-CHROMA_PATH = "/home/ragapp/rag-system/chroma_db"  # Canonical location for ChromaDB
+CHROMA_PATH = "/home/rag/chroma_db"  # Base de données ChromaDB
 EMBEDDING_MODEL = "nomic-embed-text"
 
 def clear_chroma_db():
