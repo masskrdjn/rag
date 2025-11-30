@@ -186,9 +186,138 @@ RÉPONSE :
         
         return ensemble_retriever
 
-    def ask(self, question):
+    def estimate_dynamic_topk(self, question):
+        """
+        Estime le top_k optimal en fonction de la complexité de la question.
+        """
+        # Mots-clés indiquant une recherche large ou procédurale
+        complexity_keywords = [
+            "comment", "procédure", "étapes", "guide", "tuto", 
+            "explication", "fonctionnement", "différence", "liste",
+            "tous", "toutes", "quels", "quelles"
+        ]
+        
+        # Mots-clés indiquant une recherche précise
+        precision_keywords = [
+            "code", "format", "téléphone", "mail", "contact", 
+            "adresse", "date", "prix", "montant"
+        ]
+        
+        question_lower = question.lower()
+        
+        # Score de base
+        score = 0
+        
+        # Facteur longueur (questions longues = souvent plus de contexte nécessaire)
+        words = question.split()
+        if len(words) > 10:
+            score += 2
+        elif len(words) > 5:
+            score += 1
+            
+        # Facteur mots-clés complexité
+        if any(kw in question_lower for kw in complexity_keywords):
+            score += 3
+            
+        # Facteur connecteurs logiques (indique plusieurs points à couvrir)
+        connectors = [" et ", " ou ", " puis ", " ensuite ", " avec "]
+        if any(c in question_lower for c in connectors):
+            score += 2
+            
+        # Facteur précision (réduit le besoin de documents)
+        if any(kw in question_lower for kw in precision_keywords):
+            score -= 2
+            
+        # Calcul du k final (borné entre 3 et 15)
+        base_k = 5
+        dynamic_k = max(3, min(15, base_k + score))
+        
+        return dynamic_k
+
+    def _update_retriever_topk(self, k):
+        """Met à jour le k du retriever existant."""
+        if not self.retriever:
+            return
+            
+        if isinstance(self.retriever, EnsembleRetriever):
+            for retriever in self.retriever.retrievers:
+                if hasattr(retriever, "search_kwargs"):
+                    retriever.search_kwargs["k"] = k
+                elif hasattr(retriever, "k"):
+                    retriever.k = k
+        else:
+            if hasattr(self.retriever, "search_kwargs"):
+                self.retriever.search_kwargs["k"] = k
+
+    def ask(self, question, return_sources=False, dynamic_k=True):
+        """
+        Génère une réponse à partir d'une question.
+        
+        Args:
+            question: La question à poser
+            return_sources: Si True, retourne aussi les sources et métadonnées
+            dynamic_k: Si True, ajuste automatiquement le top_k selon la complexité
+        
+        Returns:
+            Si return_sources=False: str (la réponse)
+            Si return_sources=True: dict avec 'answer', 'sources', 'metadata'
+        """
         if not self.qa_chain:
             self.setup_chain()
-        # La chaîne retourne une chaîne directement
+            
+        # Ajustement dynamique du top_k
+        current_k = self.top_k
+        if dynamic_k:
+            estimated_k = self.estimate_dynamic_topk(question)
+            # Mettre à jour le retriever
+            self._update_retriever_topk(estimated_k)
+            current_k = estimated_k
+            print(f"Dynamic top_k: {estimated_k} (base: {self.top_k})")
+        
+        # Générer la réponse
         response = self.qa_chain.invoke(question)
-        return response
+        
+        if not return_sources:
+            # Restaurer le k original si besoin (bonnes pratiques)
+            if dynamic_k:
+                self._update_retriever_topk(self.top_k)
+            return response
+        
+        # Récupérer les documents sources utilisés
+        try:
+            docs = self.retriever.invoke(question)
+            sources = []
+            
+            for doc in docs[:current_k]:
+                source_info = {
+                    'source': doc.metadata.get('source', 'Unknown'),
+                    'filename': doc.metadata.get('filename', 'Unknown'),
+                    'category': doc.metadata.get('category', 'Unknown'),
+                    'post_id': doc.metadata.get('post_id', ''),
+                    'content_preview': doc.page_content[:200] + '...' if len(doc.page_content) > 200 else doc.page_content
+                }
+                sources.append(source_info)
+            
+            # Restaurer le k original
+            if dynamic_k:
+                self._update_retriever_topk(self.top_k)
+            
+            return {
+                'answer': response,
+                'sources': sources,
+                'metadata': {
+                    'top_k': current_k,
+                    'dynamic_k_used': dynamic_k,
+                    'retrieval_mode': self.retrieval_mode,
+                    'use_hybrid': self.use_hybrid,
+                    'num_sources': len(sources)
+                }
+            }
+        except Exception as e:
+            # En cas d'erreur, retourner quand même la réponse
+            print(f"Warning: Could not retrieve sources: {e}")
+            return {
+                'answer': response,
+                'sources': [],
+                'metadata': {'error': str(e)}
+            }
