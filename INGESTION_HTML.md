@@ -270,7 +270,7 @@ sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn ser
 
 ### Workflow Complet (Une Commande)
 ```bash
-sudo bash /home/rag/ingest_html_optimized_workflow.sh /source/html
+sudo bash /home/rag/ingest_html_adaptive.sh /source/html
 ```
 
 ### Workflow Manuel
@@ -283,7 +283,7 @@ sudo chown ragapp:ragapp /home/ragapp/rag-system/data/*.html
 sudo -u ragapp bash -c "cd /home/ragapp/rag-system && source venv/bin/activate && pip install unstructured[html] beautifulsoup4 && deactivate"
 
 # 3. Ingérer
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest_html_optimized.py"
+sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest_html_adaptive.py"
 
 # 4. Redémarrer
 sudo pkill -f uvicorn
@@ -298,8 +298,7 @@ curl -X POST "http://localhost:8000/ask" -H "Content-Type: application/json" -d 
 ## 📚 Documentation Complémentaire
 
 - `COMPARAISON_VERSIONS.md` : Comparaison détaillée standard vs optimisé
-- `ingest_html_optimized.py` : Code source du script d'ingestion
-- `ingest_html_optimized_workflow.sh` : Script bash automatisé
+- `ingest_html_adaptive.py` : Code source du script d'ingestion
 
 ---
 

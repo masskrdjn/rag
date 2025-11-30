@@ -89,10 +89,12 @@ def get_adaptive_chunk_config(text_length, has_sections=False):
 def extract_process_sections(text, source_file):
     """
     Extrait les sections de TOUS les documents avec markers +-
-    (pas seulement les documents Amadeus).
+    avec chunking hiérarchique : document complet + sections individuelles.
     
-    Cette fonction détecte les sections marquées par +- et les sépare
-    en documents individuels pour un meilleur chunking sémantique.
+    Cette approche permet:
+    - Questions générales → document de synthèse trouvé
+    - Questions spécifiques → section précise trouvée
+    - Reconstruction de l'ordre logique grâce aux métadonnées
     
     Args:
         text: Texte du document
@@ -118,14 +120,52 @@ def extract_process_sections(text, source_file):
     
     doc_type = "amadeus" if is_amadeus else ("process" if is_process else "structured")
     
-    print(f"  ✓ Document {doc_type} détecté avec {len(matches)} sections")
+    # Extraire le titre du document
+    title_match = re.search(r'Titre du document : ([^\n]+)', text)
+    doc_title = title_match.group(1) if title_match else "Document"
     
-    # Extraire chaque section avec son contenu
+    # Nombre total de sections pour le contexte
+    total_sections = len(matches)
+    
+    print(f"  ✓ Document {doc_type} détecté avec {total_sections} sections")
+    
+    # === DOCUMENT DE SYNTHÈSE (index/sommaire) ===
+    # Ce chunk sera trouvé pour les questions générales "comment utiliser X"
+    toc_lines = [f"Document: {doc_title}", "", "=== SOMMAIRE / VUE D'ENSEMBLE ===", ""]
+    
+    # Extraire l'introduction (texte avant la première section)
+    intro_end = matches[0].start()
+    intro_text = text[:intro_end].strip()
+    # Nettoyer l'intro (enlever le titre déjà extrait)
+    intro_text = re.sub(r'Titre du document : [^\n]+\n?', '', intro_text).strip()
+    if intro_text and len(intro_text) > 50:
+        toc_lines.append("Introduction:")
+        toc_lines.append(intro_text[:500])  # Limiter l'intro
+        toc_lines.append("")
+    
+    toc_lines.append("Sections du document:")
+    for i, match in enumerate(matches, 1):
+        section_title = match.group(1).strip()
+        toc_lines.append(f"  {i}. {section_title}")
+    
+    toc_lines.append("")
+    toc_lines.append("Pour les détails de chaque étape, consulter les sections correspondantes.")
+    
+    sections.append({
+        'content': "\n".join(toc_lines),
+        'title': 'Sommaire',
+        'section_num': 0,  # 0 = sommaire, toujours en premier
+        'total_sections': total_sections,
+        'doc_type': doc_type,
+        'is_summary': True
+    })
+    
+    # === SECTIONS INDIVIDUELLES avec contexte enrichi ===
     for i, match in enumerate(matches):
         section_title = match.group(1).strip()
         start_pos = match.start()
         
-        # Trouver la fin de la section (début de la section suivante ou fin du texte)
+        # Trouver la fin de la section
         if i < len(matches) - 1:
             end_pos = matches[i + 1].start()
         else:
@@ -133,17 +173,32 @@ def extract_process_sections(text, source_file):
         
         section_content = text[start_pos:end_pos].strip()
         
-        # Enrichir avec le contexte du titre du document
-        title_match = re.search(r'Titre du document : ([^\n]+)', text)
-        doc_title = title_match.group(1) if title_match else "Document"
+        # Construire le contexte hiérarchique
+        # Cela aide le LLM à comprendre où se situe cette section
+        context_header = [
+            f"Document: {doc_title}",
+            f"Section {i+1}/{total_sections}: {section_title}",
+        ]
         
-        enriched_content = f"Document: {doc_title}\nSection: {section_title}\n\n{section_content}"
+        # Ajouter les titres des sections adjacentes pour le contexte
+        if i > 0:
+            prev_title = matches[i-1].group(1).strip()
+            context_header.append(f"(Précédent: {prev_title})")
+        if i < len(matches) - 1:
+            next_title = matches[i+1].group(1).strip()
+            context_header.append(f"(Suivant: {next_title})")
+        
+        context_header.append("")  # Ligne vide
+        
+        enriched_content = "\n".join(context_header) + section_content
         
         sections.append({
             'content': enriched_content,
             'title': section_title,
             'section_num': i + 1,
-            'doc_type': doc_type
+            'total_sections': total_sections,
+            'doc_type': doc_type,
+            'is_summary': False
         })
     
     return sections
@@ -258,19 +313,27 @@ def load_html_documents_adaptive(data_path):
             sections = extract_process_sections(text, str(html_file))
             
             if sections:
-                # Créer un document par section
+                # Créer un document par section (incluant le sommaire)
                 for section in sections:
                     section_length = len(section['content'])
                     chunk_config = get_adaptive_chunk_config(section_length, has_sections=True)
+                    
+                    # Type de document plus précis
+                    if section.get('is_summary'):
+                        doc_type_str = f"html_{section['doc_type']}_summary"
+                    else:
+                        doc_type_str = f"html_{section['doc_type']}_section"
                     
                     doc = Document(
                         page_content=section['content'],
                         metadata={
                             "source": str(html_file),
                             "filename": html_file.name,
-                            "type": f"html_{section['doc_type']}_section",
+                            "type": doc_type_str,
                             "section_title": section['title'],
                             "section_num": section['section_num'],
+                            "total_sections": section.get('total_sections', 0),
+                            "is_summary": section.get('is_summary', False),
                             "doc_type": section['doc_type'],
                             "chunk_size": chunk_config['chunk_size'],
                             "chunk_overlap": chunk_config['chunk_overlap'],
@@ -281,7 +344,8 @@ def load_html_documents_adaptive(data_path):
                     documents.append(doc)
                     stats['amadeus_sections'] += 1
                 
-                print(f"✓ {html_file.name}: {len(sections)} sections {section['doc_type']}")
+                # +1 pour le sommaire
+                print(f"✓ {html_file.name}: {len(sections)} chunks ({len(sections)-1} sections + 1 sommaire) [{section['doc_type']}]")
             else:
                 # Traitement normal avec chunking adaptatif
                 chunk_config = get_adaptive_chunk_config(text_length, has_sections=False)

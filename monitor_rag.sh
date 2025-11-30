@@ -14,7 +14,7 @@
 #    sudo pkill -9 -f 'ollama runner'
 #
 # 3. Vérifier les logs du serveur :
-#    sudo tail -100 /home/ragapp/rag-system/server.log
+#    tail -100 /home/rag/server.log
 #
 # 4. Causes fréquentes :
 #    - Contexte trop long envoyé au LLM (trop de documents récupérés)
@@ -43,7 +43,7 @@ sudo lsof -i :8000 2>/dev/null || echo "Aucune connexion ou lsof non disponible"
 echo ""
 
 echo "4. Derniers logs du serveur (10 lignes) :"
-sudo tail -10 /home/ragapp/rag-system/server.log 2>/dev/null || echo "Logs non accessibles"
+tail -10 /home/rag/server.log 2>/dev/null || echo "Logs non accessibles"
 echo ""
 
 echo "5. Test de santé de l'API :"
