@@ -118,8 +118,10 @@ echo ""
 # ============================================================================
 echo "[5/7] Ingestion des données dans ChromaDB..."
 
-# Créer des données d'exemple (vous pouvez les remplacer par vos propres données)
-sudo -u ragapp bash -c "echo 'La Tour Eiffel mesure 330 mètres de hauteur. Elle a été construite par Gustave Eiffel pour l Exposition Universelle de 1889 à Paris.' > /home/ragapp/rag-system/data/sample.txt"
+# Créer des données d'exemple si besoin
+# Note: Pour un usage en production, placez vos fichiers HTML dans /home/ragapp/rag-system/data/
+# Exemple de création d'une structure de test :
+# sudo -u ragapp bash -c "echo '<html><body><h1>Test</h1><p>Contenu de test</p></body></html>' > /home/ragapp/rag-system/data/test.html"
 
 # Exécuter le script d'ingestion
 echo "Exécution du script d'ingestion de données..."
@@ -198,9 +200,9 @@ echo '       -H "Content-Type: application/json" \'
 echo "       -d '{\"question\": \"Votre question ici\"}'"
 echo ""
 echo "Pour ajouter plus de données :"
-echo "  1. Placez les fichiers .txt dans /home/ragapp/rag-system/data/"
+echo "  1. Placez les fichiers HTML dans /home/ragapp/rag-system/data/"
 echo "  2. Exécutez : sudo -u ragapp bash -c 'cd /home/ragapp/rag-system && venv/bin/python3 ingest_adaptive.py'"
-echo "  3. Redémarrez le service : sudo pkill -f uvicorn && sudo -u ragapp bash -c 'cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &'"
+echo "  3. Redémarrez le service : sudo pkill -9 -f uvicorn && sudo -u ragapp bash -c 'cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &'"
 echo ""
 echo "Dépannage :"
 echo "  - Vérifiez les journaux : sudo cat /home/ragapp/rag-system/server.log"

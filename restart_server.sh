@@ -3,6 +3,10 @@
 
 echo "Redémarrage du serveur RAG..."
 
+# Arrêter le serveur existant s'il y en a un
+pkill -f uvicorn || true
+sleep 2
+
 # Démarrer le serveur
 sudo su - ragapp -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"
 

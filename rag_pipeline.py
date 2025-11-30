@@ -26,7 +26,7 @@ class SimpleRAG:
             use_hybrid (bool): Utiliser la recherche hybride BM25 + vectorielle
             hybrid_weights (list): Poids pour [vectoriel, bm25] (par défaut [0.5, 0.5])
         """
-        self.persist_directory = "chroma_db"
+        self.persist_directory = "/home/ragapp/rag-system/chroma_db"  # Emplacement canonique pour ChromaDB
         self.model_name = "llama3.2"
         self.embedding_model = "nomic-embed-text"
         self.qa_chain = None
@@ -49,7 +49,8 @@ class SimpleRAG:
         vectorstore = Chroma(persist_directory=self.persist_directory, embedding_function=embeddings)
         
         # Configurer le récupérateur selon le mode
-        retriever = self._create_retriever(vectorstore)
+        self.retriever = self._create_retriever(vectorstore)
+        retriever = self.retriever
             
         # Initialiser le LLM avec température basse pour des réponses plus fidèles
         llm = ChatOllama(model=self.model_name, temperature=0.1)
