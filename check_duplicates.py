@@ -6,7 +6,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 try:
     embeddings = OllamaEmbeddings(model="nomic-embed-text")
-    vectorstore = Chroma(persist_directory="/home/ragapp/rag-system/chroma_db", embedding_function=embeddings)
+    vectorstore = Chroma(persist_directory="/home/rag/chroma_db", embedding_function=embeddings)
     
     print("Checking for duplicates of '1068_Conges_payes_et_absences.html'...")
     

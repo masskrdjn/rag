@@ -7,14 +7,14 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 try:
     embeddings = OllamaEmbeddings(model="nomic-embed-text")
-    vectorstore = Chroma(persist_directory="/home/ragapp/rag-system/chroma_db", embedding_function=embeddings)
+    vectorstore = Chroma(persist_directory="/home/rag/chroma_db", embedding_function=embeddings)
     
     # Search by metadata
     print("Searching for document '1068_Conges_payes_et_absences.html'...")
     
     # Chroma doesn't have a direct "get by metadata" in LangChain interface easily, 
     # but we can filter. Or just search for the specific title which should be unique now.
-    results = vectorstore.similarity_search("Congés payés et absences", k=1, filter={"source": "/home/ragapp/rag-system/data/1068_Conges_payes_et_absences.html"})
+    results = vectorstore.similarity_search("Congés payés et absences", k=1, filter={"source": "/home/rag/data/1068_Conges_payes_et_absences.html"})
     
     if results:
         doc = results[0]

@@ -17,17 +17,16 @@ try:
         capture_output=True,
         text=True
     )
-    uvicorn_processes = [line for line in result.stdout.split('\n') if 'uvicorn' in line and 'server:app' in line]
-    if uvicorn_processes:
-        print(f"✓ Serveur en cours d'exécution ({len(uvicorn_processes)} processus)")
-        for proc in uvicorn_processes:
+    server_processes = [line for line in result.stdout.split('\n') if 'python3 server.py' in line]
+    if server_processes:
+        print(f"✓ Serveur en cours d'exécution ({len(server_processes)} processus)")
+        for proc in server_processes:
             print(f"  {proc[:100]}")
     else:
         print("✗ Serveur non démarré")
         print("\nRedémarrage du serveur...")
         subprocess.run([
-            "sudo", "su", "-", "ragapp", "-c",
-            "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"
+            "bash", "/home/rag/restart_server.sh"
         ])
         print("Attente de 10 secondes...")
         time.sleep(10)
@@ -54,7 +53,7 @@ except Exception as e:
     print("\nDernières lignes du log serveur:")
     try:
         result = subprocess.run(
-            ["sudo", "tail", "-20", "/home/ragapp/rag-system/server.log"],
+            ["tail", "-20", "/home/rag/server.log"],
             capture_output=True,
             text=True
         )

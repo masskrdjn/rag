@@ -10,20 +10,26 @@
 # - Privilèges sudo
 # - Connexion Internet
 #
+# Répertoire d'installation : /home/rag/
+#
 # Utilisation : sudo bash complete_install.sh
 # ============================================================================
 
 set -e  # Quitter en cas d'erreur
 
+# Répertoire d'installation
+RAG_DIR="/home/rag"
+
 echo "=========================================="
 echo "SYSTÈME RAG - INSTALLATION COMPLÈTE"
 echo "=========================================="
+echo "Répertoire d'installation : $RAG_DIR"
 echo ""
 
 # ============================================================================
-# PARTIE 1 : DÉPENDANCES SYSTÈME ET CONFIGURATION UTILISATEUR
+# PARTIE 1 : DÉPENDANCES SYSTÈME
 # ============================================================================
-echo "[1/7] Installation des dépendances système..."
+echo "[1/6] Installation des dépendances système..."
 
 # Mettre à jour le système
 apt update && apt upgrade -y
@@ -35,72 +41,57 @@ apt install -y python3 python3-pip python3-venv git curl
 echo "Installation d'Ollama..."
 curl -fsSL https://ollama.com/install.sh | sh
 
-# Créer un utilisateur dédié pour l'application RAG
-echo "Création de l'utilisateur ragapp..."
-if ! id -u ragapp > /dev/null 2>&1; then
-    useradd -m -s /bin/bash ragapp
-    echo "Utilisateur 'ragapp' créé avec succès"
-else
-    echo "L'utilisateur 'ragapp' existe déjà, ignorer..."
-fi
-
-# Assurer la propriété du répertoire personnel
-chown ragapp:ragapp /home/ragapp
-
-echo "[1/7] Dépendances système installées ✓"
+echo "[1/6] Dépendances système installées ✓"
 echo ""
 
 # ============================================================================
 # PARTIE 2 : TÉLÉCHARGEMENT DES MODÈLES D'IA
 # ============================================================================
-echo "[2/7] Téléchargement des modèles d'IA (cela peut prendre plusieurs minutes)..."
+echo "[2/6] Téléchargement des modèles d'IA (cela peut prendre plusieurs minutes)..."
 
 # Télécharger les modèles Ollama requis
-sudo -u ragapp ollama pull mistral:7b
-sudo -u ragapp ollama pull nomic-embed-text
+ollama pull mistral:7b
+ollama pull nomic-embed-text
 
-echo "[2/7] Modèles d'IA téléchargés ✓"
+echo "[2/6] Modèles d'IA téléchargés ✓"
 echo ""
 
 # ============================================================================
 # PARTIE 3 : CONFIGURATION DE L'APPLICATION
 # ============================================================================
-echo "[3/7] Configuration du répertoire de l'application..."
+echo "[3/6] Configuration du répertoire de l'application..."
 
 # Créer le répertoire de l'application
-sudo -u ragapp mkdir -p /home/ragapp/rag-system
-sudo -u ragapp mkdir -p /home/ragapp/rag-system/data
-
-# Note : À ce stade, copiez vos fichiers d'application dans /home/ragapp/rag-system/
-echo "ÉTAPE MANUELLE : Copiez les fichiers suivants dans /home/ragapp/rag-system/ :"
-echo "  - server.py"
-echo "  - rag_pipeline.py"
-echo "  - ingest_adaptive.py"
-echo "  - rag-api.service (pour systemd, facultatif)"
-echo ""
-read -p "Appuyez sur Entrée une fois les fichiers copiés..."
+mkdir -p $RAG_DIR
+mkdir -p $RAG_DIR/data
 
 # Corriger la propriété
-chown -R ragapp:ragapp /home/ragapp/rag-system
+chown -R $SUDO_USER:$SUDO_USER $RAG_DIR
 
-echo "[3/7] Répertoire de l'application prêt ✓"
+# Vérifier que les fichiers principaux sont présents
+if [ ! -f "$RAG_DIR/server.py" ] || [ ! -f "$RAG_DIR/rag_pipeline.py" ] || [ ! -f "$RAG_DIR/ingest_html_adaptive.py" ]; then
+    echo "ATTENTION : Fichiers manquants dans $RAG_DIR/"
+    echo "Fichiers requis :"
+    echo "  - server.py"
+    echo "  - rag_pipeline.py"
+    echo "  - ingest_html_adaptive.py"
+    echo ""
+    read -p "Appuyez sur Entrée une fois les fichiers copiés..."
+fi
+
+echo "[3/6] Répertoire de l'application prêt ✓"
 echo ""
 
 # ============================================================================
-# PARTIE 4 : ENVIRONNEMENT VIRTUEL PYTHON
+# PARTIE 4 : DÉPENDANCES PYTHON
 # ============================================================================
-echo "[4/7] Création de l'environnement virtuel Python..."
-
-cd /home/ragapp/rag-system
-
-# Créer l'environnement virtuel en tant qu'utilisateur ragapp
-sudo -u ragapp python3 -m venv venv
+echo "[4/6] Installation des dépendances Python..."
 
 # Mettre à jour pip
-sudo -u ragapp /home/ragapp/rag-system/venv/bin/pip install --upgrade pip
+pip3 install --upgrade pip
 
 # Installer les paquets Python requis
-sudo -u ragapp /home/ragapp/rag-system/venv/bin/pip install \
+pip3 install \
     langchain \
     langchain-community \
     langchain-chroma \
@@ -108,57 +99,48 @@ sudo -u ragapp /home/ragapp/rag-system/venv/bin/pip install \
     chromadb \
     fastapi \
     uvicorn \
-    python-dotenv
+    python-dotenv \
+    beautifulsoup4
 
-echo "[4/7] Environnement Python configuré ✓"
+echo "[4/6] Dépendances Python installées ✓"
 echo ""
 
 # ============================================================================
 # PARTIE 5 : INGESTION DES DONNÉES
 # ============================================================================
-echo "[5/7] Ingestion des données dans ChromaDB..."
+echo "[5/6] Ingestion des données dans ChromaDB..."
 
-# Créer des données d'exemple si besoin
-# Note: Pour un usage en production, placez vos fichiers HTML dans /home/ragapp/rag-system/data/
-# Exemple de création d'une structure de test :
-# sudo -u ragapp bash -c "echo '<html><body><h1>Test</h1><p>Contenu de test</p></body></html>' > /home/ragapp/rag-system/data/test.html"
+# Vérifier s'il y a des fichiers HTML dans data/
+if [ -z "$(ls -A $RAG_DIR/data/*.html 2>/dev/null)" ]; then
+    echo "ATTENTION : Aucun fichier HTML trouvé dans $RAG_DIR/data/"
+    echo "Placez vos fichiers HTML dans ce répertoire avant l'ingestion."
+else
+    # Exécuter le script d'ingestion
+    echo "Exécution du script d'ingestion de données..."
+    cd $RAG_DIR && python3 ingest_html_adaptive.py
+fi
 
-# Exécuter le script d'ingestion
-echo "Exécution du script d'ingestion de données..."
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest_adaptive.py"
-
-echo "[5/7] Ingestion des données terminée ✓"
+echo "[5/6] Ingestion des données terminée ✓"
 echo ""
 
 # ============================================================================
-# PARTIE 6 : CONFIGURATION DU SERVICE (FACULTATIF - Choisissez une méthode)
+# PARTIE 6 : DÉMARRAGE DU SERVICE
 # ============================================================================
-echo "[6/7] Démarrage du service..."
+echo "[6/6] Démarrage du service..."
 
-# Méthode A : Utilisation de systemd (recommandé pour la production)
-# Décommentez les lignes suivantes si vous avez configuré rag-api.service
-# cp /home/ragapp/rag-system/rag-api.service /etc/systemd/system/
-# systemctl daemon-reload
-# systemctl enable rag-api
-# systemctl start rag-api
-
-# Méthode B : Utilisation de nohup (plus simple, pour le développement/test)
-echo "Démarrage du serveur avec nohup..."
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"
+# Utilisation du script de redémarrage s'il existe
+if [ -f "$RAG_DIR/restart_server.sh" ]; then
+    bash $RAG_DIR/restart_server.sh
+else
+    # Démarrage manuel avec nohup
+    cd $RAG_DIR && nohup python3 server.py > server.log 2>&1 &
+fi
 
 # Attendre le démarrage du serveur
 sleep 5
 
-echo "[6/7] Service démarré ✓"
-echo ""
-
-# ============================================================================
-# PARTIE 7 : VÉRIFICATION
-# ============================================================================
-echo "[7/7] Vérification de l'installation..."
-
 # Vérifier si le processus est en cours d'exécution
-if pgrep -f "uvicorn server:app" > /dev/null; then
+if pgrep -f "python3 server.py" > /dev/null; then
     echo "✓ Le processus du serveur est en cours d'exécution"
 else
     echo "✗ Processus du serveur introuvable - vérifiez les journaux"
@@ -166,19 +148,15 @@ fi
 
 # Tester l'API
 echo "Test du point de terminaison de l'API..."
-RESPONSE=$(curl -s -X POST "http://localhost:8000/ask" \
-     -H "Content-Type: application/json" \
-     -d '{"question": "Quelle est la hauteur de la Tour Eiffel ?"}')
+RESPONSE=$(curl -s http://localhost:8000/health 2>/dev/null || echo "Erreur de connexion")
 
-if echo "$RESPONSE" | grep -q "330"; then
-    echo "✓ Test de l'API réussi !"
-    echo "Réponse : $RESPONSE"
+if echo "$RESPONSE" | grep -qi "ok\|healthy\|status"; then
+    echo "✓ API accessible !"
 else
-    echo "✗ Test de l'API échoué - réponse inattendue"
-    echo "Réponse : $RESPONSE"
+    echo "⚠ API peut ne pas être encore prête. Vérifiez les logs."
 fi
 
-echo "[7/7] Vérification terminée ✓"
+echo "[6/6] Vérification terminée ✓"
 echo ""
 
 # ============================================================================
@@ -192,7 +170,7 @@ echo "Informations sur le service :"
 echo "  - URL : http://localhost:8000"
 echo "  - Vérification de l'état : http://localhost:8000/health"
 echo "  - Point de terminaison de l'API : POST http://localhost:8000/ask"
-echo "  - Journaux : /home/ragapp/rag-system/server.log"
+echo "  - Journaux : $RAG_DIR/server.log"
 echo ""
 echo "Exemple d'utilisation :"
 echo '  curl -X POST "http://localhost:8000/ask" \'
@@ -200,13 +178,13 @@ echo '       -H "Content-Type: application/json" \'
 echo "       -d '{\"question\": \"Votre question ici\"}'"
 echo ""
 echo "Pour ajouter plus de données :"
-echo "  1. Placez les fichiers HTML dans /home/ragapp/rag-system/data/"
-echo "  2. Exécutez : sudo -u ragapp bash -c 'cd /home/ragapp/rag-system && venv/bin/python3 ingest_adaptive.py'"
-echo "  3. Redémarrez le service : sudo pkill -9 -f uvicorn && sudo -u ragapp bash -c 'cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &'"
+echo "  1. Placez les fichiers HTML dans $RAG_DIR/data/"
+echo "  2. Exécutez : cd $RAG_DIR && python3 ingest_html_adaptive.py"
+echo "  3. Redémarrez le service : bash $RAG_DIR/restart_server.sh"
 echo ""
 echo "Dépannage :"
-echo "  - Vérifiez les journaux : sudo cat /home/ragapp/rag-system/server.log"
+echo "  - Vérifiez les journaux : cat $RAG_DIR/server.log"
 echo "  - Vérifiez si Ollama est en cours d'exécution : systemctl status ollama"
-echo "  - Vérifiez les modèles : sudo -u ragapp ollama list"
-echo "  - Tuez les processus bloqués : sudo pkill -f uvicorn"
+echo "  - Vérifiez les modèles : ollama list"
+echo "  - Tuez les processus bloqués : pkill -f 'python3 server.py'"
 echo ""

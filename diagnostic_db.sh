@@ -3,7 +3,7 @@ echo "=========================================="
 echo "DIAGNOSTIC BASE CHROMADB"
 echo "=========================================="
 
-cd /home/ragapp/rag-system
+cd /home/rag
 
 echo ""
 echo "1. Vérification de la base ChromaDB..."

@@ -8,7 +8,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 try:
     print("--- Direct ChromaDB Inspection ---")
-    client = chromadb.PersistentClient(path="/home/ragapp/rag-system/chroma_db")
+    client = chromadb.PersistentClient(path="/home/rag/chroma_db")
     print(f"Collections: {client.list_collections()}")
     
     for col in client.list_collections():
@@ -18,7 +18,7 @@ try:
 
     print("\n--- LangChain Inspection ---")
     embeddings = OllamaEmbeddings(model="nomic-embed-text")
-    vectorstore = Chroma(persist_directory="/home/ragapp/rag-system/chroma_db", embedding_function=embeddings)
+    vectorstore = Chroma(persist_directory="/home/rag/chroma_db", embedding_function=embeddings)
     
     print(f"Total docs in collection (LangChain): {len(vectorstore.get()['ids'])}")
     

@@ -178,13 +178,16 @@ Elle est décrite comme 'Capture écran du tableau de bord'."
 
 ```bash
 # 1. Supprimer l'ancienne base
-sudo rm -rf /home/ragapp/rag-system/chroma_db/
+rm -rf /home/rag/chroma_db/
 
-# 2. Installer BeautifulSoup
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && source venv/bin/activate && pip install beautifulsoup4 && deactivate"
+# 2. Installer BeautifulSoup (si pas déjà fait)
+pip3 install beautifulsoup4
 
-# 3. Utiliser le nouveau script
-sudo bash /home/rag/ingest_html_optimized_workflow.sh
+# 3. Ré-ingérer les données
+cd /home/rag && python3 ingest_html_adaptive.py
+
+# 4. Redémarrer le serveur
+bash /home/rag/restart_server.sh
 ```
 
 ---
@@ -230,14 +233,14 @@ sudo bash /home/rag/ingest_html_optimized_workflow.sh /chemin/vers/vos/html
 ### Erreur : "No module named 'bs4'"
 **Solution** : Installer BeautifulSoup4
 ```bash
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && source venv/bin/activate && pip install beautifulsoup4 && deactivate"
+pip3 install beautifulsoup4
 ```
 
 ### Les images ne sont pas indexées
-**Solution** : Vérifiez que vous utilisez bien `ingest_html_optimized.py`
+**Solution** : Vérifiez que vous utilisez bien `ingest_html_adaptive.py`
 
 ### Vérifier quelle version est utilisée
 ```bash
 # Regarder le nom du script dans les logs
-cat /home/ragapp/rag-system/server.log
+cat /home/rag/server.log
 ```

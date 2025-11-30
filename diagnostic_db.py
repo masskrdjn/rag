@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Script de diagnostic de la base ChromaDB"""
 import sys
-sys.path.insert(0, '/home/ragapp/rag-system/venv/lib/python3.10/site-packages')
+# sys.path.insert(0, '/home/rag')  # Pas nécessaire avec installation globale
 
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
@@ -14,7 +14,7 @@ try:
     print("\n1. Chargement de la base...")
     embeddings = OllamaEmbeddings(model="nomic-embed-text")
     vectorstore = Chroma(
-        persist_directory="/home/ragapp/rag-system/chroma_db",
+        persist_directory="/home/rag/chroma_db",
         embedding_function=embeddings
     )
     

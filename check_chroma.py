@@ -4,7 +4,7 @@ import sys
 
 try:
     embeddings = OllamaEmbeddings(model="nomic-embed-text")
-    vectorstore = Chroma(persist_directory="/home/ragapp/rag-system/chroma_db", embedding_function=embeddings)
+    vectorstore = Chroma(persist_directory="/home/rag/chroma_db", embedding_function=embeddings)
     
     print("Querying for 'congés payés'...")
     results = vectorstore.similarity_search("congés payés", k=3)

@@ -4,9 +4,7 @@
 echo "Debug du contexte envoyé au LLM"
 echo "==============================="
 
-sudo -u ragapp bash << 'EOF'
-cd /home/ragapp/rag-system
-source venv/bin/activate
+cd /home/rag
 
 python3 << 'PYTHON_SCRIPT'
 from langchain_chroma import Chroma
@@ -16,7 +14,7 @@ from langchain_core.prompts import ChatPromptTemplate
 print("\n1. Initialisation...")
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
 vectorstore = Chroma(
-    persist_directory="/home/ragapp/rag-system/chroma_db",
+    persist_directory="/home/rag/chroma_db",
     embedding_function=embeddings
 )
 
@@ -57,5 +55,3 @@ for question in questions:
     print('='*70)
 
 PYTHON_SCRIPT
-
-EOF

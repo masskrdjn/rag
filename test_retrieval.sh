@@ -1,12 +1,10 @@
 #!/bin/bash
-# Script pour tester la recherche depuis l'environnement ragapp
+# Script pour tester la recherche dans ChromaDB
 
 echo "Test de recherche dans ChromaDB"
 echo "================================"
 
-sudo -u ragapp bash << 'EOF'
-cd /home/ragapp/rag-system
-source venv/bin/activate
+cd /home/rag
 
 python3 << 'PYTHON_SCRIPT'
 from langchain_chroma import Chroma
@@ -15,7 +13,7 @@ from langchain_ollama import OllamaEmbeddings
 print("\n1. Chargement de la base...")
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
 vectorstore = Chroma(
-    persist_directory="/home/ragapp/rag-system/chroma_db",
+    persist_directory="/home/rag/chroma_db",
     embedding_function=embeddings
 )
 
@@ -41,5 +39,3 @@ for i, (doc, score) in enumerate(results, 1):
     print(f"Contenu: {doc.page_content[:300]}...")
     print()
 PYTHON_SCRIPT
-
-EOF

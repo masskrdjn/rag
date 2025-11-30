@@ -97,44 +97,22 @@ ollama pull nomic-embed-text
 ollama list
 ```
 
-### Étape 6: Création de l'Utilisateur et du Répertoire
+### Étape 6: Configuration du Répertoire
 
 ```bash
-# Créer un utilisateur dédié (bonne pratique de sécurité)
-sudo useradd -m -s /bin/bash ragapp
-sudo usermod -aG sudo ragapp
+# Le répertoire de l'application est /home/rag/
+cd /home/rag
 
-# Se connecter en tant que ragapp
-sudo su - ragapp
-
-# Créer le répertoire de l'application
-mkdir -p ~/rag-system
-cd ~/rag-system
+# Créer le répertoire pour les données
+mkdir -p /home/rag/data
 ```
 
-### Étape 7: Déploiement du Code
+### Étape 7: Installation des Dépendances Python
 
 ```bash
-# Créer l'environnement virtuel
-python3 -m venv venv
-source venv/bin/activate
-
-# Créer requirements.txt
-cat > requirements.txt << 'EOF'
-langchain
-langchain-openai
-langchain-community
-chromadb
-langchain-chroma
-langchain-ollama
-python-dotenv
-fastapi
-uvicorn
-EOF
-
-# Installer les dépendances
-pip install --upgrade pip
-pip install -r requirements.txt
+# Installer les dépendances Python globalement
+pip3 install --upgrade pip
+pip3 install langchain langchain-community langchain-chroma langchain-ollama chromadb fastapi uvicorn python-dotenv beautifulsoup4
 ```
 
 ### Étape 8: Copie des Fichiers de Code
@@ -143,13 +121,13 @@ Transférer les fichiers depuis votre PC Windows vers le serveur:
 
 ```bash
 # Depuis votre PC Windows (PowerShell)
-scp -r c:/coding/rag/* ragapp@your-server-ip:~/rag-system/
+scp -r c:/coding/rag/* user@your-server-ip:/home/rag/
 
-# Ou utiliser WinSCP / FileZilla pour transférer:
+# Fichiers requis :
 # - rag_pipeline.py
 # - server.py
-# - data/sample.txt
-# - requirements.txt
+# - ingest_html_adaptive.py
+# - restart_server.sh
 ```
 
 ### Étape 9: Configuration du Service Systemd
@@ -157,9 +135,6 @@ scp -r c:/coding/rag/* ragapp@your-server-ip:~/rag-system/
 Créer un service pour que le RAG démarre automatiquement:
 
 ```bash
-# Revenir en tant que root/sudo
-exit  # Quitter l'utilisateur ragapp
-
 # Créer le fichier de service
 sudo nano /etc/systemd/system/rag-api.service
 ```
@@ -173,10 +148,9 @@ Requires=ollama.service
 
 [Service]
 Type=simple
-User=ragapp
-WorkingDirectory=/home/ragapp/rag-system
-Environment="PATH=/home/ragapp/rag-system/venv/bin"
-ExecStart=/home/ragapp/rag-system/venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 --workers 1
+User=hell
+WorkingDirectory=/home/rag
+ExecStart=/usr/bin/python3 /home/rag/server.py
 Restart=always
 RestartSec=10
 
@@ -192,6 +166,9 @@ sudo systemctl start rag-api
 
 # Vérifier le statut
 sudo systemctl status rag-api
+
+# Alternative : démarrage manuel
+bash /home/rag/restart_server.sh
 ```
 
 ### Étape 10: Configuration du Firewall
@@ -334,16 +311,15 @@ Environment="OLLAMA_NUM_THREAD=8"
 ## 📁 Structure Finale du Serveur
 
 ```
-/home/ragapp/rag-system/
-├── venv/                    # Environnement virtuel Python
+/home/rag/
 ├── chroma_db/               # Base de données vectorielle
-├── data/
-│   └── sample.txt          # Données sources
+├── data/                    # Fichiers HTML sources
+│   └── *.html
 ├── rag_pipeline.py         # Pipeline RAG
 ├── server.py               # API FastAPI
-├── main.py                 # Script CLI (optionnel)
-├── requirements.txt        # Dépendances Python
-└── .env                    # Variables d'environnement (si nécessaire)
+├── ingest_html_adaptive.py # Script d'ingestion
+├── restart_server.sh       # Script de redémarrage
+└── server.log              # Logs du serveur
 ```
 
 ---

@@ -1,96 +1,90 @@
-# RAG System - Complete Installation & Operation Procedure
+# Système RAG - Procédure complète d'installation et d'exploitation
 
-## Table of Contents
-1. [Prerequisites](#prerequisites)
-2. [Installation Steps](#installation-steps)
-3. [Data Ingestion](#data-ingestion)
-4. [Service Management](#service-management)
-5. [Troubleshooting](#troubleshooting)
+## Table des matières
+1. [Prérequis](#prérequis)
+2. [Étapes d'installation](#étapes-dinstallation)
+3. [Ingestion des données](#ingestion-des-données)
+4. [Gestion des services](#gestion-des-services)
+5. [Dépannage](#dépannage)
 6. [Maintenance](#maintenance)
 
 ---
 
-## Prerequisites
+## Prérequis
 
-- **OS:** Ubuntu 22.04 or later (tested on WSL2)
-- **Privileges:** sudo access
-- **Network:** Internet connection for downloading models (~2-4 GB)
-- **Disk Space:** ~10 GB free (for models and ChromaDB)
+- **OS :** Ubuntu 22.04 ou ultérieur (testé sur WSL2)
+- **Privilèges :** accès sudo
+- **Réseau :** connexion Internet pour télécharger les modèles (~2-4 Go)
+- **Espace disque :** ~10 Go libres (pour les modèles et ChromaDB)
+- **Répertoire d'installation :** `/home/rag/`
 
 ---
 
-## Installation Steps
+## Étapes d'installation
 
-### Method 1: Automated Installation (Recommended)
+### Méthode 1 : Installation automatisée (Recommandée)
 
 ```bash
-# Download and execute the complete installation script
+# Télécharger et exécuter le script d'installation complet
 sudo bash complete_install.sh
 ```
 
-This script will:
-1. Install system dependencies (Python, pip, git, curl)
-2. Install Ollama
-3. Create `ragapp` user
-4. Download AI models (llama3.2, nomic-embed-text)
-5. Setup Python virtual environment
-6. Ingest sample data
-7. Start the service
-8. Verify the installation
+Ce script va :
+1. Installer les dépendances système (Python, pip, git, curl)
+2. Installer Ollama
+3. Configurer le répertoire `/home/rag/`
+4. Télécharger les modèles IA (mistral:7b, nomic-embed-text)
+5. Installer les dépendances Python
+6. Ingérer les données
+7. Démarrer le service
 
-### Method 2: Manual Step-by-Step Installation
+### Méthode 2 : Installation manuelle étape par étape
 
-#### Step 1: System Dependencies
+#### Étape 1 : Dépendances système
 ```bash
-# Update system
+# Mettre à jour le système
 sudo apt update && sudo apt upgrade -y
 
-# Install Python and tools
+# Installer Python et les outils
 sudo apt install -y python3 python3-pip python3-venv git curl
 
-# Install Ollama
+# Installer Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-#### Step 2: User Creation
+#### Étape 2 : Configuration du répertoire
 ```bash
-# Create dedicated user
-sudo useradd -m -s /bin/bash ragapp
+# Créer le répertoire de l'application (si nécessaire)
+mkdir -p /home/rag
+mkdir -p /home/rag/data
 
-# Ensure proper ownership
-sudo chown ragapp:ragapp /home/ragapp
+# S'assurer que l'utilisateur courant a les droits
+sudo chown -R $USER:$USER /home/rag
 ```
 
-#### Step 3: Download AI Models
+#### Étape 3 : Téléchargement des modèles IA
 ```bash
-# Pull LLM model (for generating answers)
-sudo -u ragapp ollama pull llama3.2
+# Tirer le modèle LLM (pour générer des réponses)
+ollama pull mistral:7b
 
-# Pull embedding model (for vectorization)
-sudo -u ragapp ollama pull nomic-embed-text
+# Tirer le modèle d'intégration (pour la vectorisation)
+ollama pull nomic-embed-text
 ```
 
-#### Step 4: Application Setup
+#### Étape 4 : Configuration de l'application
 ```bash
-# Create application directory
-sudo -u ragapp mkdir -p /home/ragapp/rag-system
-sudo -u ragapp mkdir -p /home/ragapp/rag-system/data
+# Les fichiers de l'application sont déjà dans /home/rag/
+cd /home/rag
 
-# Copy application files
-sudo cp server.py rag_pipeline.py ingest.py /home/ragapp/rag-system/
-sudo chown -R ragapp:ragapp /home/ragapp/rag-system
+# Vérifier que les fichiers principaux sont présents
+ls -la server.py rag_pipeline.py ingest_html_adaptive.py
 ```
 
-#### Step 5: Python Environment
+#### Étape 5 : Dépendances Python
 ```bash
-cd /home/ragapp/rag-system
-
-# Create virtual environment
-sudo -u ragapp python3 -m venv venv
-
-# Install dependencies
-sudo -u ragapp venv/bin/pip install --upgrade pip
-sudo -u ragapp venv/bin/pip install \
+# Installer les dépendances Python (installation globale)
+pip3 install --upgrade pip
+pip3 install \
     langchain \
     langchain-community \
     langchain-chroma \
@@ -98,332 +92,335 @@ sudo -u ragapp venv/bin/pip install \
     chromadb \
     fastapi \
     uvicorn \
-    python-dotenv
+    python-dotenv \
+    beautifulsoup4
 ```
 
 ---
 
-## Data Ingestion
+## Ingestion des données
 
-### Initial Data Ingestion
+### Ingestion initiale des données
 
-1. **Place your documents** in `/home/ragapp/rag-system/data/`:
+1. **Placez vos documents** dans `/home/rag/data/` :
    ```bash
-   # Example: Create sample data
-   sudo -u ragapp bash -c "echo 'Your text content here' > /home/ragapp/rag-system/data/document.txt"
+   # Copier vos fichiers HTML dans le répertoire data
+   cp /chemin/vers/vos/fichiers/*.html /home/rag/data/
    ```
 
-2. **Run the ingestion script**:
+2. **Exécutez le script d'ingestion** :
    ```bash
-   sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest.py"
+   cd /home/rag && python3 ingest_html_adaptive.py
    ```
 
-   **Expected output:**
+   **Sortie attendue :**
    ```
-   Loading documents from data...
-   Loaded X documents.
-   Split into Y chunks.
-   Saving to ChromaDB...
-   Ingestion complete! Data saved to chroma_db
+   Chargement des documents depuis data...
+   Chargé X documents.
+   Divisé en Y morceaux.
+   Sauvegarde dans ChromaDB...
+   Ingestion terminée ! Données sauvegardées dans chroma_db
    ```
 
-### What Happens During Ingestion
+### Ce qui se passe pendant l'ingestion
 
-The `ingest.py` script performs the following:
+Le script `ingest_html_adaptive.py` effectue les opérations suivantes :
 
-1. **Loading:** Reads all `.txt` files from the `data/` directory
-2. **Chunking:** Splits documents into manageable pieces:
-   - Chunk size: 1000 characters
-   - Overlap: 200 characters (for context continuity)
-3. **Embedding:** Converts text chunks to vectors using `nomic-embed-text` model
-4. **Storage:** Saves vectors to ChromaDB in the `chroma_db/` directory
+1. **Chargement :** Lit tous les fichiers `.html` du répertoire `data/`
+2. **Découpage :** Divise les documents en morceaux gérables :
+   - Taille des morceaux : 1000 caractères
+   - Chevauchement : 200 caractères (pour la continuité du contexte)
+3. **Intégration :** Convertit les morceaux de texte en vecteurs utilisant le modèle `nomic-embed-text`
+4. **Stockage :** Sauvegarde les vecteurs dans ChromaDB dans le répertoire `chroma_db/`
 
-### Adding New Data
+### Ajout de nouvelles données
 
-When you add new documents:
+Lorsque vous ajoutez de nouveaux documents :
 
 ```bash
-# 1. Add files to data directory
-sudo cp /path/to/new_documents/*.txt /home/ragapp/rag-system/data/
-sudo chown ragapp:ragapp /home/ragapp/rag-system/data/*.txt
+# 1. Ajouter des fichiers au répertoire data
+cp /path/to/new_documents/*.html /home/rag/data/
 
-# 2. Re-run ingestion
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest.py"
+# 2. Ré-exécuter l'ingestion
+cd /home/rag && python3 ingest_html_adaptive.py
 
-# 3. Restart the service
-sudo pkill -f uvicorn
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"
+# 3. Redémarrer le service
+bash /home/rag/restart_server.sh
 ```
 
 ---
 
-## Service Management
+## Gestion des services
 
-### Starting the Service
+### Démarrage du service
 
-**Method A: Using nohup (Simple)**
+**Méthode A : Script de redémarrage (Recommandée)**
 ```bash
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"
+bash /home/rag/restart_server.sh
 ```
 
-**Method B: Using systemd (Production)**
+**Méthode B : Démarrage manuel**
 ```bash
-# 1. Copy service file
-sudo cp rag-api.service /etc/systemd/system/
+cd /home/rag && nohup python3 server.py > server.log 2>&1 &
+```
 
-# 2. Reload systemd
+**Méthode C : Utilisation de systemd (Production)**
+```bash
+# 1. Copier le fichier de service
+sudo cp /home/rag/rag-api.service /etc/systemd/system/
+
+# 2. Recharger systemd
 sudo systemctl daemon-reload
 
-# 3. Enable and start
+# 3. Activer et démarrer
 sudo systemctl enable rag-api
 sudo systemctl start rag-api
 ```
 
-### Stopping the Service
+### Arrêt du service
 
 ```bash
-# Method A: Kill process
-sudo pkill -f uvicorn
+# Méthode A : Tuer le processus
+pkill -f "python3 server.py"
 
-# Method B: Systemd
+# Méthode B : Systemd
 sudo systemctl stop rag-api
 ```
 
-### Checking Service Status
+### Vérification du statut du service
 
 ```bash
-# Check if process is running
-ps aux | grep uvicorn
+# Vérifier si le processus fonctionne
+ps aux | grep "python3 server.py"
 
-# Check logs (nohup method)
-sudo cat /home/ragapp/rag-system/server.log
+# Vérifier les logs
+cat /home/rag/server.log
 
-# Check logs (systemd method)
+# Suivre les logs en temps réel
+tail -f /home/rag/server.log
+
+# Vérifier les logs (méthode systemd)
 sudo journalctl -u rag-api -f
 ```
 
-### Testing the API
+### Test de l'API
 
 ```bash
-# Health check
+# Vérification de santé
 curl http://localhost:8000/health
 
-# Ask a question
+# Poser une question
 curl -X POST "http://localhost:8000/ask" \
      -H "Content-Type: application/json" \
-     -d '{"question": "Your question here"}'
+     -d '{"question": "Votre question ici"}'
 ```
 
 ---
 
-## Troubleshooting
+## Dépannage
 
-### Problem 1: Permission Denied Errors
+### Problème 1 : Erreurs de permission refusée
 
-**Symptom:**
+**Symptôme :**
 ```
-bash: /home/ragapp/rag-system/file.txt: Permission denied
+bash: /home/rag/file.txt: Permission denied
 ```
 
-**Solution:**
+**Solution :**
 ```bash
-# Fix ownership
-sudo chown -R ragapp:ragapp /home/ragapp/rag-system
-
-# Ensure parent directory ownership
-sudo chown ragapp:ragapp /home/ragapp
+# Corriger la propriété
+sudo chown -R $USER:$USER /home/rag
 ```
 
-### Problem 2: ChromaDB Error "Nothing found on disk"
+### Problème 2 : Erreur ChromaDB "Nothing found on disk"
 
-**Symptom:**
+**Symptôme :**
 ```
 Error creating hnsw segment reader: Nothing found on disk
 ```
 
-**Cause:** Service started before data ingestion, or data ingestion failed.
+**Cause :** Service démarré avant l'ingestion des données, ou ingestion échouée.
 
-**Solution:**
+**Solution :**
 ```bash
-# 1. Stop the service
-sudo pkill -f uvicorn
+# 1. Arrêter le service
+pkill -f "python3 server.py"
 
-# 2. Verify data exists
-ls -la /home/ragapp/rag-system/data/
+# 2. Vérifier que les données existent
+ls -la /home/rag/data/
 
-# 3. Re-run ingestion
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest.py"
+# 3. Ré-exécuter l'ingestion
+cd /home/rag && python3 ingest_html_adaptive.py
 
-# 4. Restart service
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"
+# 4. Redémarrer le service
+bash /home/rag/restart_server.sh
 ```
 
-### Problem 3: Generic Answers (Not Using RAG Data)
+### Problème 3 : Réponses génériques (Ne utilisant pas les données RAG)
 
-**Symptom:** API responds but doesn't use ingested data.
+**Symptôme :** L'API répond mais n'utilise pas les données ingérées.
 
-**Diagnosis:**
+**Diagnostic :**
 ```bash
-# Check if ChromaDB exists
-ls -la /home/ragapp/rag-system/chroma_db/
+# Vérifier si ChromaDB existe
+ls -la /home/rag/chroma_db/
 
-# Check ingestion logs
-sudo cat /home/ragapp/rag-system/server.log
+# Vérifier les logs d'ingestion
+cat /home/rag/server.log
 ```
 
-**Solution:** Follow steps in Problem 2.
+**Solution :** Suivre les étapes du Problème 2.
 
-### Problem 4: Ollama Models Not Found
+### Problème 4 : Modèles Ollama introuvables
 
-**Symptom:**
+**Symptôme :**
 ```
-Model 'llama3.2' not found
+Model 'mistral:7b' not found
 ```
 
-**Solution:**
+**Solution :**
 ```bash
-# List available models
-sudo -u ragapp ollama list
+# Lister les modèles disponibles
+ollama list
 
-# Pull missing models
-sudo -u ragapp ollama pull llama3.2
-sudo -u ragapp ollama pull nomic-embed-text
+# Tirer les modèles manquants
+ollama pull mistral:7b
+ollama pull nomic-embed-text
 ```
 
-### Problem 5: Port 8000 Already in Use
+### Problème 5 : Port 8000 déjà utilisé
 
-**Symptom:**
+**Symptôme :**
 ```
 ERROR: [Errno 98] Address already in use
 ```
 
-**Solution:**
+**Solution :**
 ```bash
-# Find process using port 8000
-sudo lsof -i :8000
+# Trouver le processus utilisant le port 8000
+lsof -i :8000
 
-# Kill the process
-sudo kill -9 <PID>
+# Tuer le processus
+kill -9 <PID>
 
-# Or change port in startup command
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8001 > server.log 2>&1 &"
+# Ou utiliser le script de redémarrage qui gère cela automatiquement
+bash /home/rag/restart_server.sh
 ```
 
-### Problem 6: Python Dependencies Missing
+### Problème 6 : Dépendances Python manquantes
 
-**Symptom:**
+**Symptôme :**
 ```
 ModuleNotFoundError: No module named 'langchain'
 ```
 
-**Solution:**
+**Solution :**
 ```bash
-# Reinstall dependencies
-sudo -u ragapp /home/ragapp/rag-system/venv/bin/pip install \
+# Réinstaller les dépendances
+pip3 install \
     langchain langchain-community langchain-chroma \
-    langchain-ollama chromadb fastapi uvicorn python-dotenv
+    langchain-ollama chromadb fastapi uvicorn python-dotenv beautifulsoup4
 ```
 
 ---
 
 ## Maintenance
 
-### Monitoring
+### Surveillance
 
 ```bash
-# Check server logs
-sudo tail -f /home/ragapp/rag-system/server.log
+# Vérifier les logs du serveur
+tail -f /home/rag/server.log
 
-# Monitor resource usage
+# Surveiller l'utilisation des ressources
 htop
 ```
 
-### Backup
+### Sauvegarde
 
 ```bash
-# Backup data and database
-sudo tar -czf rag-backup-$(date +%Y%m%d).tar.gz \
-    /home/ragapp/rag-system/data \
-    /home/ragapp/rag-system/chroma_db
+# Sauvegarder les données et la base de données
+tar -czf rag-backup-$(date +%Y%m%d).tar.gz \
+    /home/rag/data \
+    /home/rag/chroma_db
 ```
 
-### Updating Models
+### Mise à jour des modèles
 
 ```bash
-# Update Ollama models
-sudo -u ragapp ollama pull llama3.2
-sudo -u ragapp ollama pull nomic-embed-text
+# Mettre à jour les modèles Ollama
+ollama pull mistral:7b
+ollama pull nomic-embed-text
 
-# Restart service to use updated models
-sudo pkill -f uvicorn
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"
+# Redémarrer le service pour utiliser les modèles mis à jour
+bash /home/rag/restart_server.sh
 ```
 
-### Clearing and Re-ingesting Data
+### Effacement et ré-ingestion des données
 
 ```bash
-# Stop service
-sudo pkill -f uvicorn
+# Arrêter le service
+pkill -f "python3 server.py"
 
-# Remove old database
-sudo rm -rf /home/ragapp/rag-system/chroma_db
+# Supprimer l'ancienne base de données
+rm -rf /home/rag/chroma_db
 
-# Clear data directory
-sudo rm -rf /home/ragapp/rag-system/data/*
+# Effacer le répertoire data (optionnel)
+rm -rf /home/rag/data/*
 
-# Add new data
-sudo cp /path/to/new/data/*.txt /home/ragapp/rag-system/data/
-sudo chown ragapp:ragapp /home/ragapp/rag-system/data/*.txt
+# Ajouter de nouvelles données
+cp /path/to/new/data/*.html /home/rag/data/
 
-# Re-ingest
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest.py"
+# Ré-ingérer
+cd /home/rag && python3 ingest_html_adaptive.py
 
-# Restart service
-sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"
+# Redémarrer le service
+bash /home/rag/restart_server.sh
 ```
 
 ---
 
-## Quick Reference Commands
+## Référence rapide des commandes
 
-| Action | Command |
-|--------|---------|
-| Start service | `sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &"` |
-| Stop service | `sudo pkill -f uvicorn` |
-| Check status | `ps aux \| grep uvicorn` |
-| View logs | `sudo cat /home/ragapp/rag-system/server.log` |
-| Test API | `curl http://localhost:8000/health` |
-| Ingest data | `sudo -u ragapp bash -c "cd /home/ragapp/rag-system && venv/bin/python3 ingest.py"` |
-| List models | `sudo -u ragapp ollama list` |
+| Action | Commande |
+|--------|----------|
+| Démarrer le service | `bash /home/rag/restart_server.sh` |
+| Arrêter le service | `pkill -f "python3 server.py"` |
+| Vérifier le statut | `ps aux \| grep "python3 server.py"` |
+| Voir les logs | `cat /home/rag/server.log` |
+| Tester l'API | `curl http://localhost:8000/health` |
+| Ingérer les données | `cd /home/rag && python3 ingest_html_adaptive.py` |
+| Lister les modèles | `ollama list` |
+| Changer le modèle | `bash /home/rag/change_model.sh <nom_modele>` |
 
 ---
 
-## Architecture Summary
+## Résumé de l'architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Client (curl/browser)                 │
+│                    Client (curl/navigateur)              │
 └────────────────────────┬────────────────────────────────┘
                          │ HTTP POST /ask
                          ▼
 ┌─────────────────────────────────────────────────────────┐
-│              FastAPI Server (server.py)                  │
+│              Serveur FastAPI (server.py)                 │
 │                  Port 8000                               │
 └────────────────────────┬────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────┐
-│           RAG Pipeline (rag_pipeline.py)                 │
+│           Pipeline RAG (rag_pipeline.py)                 │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │   ChromaDB   │  │  Embeddings  │  │   LLM Model  │  │
-│  │  (Retriever) │  │ nomic-embed  │  │   llama3.2   │  │
+│  │   ChromaDB   │  │  Intégrations│  │   Modèle LLM │  │
+│  │  (Retriever) │  │ nomic-embed  │  │  mistral:7b  │  │
 │  └──────────────┘  └──────────────┘  └──────────────┘  │
 └─────────────────────────────────────────────────────────┘
                          ▲
-                         │ Ingestion (ingest.py)
+                         │ Ingestion (ingest_html_adaptive.py)
                          │
 ┌─────────────────────────────────────────────────────────┐
-│              Data Files (data/*.txt)                     │
+│              Fichiers de données (data/*.html)            │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -431,8 +428,8 @@ sudo -u ragapp bash -c "cd /home/ragapp/rag-system && nohup venv/bin/uvicorn ser
 
 ## Support
 
-For issues or questions:
-1. Check the [Troubleshooting](#troubleshooting) section
-2. Review logs: `/home/ragapp/rag-system/server.log`
-3. Verify all prerequisites are met
-4. Ensure Ollama service is running: `systemctl status ollama`
+Pour les problèmes ou questions :
+1. Vérifiez la section [Dépannage](#dépannage)
+2. Examinez les logs : `/home/rag/server.log`
+3. Vérifiez que tous les prérequis sont satisfaits
+4. Assurez-vous que le service Ollama fonctionne : `systemctl status ollama`
