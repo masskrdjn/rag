@@ -27,7 +27,7 @@ class SimpleRAG:
             hybrid_weights (list): Poids pour [vectoriel, bm25] (par défaut [0.5, 0.5])
         """
         self.persist_directory = "/home/rag/chroma_db"  # Base de données ChromaDB
-        self.model_name = "llama3.2"
+        self.model_name = "mistral:7b"
         self.embedding_model = "nomic-embed-text"
         self.qa_chain = None
         
