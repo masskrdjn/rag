@@ -64,16 +64,15 @@ CONTEXTE RÉCUPÉRÉ :
 QUESTION :
 {question}
 
-INSTRUCTIONS INTERNES (NE PAS répéter ces instructions dans ta réponse) :
-- Réponds en te basant UNIQUEMENT sur le CONTEXTE RÉCUPÉRÉ ci-dessus.
-- Si le contexte mentionne de "consulter" une source externe (Whaller, sphère, intranet, fiche Gravity, etc.), CITE cette source EXACTEMENT comme elle apparaît dans le contexte.
-- N'invente RIEN. Si l'information n'est pas dans le contexte, dis-le.
-- NE FAIS PAS RÉFÉRENCE aux sources du contexte dans ta réponse. Évite les formulations comme "Selon le document X...", "D'après l'article Y...", noms de fichiers (.html, .pdf). Ces références sont internes et n'ont pas de sens pour l'utilisateur.
-- Réponds directement à la question de manière naturelle, comme si tu avais cette connaissance.
-- Si la question porte sur une PROCÉDURE ou un PROCESSUS (mots-clés: comment, étapes, procédure, guide): Organise ta réponse en étapes numérotées dans l'ORDRE LOGIQUE. Si le contexte contient des sections numérotées (Étape 1, Étape 2, etc.), RESPECTE cet ordre. Présente un résumé clair avant les détails si la procédure est longue.
-- Priorise la COMPLÉTUDE : si le contexte contient plusieurs sections d'un même document, synthétise-les toutes de manière cohérente.
+INSTRUCTIONS STRICTES :
+1. Réponds UNIQUEMENT avec les informations présentes dans le CONTEXTE RÉCUPÉRÉ ci-dessus.
+2. NE JAMAIS inventer d'informations. Si tu ne trouves pas l'information dans le contexte, dis "Je n'ai pas trouvé cette information dans la documentation."
+3. Si le contexte contient des étapes numérotées (Étape 1, Étape 2, etc.), tu DOIS les reprendre TOUTES dans l'ordre.
+4. Pour une procédure, structure ta réponse avec des étapes numérotées claires.
+5. N'invente PAS de sites web, d'URLs, ou de procédures qui ne sont pas explicitement dans le contexte.
+6. Cite les outils/systèmes EXACTEMENT comme ils apparaissent (SpeedTravel, Galaxy, STRA, etc.).
 
-RÉPONSE :"""
+RÉPONSE (basée uniquement sur le contexte ci-dessus) :"""
         
         prompt = ChatPromptTemplate.from_template(template)
         
@@ -86,8 +85,8 @@ RÉPONSE :"""
             if not docs:
                 return "Aucun contexte pertinent trouvé."
             
-            # Limiter au top_k
-            docs = docs[:self.top_k]
+            # Enrichir avec les sections manquantes si nécessaire
+            docs = self._fetch_related_sections(docs)
             
             # Regrouper les documents par source (même fichier)
             by_source = {}
@@ -164,6 +163,9 @@ RÉPONSE :"""
     def _create_retriever(self, vectorstore):
         """Créer un récupérateur basé sur la configuration."""
         
+        # Stocker le vectorstore pour la récupération de sections liées
+        self.vectorstore = vectorstore
+        
         if self.use_hybrid:
             # Mode hybride : combiner vectoriel + BM25
             return self._create_hybrid_retriever(vectorstore)
@@ -184,6 +186,121 @@ RÉPONSE :"""
                 search_type="similarity",
                 search_kwargs={"k": self.top_k}
             )
+    
+    def _fetch_related_sections(self, docs):
+        """
+        Si un document sommaire ou processus est trouvé, récupère toutes les sections
+        liées pour garantir la complétude de la réponse.
+        
+        Args:
+            docs: Documents initialement récupérés
+            
+        Returns:
+            Liste enrichie de documents avec toutes les sections liées
+        """
+        if not docs or not hasattr(self, 'vectorstore'):
+            return docs
+        
+        # Identifier les documents qui nécessitent une récupération complète
+        existing_sources = {}
+        
+        for doc in docs:
+            source = doc.metadata.get('source', '')
+            post_id = doc.metadata.get('post_id', '')
+            is_summary = doc.metadata.get('is_summary', False)
+            doc_type = doc.metadata.get('doc_type', '')
+            total_sections = doc.metadata.get('total_sections', 0)
+            
+            # Clé unique pour le document - préférer post_id
+            doc_key = post_id if post_id else source
+            
+            if not doc_key:
+                continue
+            
+            if doc_key not in existing_sources:
+                existing_sources[doc_key] = {
+                    'sections': set(),
+                    'has_summary': False,
+                    'total_sections': total_sections,
+                    'source': source,
+                    'post_id': post_id,
+                    'count': 0  # Nombre de chunks récupérés pour ce document
+                }
+            
+            existing_sources[doc_key]['sections'].add(doc.metadata.get('section_num', -1))
+            existing_sources[doc_key]['count'] += 1
+            if is_summary:
+                existing_sources[doc_key]['has_summary'] = True
+        
+        if not existing_sources:
+            return docs
+        
+        # Trouver le document principal (celui avec le plus de chunks OU un sommaire)
+        main_doc_key = None
+        max_score = 0
+        
+        for doc_key, info in existing_sources.items():
+            # Score = nombre de chunks + bonus si sommaire trouvé
+            score = info['count'] + (5 if info['has_summary'] else 0)
+            if score > max_score:
+                max_score = score
+                main_doc_key = doc_key
+        
+        if not main_doc_key:
+            return docs
+        
+        info = existing_sources[main_doc_key]
+        total = info['total_sections']
+        existing_sections = info['sections']
+        
+        # Vérifier s'il manque des sections
+        if total == 0:
+            return docs
+            
+        all_sections = set(range(0, total + 1))  # 0 = sommaire, 1 à total = sections
+        missing_sections = all_sections - existing_sections
+        
+        if not missing_sections:
+            return docs  # Toutes les sections sont déjà présentes
+        
+        print(f"[RAG] Document principal: {main_doc_key} ({info['count']} chunks)")
+        print(f"[RAG] Récupération des sections manquantes: {sorted(missing_sections)}")
+        
+        # Récupérer les sections manquantes
+        enriched_docs = list(docs)
+        
+        try:
+            # Utiliser post_id pour filtrer (plus fiable)
+            if info['post_id']:
+                filter_dict = {"post_id": info['post_id']}
+            else:
+                filter_dict = {"source": info['source']}
+            
+            # Récupérer tous les documents de cette source
+            results = self.vectorstore.get(
+                where=filter_dict,
+                include=["documents", "metadatas"]
+            )
+            
+            if results and results.get('documents'):
+                from langchain_core.documents import Document
+                added = set()
+                for content, metadata in zip(results['documents'], results['metadatas']):
+                    section_num = metadata.get('section_num', -1)
+                    section_key = (metadata.get('post_id', ''), section_num)
+                    
+                    if section_num in missing_sections and section_key not in added:
+                        new_doc = Document(page_content=content, metadata=metadata)
+                        enriched_docs.append(new_doc)
+                        added.add(section_key)
+                        print(f"  + Section {section_num}: {metadata.get('section_title', 'N/A')[:50]}")
+                        
+        except Exception as e:
+            print(f"[RAG] Erreur lors de la récupération des sections: {e}")
+        
+        return enriched_docs
+        
+        return enriched_docs
     
     def _create_hybrid_retriever(self, vectorstore):
         """Créer un récupérateur hybride combinant recherche vectorielle et BM25."""
