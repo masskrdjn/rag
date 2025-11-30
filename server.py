@@ -8,9 +8,17 @@ import os
 # Initialize FastAPI
 app = FastAPI(title="RAG Enterprise API", version="1.0.0")
 
+# Configuration via variables d'environnement
+MODEL_NAME = os.getenv("RAG_MODEL", "mistral:7b")
+MAX_CONTEXT = int(os.getenv("RAG_MAX_CONTEXT", "3000"))
+
+print(f"🚀 Configuration RAG: model={MODEL_NAME}, max_context={MAX_CONTEXT}")
+
 # Initialize RAG Pipeline (Global instance)
-# In a production setting, you might want to load this lazily or handle concurrency better
-rag = SimpleRAG()
+rag = SimpleRAG(
+    model_name=MODEL_NAME,
+    max_context_chars=MAX_CONTEXT
+)
 
 class QueryRequest(BaseModel):
     question: str
