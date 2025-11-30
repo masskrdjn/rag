@@ -1,0 +1,439 @@
+[
+    {
+        "category": "Congés et absences",
+        "questions": [
+            "Où puis-je consulter les règles concernant les congés payés?",
+            "Quelle est la procédure pour poser des congés?",
+            "Comment sont gérées les absences dans l'entreprise?"
+        ]
+    },
+    {
+        "category": "Emissions GDS",
+        "questions": [
+            "Comment émettre un dossier confirmé sur GDS?",
+            "Que signifient les différentes couleurs du robot d'émission?",
+            "Que faire quand le robot d'émission échoue?",
+            "Quelles sont les conditions pour qu'un dossier soit éligible à l'émission automatique?",
+            "Comment émettre un dossier en devis ou en demande?",
+            "Quelle est la procédure pour les émissions manuelles?",
+            "Que faire en cas de changement de tarif en achat?",
+            "Comment traiter l'alerte 'ATTENTION verifier horaire du vol'?",
+            "Que faire si l'émission est impossible?"
+        ]
+    },
+    {
+        "category": "Assurance XPLORASSUR",
+        "questions": [
+            "Comment réserver une assurance XPLORASSUR?",
+            "Comment obtenir une attestation d'assurance?",
+            "Comment modifier les dates d'un contrat d'assurance?",
+            "Quelle est la procédure pour annuler une assurance sans frais?",
+            "Peut-on ajouter une assurance annulation sur un dossier à la carte?",
+            "Comment proposer une assurance sur un dossier groupe?",
+            "Où trouver les codes d'accès pour le B2B XPLORASSUR?",
+            "Quelles sont les différentes garanties d'assurance disponibles?",
+            "Quelle est la différence entre l'assurance Annulation et Multirisque Annulation?"
+        ]
+    },
+    {
+        "category": "Réclamations",
+        "questions": [
+            "Comment traiter une réclamation client?",
+            "Quelle est la procédure pour faire un geste commercial?",
+            "Quand transmettre un dossier à l'Operations Manager?",
+            "Comment gérer une réclamation liée au transporteur?",
+            "Que faire en cas de retard ou d'annulation de vol?",
+            "Comment traiter les demandes de remboursement?",
+            "Quelle est la grille de responsabilité pour analyser un litige?",
+            "Comment clôturer un dossier de réclamation?",
+            "Que faire avec les dossiers sans suite?"
+        ]
+    },
+    {
+        "category": "Modifications et prestations",
+        "questions": [
+            "Comment modifier ou ajouter une prestation hors demandes?",
+            "Quelle est la procédure pour les demandes médicales ou repas spécifiques?",
+            "Comment traiter une demande d'annulation du fait du client?",
+            "Que faire en cas de modification de plan de vol par le transporteur?",
+            "Comment gérer les no-show?",
+            "Quelle est la procédure pour les add-ons réservables en ligne?"
+        ]
+    },
+    {
+        "category": "Documents de voyage",
+        "questions": [
+            "Comment obtenir les cartes d'embarquement?",
+            "Où trouver les convocations de voyage?",
+            "Comment envoyer les documents de voyage au client?"
+        ]
+    },
+    {
+        "category": "Grèves",
+        "questions": [
+            "Quelle est la procédure en cas de grève des contrôleurs aériens?",
+            "Comment gérer les grèves de compagnies aériennes?",
+            "Quels sont les droits des passagers en cas de grève?"
+        ]
+    },
+    {
+        "category": "Réservations IATA",
+        "questions": [
+            "Comment émettre une réservation IATA?",
+            "Quelles sont les spécificités des dossiers IATA?",
+            "Où trouver la fiche sur les émissions RESA IATA?"
+        ]
+    },
+    {
+        "category": "Boîtes mails",
+        "questions": [
+            "Comment traiter les e-mails booking@vlctravel.com?",
+            "Quelle est la procédure pour les daily tasks des boîtes mails?",
+            "Quelles sont les différentes boîtes mails à surveiller?"
+        ]
+    },
+    {
+        "category": "Ventes de dernière minute",
+        "questions": [
+            "Comment réserver manuellement une vente de dernière minute?",
+            "Quelles sont les contraintes pour les réservations urgentes?"
+        ]
+    },
+    {
+        "category": "Sites professionnels",
+        "questions": [
+            "Quels sont les sites pros à codes d'accès personnels?",
+            "Où trouver les identifiants pour les différents sites?"
+        ]
+    },
+    {
+        "category": "Etats de caisse",
+        "questions": [
+            "Comment faire les états de caisses en daily task?",
+            "Quelle est la procédure de vérification des états de caisse?"
+        ]
+    },
+    {
+        "category": "Erreurs et problèmes techniques",
+        "questions": [
+            "Comment traiter les KO inconnues?",
+            "Que faire en cas d'erreur technique?",
+            "Comment contacter le support Penguin pour un problème technique?"
+        ]
+    },
+    {
+        "category": "Fraude",
+        "questions": [
+            "Quelle est la procédure en cas de suspicion de fraude?",
+            "Comment prévenir la fraude?",
+            "Que faire si je détecte une transaction suspecte?"
+        ]
+    },
+    {
+        "category": "Fiches de poste",
+        "questions": [
+            "Où trouver les fiches de poste?",
+            "Quelles sont les responsabilités de mon poste?"
+        ]
+    },
+    {
+        "category": "Remise de chèques",
+        "questions": [
+            "Quelle est la procédure pour la remise de chèques?",
+            "À qui remettre les chèques?"
+        ]
+    },
+    {
+        "category": "Facturation",
+        "questions": [
+            "Comment fonctionne la facturation client?",
+            "Quelle est la procédure pour la facturation fournisseurs?",
+            "Comment faire le pointage financier?",
+            "Comment traiter les remboursements CB?",
+            "Que faire en cas d'erreur technique de facturation Penguin World?"
+        ]
+    },
+    {
+        "category": "DAR",
+        "questions": [
+            "Comment faire une DAR?",
+            "Qu'est-ce qu'une DAR?",
+            "Dans quels cas doit-on faire une DAR?"
+        ]
+    },
+    {
+        "category": "Daily tasks Team Leaders",
+        "questions": [
+            "Quelles sont les daily tasks des Team Leaders RESA?",
+            "Quelles vérifications doivent faire les Team Leaders quotidiennement?"
+        ]
+    },
+    {
+        "category": "Annulations",
+        "questions": [
+            "Comment annuler un dossier en devis, demande ou option?",
+            "Quelle est la procédure d'annulation?"
+        ]
+    },
+    {
+        "category": "Connecteurs",
+        "questions": [
+            "Comment mettre en production un nouveau connecteur?",
+            "Comment fonctionne le connecteur Speedflight?",
+            "Quelle est la procédure pour le connecteur SNCF?",
+            "Comment utiliser le connecteur Railneo speedrail?"
+        ]
+    },
+    {
+        "category": "Accords et refus d'intervention",
+        "questions": [
+            "Comment gérer les accords d'intervention?",
+            "Quelle est la procédure pour les refus d'intervention?"
+        ]
+    },
+    {
+        "category": "Reporting",
+        "questions": [
+            "Comment faire le reporting des chiffres compagnie?",
+            "Quels sont les indicateurs à reporter?"
+        ]
+    },
+    {
+        "category": "Travel Connect",
+        "questions": [
+            "Comment traiter les dossiers TRAVEL CONNECT?",
+            "Quelles sont les spécificités de Travel Connect?"
+        ]
+    },
+    {
+        "category": "Filiale à l'étranger",
+        "questions": [
+            "Quelles sont les étapes de lancement d'une filiale à l'étranger?",
+            "Quels sont les paramétrages techniques nécessaires?",
+            "Quelle est la stratégie pour lancer une filiale?",
+            "Comment faire une fiche pays?",
+            "Quelle est la procédure de recrutement pour une filiale?",
+            "Comment faire une fiche marché?",
+            "Comment choisir l'implantation (ville et bureaux)?",
+            "Quelle est la fiche administrative nécessaire?"
+        ]
+    },
+    {
+        "category": "Astreinte",
+        "questions": [
+            "Comment fonctionne l'astreinte?",
+            "Quelles sont les responsabilités en astreinte?",
+            "Qui contacter en cas d'astreinte?"
+        ]
+    },
+    {
+        "category": "Schedule change",
+        "questions": [
+            "Quelles sont les procédures de schedule change des compagnies?",
+            "Comment traiter un changement d'horaire imposé par la compagnie?"
+        ]
+    },
+    {
+        "category": "Cartes bancaires",
+        "questions": [
+            "Comment générer une carte bancaire?",
+            "Quelle est la procédure pour NIUM?",
+            "Comment créer une carte bancaire virtuelle?"
+        ]
+    },
+    {
+        "category": "Options Resaneo",
+        "questions": [
+            "Comment gérer les options Resaneo en daily task?",
+            "Quelle est la procédure de vérification des options?"
+        ]
+    },
+    {
+        "category": "UM - Mineurs non accompagnés",
+        "questions": [
+            "Comment traiter une demande d'assistance UM?",
+            "Quelles sont les conditions pour les unaccompanied minors?",
+            "Comment faire un devis à la carte UM?"
+        ]
+    },
+    {
+        "category": "Installation GDS",
+        "questions": [
+            "Comment installer le GDS?",
+            "Quels sont les prérequis pour l'installation GDS?"
+        ]
+    },
+    {
+        "category": "Formats Amadeus",
+        "questions": [
+            "Quels sont les formats utiles Amadeus?",
+            "Où trouver la liste des commandes Amadeus?",
+            "Comment utiliser Amadeus efficacement?"
+        ]
+    },
+    {
+        "category": "Formats Galileo",
+        "questions": [
+            "Quels sont les formats et tutoriels utiles pour Galileo?",
+            "Comment utiliser Galileo?",
+            "Quelles sont les commandes principales de Galileo?"
+        ]
+    },
+    {
+        "category": "API Resaneo",
+        "questions": [
+            "Comment utiliser l'API Resaneo?",
+            "Quelle est la documentation de l'API Resaneo?",
+            "Comment intégrer l'API Resaneo?"
+        ]
+    },
+    {
+        "category": "Robot et queues",
+        "questions": [
+            "Comment le robot traite les queues?",
+            "Quelle est la procédure de traitement des queues par le robot?"
+        ]
+    },
+    {
+        "category": "Groupes",
+        "questions": [
+            "Comment demander une cotation auprès des fournisseurs pour un groupe?",
+            "Comment traiter une demande de cotation B2C pour un groupe?",
+            "Comment confirmer et gérer les dossiers groupes auprès des compagnies?",
+            "Comment traiter une demande de groupe ASVEL?",
+            "Comment payer un acompte groupe par EMD?",
+            "Comment faire une demande de cotation groupe sur GDS?",
+            "Comment traiter les dossiers groupes sur Galaxy?"
+        ]
+    },
+    {
+        "category": "Marques blanches",
+        "questions": [
+            "Quelle est la procédure de création à résiliation d'une marque blanche?",
+            "Comment gérer les marques blanches?"
+        ]
+    },
+    {
+        "category": "Inscriptions",
+        "questions": [
+            "Comment gérer les demandes d'inscriptions?",
+            "Quelle est la procédure de validation d'une inscription?"
+        ]
+    },
+    {
+        "category": "API compagnies",
+        "questions": [
+            "Comment fonctionne l'API Air France?",
+            "Comment utiliser l'API British Airways?",
+            "Quelles sont les spécificités des API compagnies?"
+        ]
+    },
+    {
+        "category": "Défaillances compagnies",
+        "questions": [
+            "Que faire en cas de défaillance d'une compagnie aérienne?",
+            "Quelle est la procédure en cas de faillite d'une compagnie?"
+        ]
+    },
+    {
+        "category": "Pré-réservée",
+        "questions": [
+            "Comment traiter une pré-réservée?",
+            "Quelle est la différence entre pré-réservée et confirmée?"
+        ]
+    },
+    {
+        "category": "EMD externe",
+        "questions": [
+            "Comment traiter une demande de réservation avec EMD externe?",
+            "Qu'est-ce qu'un EMD externe?"
+        ]
+    },
+    {
+        "category": "TGV Air",
+        "questions": [
+            "Quelle est la procédure d'enregistrement des passagers TGV Air?",
+            "Comment fonctionne TGV Air?"
+        ]
+    },
+    {
+        "category": "Modes de règlement",
+        "questions": [
+            "Quels sont les différents modes de règlement client?",
+            "Comment accepter un paiement par chèque?",
+            "Comment gérer le recouvrement et les impayés?"
+        ]
+    },
+    {
+        "category": "Réservation train",
+        "questions": [
+            "Comment réserver un train via le connecteur SNCF?",
+            "Comment utiliser Rail Europe?"
+        ]
+    },
+    {
+        "category": "Alertes",
+        "questions": [
+            "Quelles sont les alertes explications lexiques pour RESA?",
+            "Quelles sont les alertes pour GROUPE?",
+            "Comment traiter l'alerte 'Vérifier opération vol - Vol Introuvable'?",
+            "Que signifient les alertes UC et HX sur un dossier non confirmé?"
+        ]
+    },
+    {
+        "category": "Ryanair",
+        "questions": [
+            "Comment traiter les réservations Ryanair?",
+            "Quelles sont les spécificités de Ryanair?"
+        ]
+    },
+    {
+        "category": "ANCV Connect",
+        "questions": [
+            "Quelles sont les particularités de traitement ANCV Connect?",
+            "Comment traiter un dossier ANCV?"
+        ]
+    },
+    {
+        "category": "EasyJet",
+        "questions": [
+            "Comment confirmer un dossier EasyJet?",
+            "Quelles sont les spécificités EasyJet?"
+        ]
+    },
+    {
+        "category": "Prise d'appel",
+        "questions": [
+            "Comment réussir sa prise d'appel?",
+            "Quelles sont les bonnes pratiques pour la prise d'appel téléphonique?"
+        ]
+    },
+    {
+        "category": "Comptes dormants",
+        "questions": [
+            "Quelle est la procédure de suivi et désactivation des comptes dormants?",
+            "Comment identifier un compte dormant?"
+        ]
+    },
+    {
+        "category": "Google Analytics",
+        "questions": [
+            "Comment créer un nouveau rapport sur Google Analytics?",
+            "Quelle est la procédure pour les rapports Analytics?"
+        ]
+    },
+    {
+        "category": "Facturation et remboursements",
+        "questions": [
+            "Comment traiter la facturation et les remboursements?",
+            "Quelle est la fiche aide pour facturation et remboursements?"
+        ]
+    },
+    {
+        "category": "BSP et échanges",
+        "questions": [
+            "Quelles sont les procédures d'échange pour les compagnies BSP?",
+            "Comment faire un échange sur une compagnie BSP?"
+        ]
+    }
+]
