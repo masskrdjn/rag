@@ -7,10 +7,19 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 import re
 
+import shutil
+
 # Configuration
-DATA_PATH = "/home/ragapp/rag-system/data"
-CHROMA_PATH = "chroma_db"
+DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+CHROMA_PATH = "/home/ragapp/rag-system/chroma_db"  # Canonical location for ChromaDB
 EMBEDDING_MODEL = "nomic-embed-text"
+
+def clear_chroma_db():
+    """Supprime la base de données existante pour éviter la corruption."""
+    if os.path.exists(CHROMA_PATH):
+        print(f"Cleaning up existing ChromaDB at {CHROMA_PATH}...")
+        shutil.rmtree(CHROMA_PATH)
+        print("✓ Cleanup complete")
 
 def get_adaptive_chunk_config(text_length, has_sections=False):
     """
@@ -322,6 +331,9 @@ def ingest_html_documents_adaptive():
     print(f"\n{'='*80}")
     print(f"INGESTION ADAPTATIVE - Chargement depuis {DATA_PATH}")
     print(f"{'='*80}\n")
+    
+    # Nettoyer la base existante
+    clear_chroma_db()
     
     # Charger les documents avec métadonnées de chunking
     documents = load_html_documents_adaptive(DATA_PATH)

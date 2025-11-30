@@ -66,10 +66,14 @@ QUESTION :
 
 INSTRUCTIONS :
 1. Réponds en te basant UNIQUEMENT sur le CONTEXTE RÉCUPÉRÉ ci-dessus.
-2. Si le contexte mentionne de "consulter" une source externe (Whaller, sphère, intranet, lien, etc.), 
+2. Si le contexte mentionne de "consulter" une source externe (Whaller, sphère, intranet, fiche Gravity, etc.), 
    CITE cette source EXACTEMENT comme elle apparaît dans le contexte.
 3. N'invente RIEN. Si l'information n'est pas dans le contexte, dis-le.
-4. Réponds en français.
+4. NE FAIS PAS RÉFÉRENCE aux sources du contexte dans ta réponse. Évite les formulations comme :
+   - "Selon le document X...", "D'après l'article Y...", "Le fichier Z indique..."
+   - "[Source: ...]", "Document 1", "Document 2", noms de fichiers (.html, .pdf)
+   Ces références sont internes et n'ont pas de sens pour l'utilisateur.
+5. Réponds directement à la question de manière naturelle, comme si tu avais cette connaissance.
 
 RÉPONSE :
 """
@@ -87,10 +91,27 @@ RÉPONSE :
             formatted_parts = []
             for i, doc in enumerate(docs[:self.top_k], 1):  # Limiter à top_k
                 content = doc.page_content.strip()
-                source = doc.metadata.get('source', 'Source inconnue') if hasattr(doc, 'metadata') else 'Source inconnue'
+                # Extraire le titre du document depuis les métadonnées ou le nom de fichier
+                source = doc.metadata.get('source', '') if hasattr(doc, 'metadata') else ''
+                title = doc.metadata.get('title', '') if hasattr(doc, 'metadata') else ''
                 
-                # Ajouter une référence de source pour la traçabilité
-                formatted_parts.append(f"[Document {i} - {source}]\n{content}")
+                # Utiliser le titre si disponible, sinon extraire du chemin source
+                if title:
+                    doc_label = title
+                elif source:
+                    # Extraire le nom de fichier et le nettoyer
+                    import os
+                    filename = os.path.basename(source)
+                    # Retirer l'extension et les préfixes numériques
+                    doc_label = filename.replace('.html', '').replace('_', ' ')
+                    # Retirer le préfixe numérique (ex: "1179 ")
+                    if doc_label and doc_label.split(' ')[0].isdigit():
+                        doc_label = ' '.join(doc_label.split(' ')[1:])
+                else:
+                    doc_label = "Documentation"
+                
+                # Ne pas inclure de référence numérique, juste le contenu
+                formatted_parts.append(f"[Source: {doc_label}]\n{content}")
             
             return "\n\n---\n\n".join(formatted_parts)
         
