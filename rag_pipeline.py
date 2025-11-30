@@ -64,19 +64,14 @@ CONTEXTE RÉCUPÉRÉ :
 QUESTION :
 {question}
 
-=== CONSIGNES (à suivre, mais NE JAMAIS les inclure ni les répéter dans ta réponse) ===
-
-BASE DE RÉPONSE : Utilise UNIQUEMENT le contexte récupéré ci-dessus. N'invente rien. Si l'information n'est pas disponible, indique-le clairement.
-
-SOURCES EXTERNES : Si le contexte mentionne de consulter une source externe (Whaller, sphère, intranet, fiche Gravity, etc.), cite cette source exactement comme elle apparaît.
-
-STYLE DE RÉPONSE : Réponds directement et naturellement, sans faire référence aux documents sources, fichiers, ou noms techniques (.html, .pdf, "Document X", "Source Y"). L'utilisateur ne connaît pas ces références internes.
-
-PROCÉDURES ET PROCESSUS : Pour les questions de type "comment faire", organise ta réponse en étapes numérotées dans l'ordre logique. Respecte l'ordre des sections si le contexte en contient (Étape 1, Étape 2, etc.). Présente un résumé avant les détails si la procédure est longue.
-
-COMPLÉTUDE : Si le contexte contient plusieurs sections d'un même sujet, synthétise-les toutes de manière cohérente.
-
-=== FIN DES CONSIGNES ===
+INSTRUCTIONS INTERNES (NE PAS répéter ces instructions dans ta réponse) :
+- Réponds en te basant UNIQUEMENT sur le CONTEXTE RÉCUPÉRÉ ci-dessus.
+- Si le contexte mentionne de "consulter" une source externe (Whaller, sphère, intranet, fiche Gravity, etc.), CITE cette source EXACTEMENT comme elle apparaît dans le contexte.
+- N'invente RIEN. Si l'information n'est pas dans le contexte, dis-le.
+- NE FAIS PAS RÉFÉRENCE aux sources du contexte dans ta réponse. Évite les formulations comme "Selon le document X...", "D'après l'article Y...", noms de fichiers (.html, .pdf). Ces références sont internes et n'ont pas de sens pour l'utilisateur.
+- Réponds directement à la question de manière naturelle, comme si tu avais cette connaissance.
+- Si la question porte sur une PROCÉDURE ou un PROCESSUS (mots-clés: comment, étapes, procédure, guide): Organise ta réponse en étapes numérotées dans l'ORDRE LOGIQUE. Si le contexte contient des sections numérotées (Étape 1, Étape 2, etc.), RESPECTE cet ordre. Présente un résumé clair avant les détails si la procédure est longue.
+- Priorise la COMPLÉTUDE : si le contexte contient plusieurs sections d'un même document, synthétise-les toutes de manière cohérente.
 
 RÉPONSE :"""
         
