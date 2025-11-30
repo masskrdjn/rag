@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from rag_pipeline import SimpleRAG
 import uvicorn
 import os
@@ -17,8 +17,8 @@ class QueryRequest(BaseModel):
     dynamic_k: bool = True
 
 class SourceInfo(BaseModel):
-    source: str
-    filename: str
+    source_url: Optional[str] = None
+    title: str = ""
     category: str = "Unknown"
     post_id: str = ""
     content_preview: str = ""

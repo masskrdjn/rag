@@ -328,9 +328,11 @@ RÉPONSE :"""
             sources = []
             
             for doc in docs[:current_k]:
+                # Utiliser source_url (métadonnée HTML) si disponible, sinon fallback sur source
+                source_url = doc.metadata.get('source_url', '')
                 source_info = {
-                    'source': doc.metadata.get('source', 'Unknown'),
-                    'filename': doc.metadata.get('filename', 'Unknown'),
+                    'source_url': source_url if source_url else None,
+                    'title': doc.metadata.get('section_title', '') or doc.metadata.get('filename', 'Unknown').replace('.html', '').replace('_', ' '),
                     'category': doc.metadata.get('category', 'Unknown'),
                     'post_id': doc.metadata.get('post_id', ''),
                     'content_preview': doc.page_content[:200] + '...' if len(doc.page_content) > 200 else doc.page_content
