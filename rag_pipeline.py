@@ -9,6 +9,14 @@ from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 import os
 import re
+import time
+
+# Import optimization modules
+from reranker import RAGRerankerLightweight as RAGReranker
+from cache_manager import CacheManager
+from query_expander import QueryExpander
+from prompt_builder import PromptBuilder
+from hallucination_detector import HallucinationDetectorLightweight as HallucinationDetector
 
 class SimpleRAG:
     def __init__(self, 
@@ -20,16 +28,7 @@ class SimpleRAG:
                  model_name="mistral:7b",
                  max_context_chars=3000):
         """
-        Initialise le pipeline RAG.
-        
-        Args:
-            retrieval_mode (str): "similarity" ou "similarity_score_threshold"
-            top_k (int): Nombre de documents à récupérer (3-8 recommandé)
-            score_threshold (float): Score de similarité minimum (0.5-0.8)
-            use_hybrid (bool): Utiliser la recherche hybride BM25-first (recommandé)
-            hybrid_weights (list): Non utilisé (conservé pour compatibilité)
-            model_name (str): Modèle LLM à utiliser (mistral:7b, llama3.2, etc.)
-            max_context_chars (int): Limite de caractères pour le contexte
+        Initialise le pipeline RAG optimisé.
         """
         self.persist_directory = "/home/rag/chroma_db"
         self.model_name = model_name
@@ -46,6 +45,15 @@ class SimpleRAG:
         
         # Cache pour les documents (nécessaire pour BM25)
         self.documents = None
+        
+        # Initialisation des modules d'optimisation
+        print("🚀 Initialisation des modules d'optimisation...")
+        self.cache_manager = CacheManager()
+        self.reranker = RAGReranker()
+        self.query_expander = QueryExpander(model_name=model_name)
+        self.prompt_builder = PromptBuilder()
+        self.hallucination_detector = HallucinationDetector()
+        print("✓ Modules chargés")
 
     def setup_chain(self):
         """Initialise le pipeline RAG."""
@@ -77,7 +85,7 @@ class SimpleRAG:
             return vectorstore.as_retriever(
                 search_type="similarity_score_threshold",
                 search_kwargs={
-                    "k": self.top_k,
+                    "k": self.top_k * 3, # Fetch more for reranking
                     "score_threshold": self.score_threshold
                 }
             )
@@ -85,7 +93,7 @@ class SimpleRAG:
         else:
             return vectorstore.as_retriever(
                 search_type="similarity",
-                search_kwargs={"k": self.top_k}
+                search_kwargs={"k": self.top_k * 3} # Fetch more for reranking
             )
     
     def _create_hybrid_retriever(self, vectorstore):
@@ -107,17 +115,17 @@ class SimpleRAG:
                 ]
             else:
                 print("Avertissement : Aucun document trouvé pour BM25")
-                return vectorstore.as_retriever(search_kwargs={"k": self.top_k})
+                return vectorstore.as_retriever(search_kwargs={"k": self.top_k * 3})
         
         # Créer le récupérateur BM25
         bm25_retriever = BM25Retriever.from_documents(self.documents)
-        bm25_retriever.k = self.top_k
+        bm25_retriever.k = self.top_k * 3 # Fetch more for reranking
         
         # Stocker pour usage dans custom retriever
         self._bm25_retriever = bm25_retriever
         self._vector_retriever = vectorstore.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": self.top_k}
+            search_kwargs={"k": self.top_k * 3}
         )
         
         return self._create_bm25_first_retriever()
@@ -169,96 +177,138 @@ class SimpleRAG:
                     if any(kw in content_lower for kw in keywords):
                         relevant_docs.append(doc)
                 
-                if relevant_docs:
-                    return relevant_docs[:parent.top_k]
+                # Si BM25 donne de bons résultats, on les garde
+                if len(relevant_docs) >= 3:
+                    return relevant_docs
                 
-                # Fallback: recherche vectorielle
-                return parent._vector_retriever.invoke(query)[:parent.top_k]
+                # Sinon, on complète avec la recherche vectorielle
+                vector_docs = parent._vector_retriever.invoke(query)
+                
+                # Combiner et dédupliquer (par contenu)
+                seen_content = set(d.page_content for d in relevant_docs)
+                for doc in vector_docs:
+                    if doc.page_content not in seen_content:
+                        relevant_docs.append(doc)
+                        seen_content.add(doc.page_content)
+                
+                return relevant_docs
         
         return BM25FirstRetriever()
 
     def ask(self, question, return_sources=False, dynamic_k=True):
         """
-        Génère une réponse à partir d'une question.
-        
-        Args:
-            question: La question à poser
-            return_sources: Si True, retourne aussi les sources
-            dynamic_k: Si True, ajuste le top_k selon la complexité
-        
-        Returns:
-            str ou dict avec 'answer', 'sources', 'metadata'
+        Génère une réponse à partir d'une question avec pipeline optimisé.
         """
+        start_time = time.time()
+        
         if not self.qa_chain:
             self.setup_chain()
+            
+        # 1. Vérifier le cache
+        cached_result = self.cache_manager.get(question, self.top_k)
+        if cached_result:
+            if return_sources:
+                return cached_result
+            return cached_result['answer']
             
         # Ajustement dynamique du top_k
         current_k = self.top_k
         if dynamic_k:
             current_k = self._estimate_dynamic_topk(question)
-            self._update_retriever_topk(current_k)
-            print(f"Dynamic top_k: {current_k} (base: {self.top_k})")
+            self._update_retriever_topk(current_k * 3) # Fetch 3x for reranking
+            print(f"Dynamic top_k: {current_k} (fetching {current_k*3} candidates)")
         
-        # Récupérer les documents
+        # 2. Expansion de la requête
+        query_variants = self.query_expander.get_all_variants(question)
+        print(f"Query variants: {query_variants}")
+        
+        # 3. Récupération multi-requêtes
+        all_docs = []
+        seen_contents = set()
+        
+        # Chercher avec la question originale
         docs = self.retriever.invoke(question)
+        for doc in docs:
+            if doc.page_content not in seen_contents:
+                all_docs.append(doc)
+                seen_contents.add(doc.page_content)
+                
+        # Chercher avec les variantes (limité)
+        for variant in query_variants[:2]: # Max 2 variantes pour performance
+            if variant != question:
+                variant_docs = self.retriever.invoke(variant)
+                for doc in variant_docs:
+                    if doc.page_content not in seen_contents:
+                        all_docs.append(doc)
+                        seen_contents.add(doc.page_content)
         
-        # Formater le contexte
-        context = self._format_docs_for_context(docs)
+        # Convertir en format dict pour reranker
+        docs_for_reranking = []
+        for doc in all_docs:
+            doc_dict = {
+                'content': doc.page_content,
+                'metadata': doc.metadata,
+                **doc.metadata
+            }
+            docs_for_reranking.append(doc_dict)
+            
+        # 4. Reranking
+        reranked_docs = self.reranker.rerank(question, docs_for_reranking, top_k=current_k)
         
-        # Limiter la taille du contexte
-        if len(context) > self.max_context_chars:
-            context = context[:self.max_context_chars] + "\n[... tronqué]"
+        # 5. Construction du prompt
+        prompts = self.prompt_builder.build_full_prompt(question, reranked_docs)
         
-        # Prompt optimisé
-        template = """Tu es un assistant QA pour agents de voyages. Réponds uniquement avec le CONTEXTE fourni.
-
-CONTEXTE:
-{context}
-
-QUESTION: {question}
-
-Règles:
-- Utilise UNIQUEMENT le contexte ci-dessus
-- Si non trouvé: "Je n'ai pas trouvé cette information."
-- Sois concis et précis
-
-RÉPONSE:"""
+        # 6. Génération
+        response = self.llm.invoke(prompts['full']).content
         
-        prompt = ChatPromptTemplate.from_template(template)
-        chain = prompt | self.llm | StrOutputParser()
+        # 7. Détection d'hallucinations
+        hallucination_check = self.hallucination_detector.check_hallucinations(
+            response, reranked_docs
+        )
         
-        response = chain.invoke({"context": context, "question": question})
+        # Ajouter badge de confiance
+        final_response = self.hallucination_detector.add_confidence_badge(
+            response, hallucination_check
+        )
         
         # Restaurer le k original
         if dynamic_k:
-            self._update_retriever_topk(self.top_k)
+            self._update_retriever_topk(self.top_k * 3)
         
-        if not return_sources:
-            return response
-        
-        # Préparer les sources
+        # Préparer le résultat complet
         sources = []
-        for doc in docs:
-            source_url = doc.metadata.get('source_url', '')
+        for doc in reranked_docs:
+            source_url = doc.get('source_url', '')
             sources.append({
                 'source_url': source_url if source_url else None,
-                'title': doc.metadata.get('section_title', '') or doc.metadata.get('filename', 'Unknown').replace('.html', '').replace('_', ' '),
-                'category': doc.metadata.get('category', 'Unknown'),
-                'post_id': doc.metadata.get('post_id', ''),
-                'content_preview': doc.page_content[:200] + '...' if len(doc.page_content) > 200 else doc.page_content
+                'title': doc.get('section_title', '') or doc.get('filename', 'Unknown').replace('.html', '').replace('_', ' '),
+                'category': doc.get('category', 'Unknown'),
+                'post_id': doc.get('post_id', ''),
+                'content_preview': doc['content'][:200] + '...' if len(doc['content']) > 200 else doc['content'],
+                'rerank_score': doc.get('rerank_score', 0)
             })
-        
-        return {
-            'answer': response,
+            
+        result = {
+            'answer': final_response,
             'sources': sources,
             'metadata': {
                 'top_k': current_k,
                 'dynamic_k_used': dynamic_k,
                 'retrieval_mode': self.retrieval_mode,
                 'use_hybrid': self.use_hybrid,
-                'num_sources': len(sources)
+                'num_sources': len(sources),
+                'execution_time': time.time() - start_time,
+                'hallucination_check': hallucination_check
             }
         }
+        
+        # 8. Mise en cache
+        self.cache_manager.set(question, self.top_k, result)
+        
+        if not return_sources:
+            return final_response
+            
+        return result
     
     def _estimate_dynamic_topk(self, question):
         """Estime le top_k optimal selon la complexité de la question."""
@@ -306,44 +356,9 @@ RÉPONSE:"""
     
     def _format_docs_for_context(self, docs):
         """Formate les documents pour le contexte."""
+        # Note: This is now largely handled by PromptBuilder, but kept for compatibility if needed
         if not docs:
             return "Aucun contexte pertinent trouvé."
         
-        # Regrouper par source
-        by_source = {}
-        for doc in docs:
-            source = doc.metadata.get('source', 'unknown')
-            if source not in by_source:
-                by_source[source] = {
-                    'docs': [],
-                    'filename': doc.metadata.get('filename', '')
-                }
-            by_source[source]['docs'].append(doc)
-        
-        formatted_parts = []
-        
-        for source, data in by_source.items():
-            source_docs = data['docs']
-            doc_title = data['filename'].replace('.html', '').replace('_', ' ')
-            
-            # Trier par section_num
-            source_docs.sort(key=lambda d: (
-                0 if d.metadata.get('is_summary', False) else 1,
-                d.metadata.get('section_num', 999)
-            ))
-            
-            source_content = []
-            if len(by_source) > 1:
-                source_content.append(f"=== {doc_title} ===")
-            
-            for doc in source_docs:
-                section_title = doc.metadata.get('section_title', '')
-                content = doc.page_content.strip()
-                
-                if section_title:
-                    source_content.append(f"[{section_title}]")
-                source_content.append(content)
-            
-            formatted_parts.append("\n\n".join(source_content))
-        
-        return "\n\n---\n\n".join(formatted_parts)
+        return "\n\n".join([d.page_content for d in docs])
+
