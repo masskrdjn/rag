@@ -71,17 +71,13 @@ class BM25:
         return score
 
 
-class RAGRerankerLightweight:
+class RAGRerankerStrict:
     """
-    Reranker multi-critères SANS ML - CPU optimisé
-    Combinaison de:
-    - BM25 (Okapi ranking)
-    - Keyword overlap
-    - Metadata scoring
+    Reranker strict sans ML - tuné pour CPU + BM25 retrieval
+    Scoring agressif pour rejeter le bruit
     """
     
     def __init__(self):
-        self.bm25 = None
         self.stop_words_fr = {
             'le', 'la', 'de', 'des', 'et', 'ou', 'est', 'un', 'une',
             'à', 'au', 'en', 'dans', 'pour', 'par', 'sur', 'avec', 'sans',
@@ -89,7 +85,7 @@ class RAGRerankerLightweight:
             'son', 'sa', 'ses', 'notre', 'nos', 'votre', 'vos', 'leur', 'leurs',
             'comment', 'où', 'quand', 'pourquoi', 'qui', 'quoi'
         }
-        print("✓ RAGRerankerLightweight initialisé (CPU-only, pas de GPU requis)")
+        print("✓ RAGRerankerStrict initialisé (CPU-only, scoring strict)")
     
     def extract_keywords(self, text: str) -> List[str]:
         """Extract keywords (>3 chars, non-stopwords)"""
@@ -97,107 +93,156 @@ class RAGRerankerLightweight:
         keywords = [w for w in words if len(w) > 3 and w not in self.stop_words_fr]
         return keywords
     
-    def calculate_keyword_overlap(self, question_keywords: List[str], doc_content: str) -> float:
-        """Calculate keyword coverage percentage"""
-        doc_keywords = set(self.extract_keywords(doc_content))
-        if not question_keywords:
+    def calculate_keyword_overlap(self, keywords: List[str], content: str) -> float:
+        """Calculate keyword coverage"""
+        if not keywords:
             return 0.0
-        
-        overlap = sum(1 for kw in question_keywords if kw in doc_keywords)
-        coverage = overlap / len(question_keywords)
-        return min(coverage, 1.0)
+        content_lower = content.lower()
+        overlap = sum(1 for kw in keywords if kw in content_lower)
+        return min(overlap / len(keywords), 1.0)
     
     def _score_metadata(self, document: Dict, question: str) -> float:
-        """Score metadata/reliability"""
-        score = 0.7
+        """Metadata scoring with title matching boost"""
+        score = 0.5
         
-        # Bonus for summaries with general questions
-        is_summary = document.get('is_summary', False)
-        if is_summary:
-            general_keywords = {'comment', 'quoi', 'qu', 'général', 'résumé'}
-            if any(kw in question.lower() for kw in general_keywords):
-                score = 0.9
+        # NOUVEAU: Bonus si le titre du document match la question
+        filename = document.get('filename', '').lower().replace('_', ' ').replace('.html', '')
+        question_lower = question.lower()
+        question_keywords = self.extract_keywords(question)
+        
+        # Compter les mots-clés de la question présents dans le filename
+        title_matches = sum(1 for kw in question_keywords if kw in filename)
+        if title_matches >= 2:
+            score = 0.9  # Fort bonus si 2+ mots-clés matchent le titre
+        elif title_matches == 1:
+            score = 0.7
+        
+        # Bonus pour documents avec structure (sections +-))
+        if document.get('is_summary', False):
+            if any(kw in question_lower for kw in ['comment', 'quoi', 'résumé']):
+                score = max(score, 0.8)
             else:
-                score = 0.5
+                score = max(score, 0.4)
         
-        # Penalty for redirect documents
-        content = document.get('content', '') or document.get('page_content', '')
-        if 'consulter' in content.lower() and 'whaller' in content.lower():
+        # Pénalité pour redirects trop court
+        content = document.get('content', '')
+        if len(content) < 200 and 'whaller' in content.lower():
             score *= 0.6
-        
-        # Bonus for reliability score
-        if 'reliability_score' in document:
-            score = (score + document['reliability_score']) / 2
         
         return min(score, 1.0)
     
-    def score_document(self, question: str, document: Dict, 
+    def score_document(self, question: str, document: Dict,
                       base_similarity: float = 0.5) -> float:
         """
-        Composite score combining multiple signals
+        Scoring strict avec gates agressifs + boost keyword exact matches
         """
-        scores = {}
         content = document.get('content', '') or document.get('page_content', '')
+        content_lower = content.lower()
+        question_lower = question.lower()
         
-        # 1. Base similarity score (from ChromaDB vector search)
+        # 🔴 GATE 1: Rejeter contenu très court (< 150 chars)
+        if len(content.strip()) < 150:
+            is_redirect = 'consulter' in content_lower and 'whaller' in content_lower
+            # FIX: Accept Whaller redirects if similarity is decent
+            if is_redirect and base_similarity > 0.30:  # Abaissé de 0.65 à 0.30
+                return 0.60  # Boost pour Whaller redirects
+            else:
+                return 0.15
+        
+        scores = {}
+        
+        # 1. Similarité vectorielle (PRIME)
         scores['semantic'] = min(base_similarity, 1.0)
         
-        # 2. BM25 score (no neural network required)
-        if content:
-            bm25_score = BM25([content]).score_query(question, 0)
-            scores['bm25'] = min(bm25_score / 10.0, 1.0)  # Normalize
-        else:
-            scores['bm25'] = 0.0
-        
-        # 3. Keyword matching score
+        # 🔴 GATE 2: Rejeter base_sim très faible
+        # FIX: Check for exact keyword matches BEFORE rejecting
         question_keywords = self.extract_keywords(question)
-        scores['keyword_match'] = self.calculate_keyword_overlap(question_keywords, content)
+        exact_matches = sum(1 for kw in question_keywords if kw in content_lower)
         
-        # 4. Metadata score
+        if base_similarity < 0.30 and exact_matches < 2:
+            return 0.10
+        
+        # 2. Longueur du contenu
+        content_norm = min(len(content) / 4000.0, 1.0)
+        scores['content_length'] = content_norm
+        
+        # 3. Densité de sentences (structure)
+        num_sentences = max(len(re.split(r'[.!?]', content)), 1)
+        structure_score = min(num_sentences / 15.0, 1.0)
+        scores['structure'] = structure_score
+        
+        # 4. Keyword overlap avec BOOST pour matches exacts multiples
+        keyword_score = self.calculate_keyword_overlap(question_keywords, content)
+        
+        # 🆕 BOOST: Si 2+ mots-clés exacts matchent (ex: "couleurs" + "robot")
+        if exact_matches >= 2:
+            keyword_score = min(keyword_score * 1.5, 1.0)
+        
+        scores['keyword_match'] = keyword_score
+        
+        # 5. Métadonnées
         scores['metadata'] = self._score_metadata(document, question)
         
-        # Optimized weights (no ML component)
+        # Poids avec augmentation du keyword matching
         weights = {
-            'semantic': 0.40,        # Increased (was 0.30)
-            'bm25': 0.30,            # Replaces cross-encoder
-            'keyword_match': 0.20,
+            'semantic': 0.50,        # Légèrement réduit
+            'content_length': 0.12,
+            'structure': 0.08,
+            'keyword_match': 0.20,   # AUGMENTÉ de 0.10 à 0.20
             'metadata': 0.10
         }
         
-        # Composite score
-        final_score = sum(scores.get(k, 0) * weights[k] for k in weights.keys())
-        return final_score
+        final = sum(scores.get(k, 0) * weights[k] for k in weights.keys())
+        return final
     
     def rerank(self, question: str, documents: List[Dict], top_k: int = 5) -> List[Dict]:
         """
-        Rerank and filter results
-        
-        Args:
-            question: User question
-            documents: List of documents with similarity_score
-            top_k: Number of results to return
-        
-        Returns:
-            Reranked documents
+        Rerank avec filtrage adaptatif selon la question
+        Threshold dynamique: questions précises = strict, questions larges = permissif
         """
         if not documents:
             return []
         
-        # Score each document
+        # Détecter questions larges/vagues nécessitant plus de contexte
+        question_lower = question.lower()
+        vague_keywords = ['comment', 'que faire', 'quels', 'quelles', 'quel']
+        is_vague = any(kw in question_lower for kw in vague_keywords)
+        
+        # Score tous les docs
         scored = []
         for doc in documents:
             base_sim = doc.get('similarity_score', 0.5)
             rerank_score = self.score_document(question, doc, base_sim)
+            
             scored.append({
                 **doc,
                 'rerank_score': rerank_score
             })
         
-        # Sort by composite score
-        sorted_docs = sorted(scored, key=lambda x: x['rerank_score'], reverse=True)
+        # Trier par score
+        sorted_docs = sorted(
+            scored,
+            key=lambda x: x['rerank_score'],
+            reverse=True
+        )
         
-        # Filter out low scores
-        filtered = [d for d in sorted_docs if d['rerank_score'] > 0.20]
+        # 🆕 Filtrage ADAPTATIF:
+        # - Questions vagues: threshold bas (0.35) pour inclure plus de contexte
+        # - Questions précises: threshold strict (0.40)
+        if is_vague:
+            min_score = 0.32  # Plus permissif pour questions larges
+        else:
+            min_score = 0.38  # Légèrement abaissé de 0.40
         
-        # Return top-k
+        filtered = [d for d in sorted_docs if d['rerank_score'] > min_score]
+        
+        # Fallback: si < 2 résultats, abaisser encore
+        if len(filtered) < 2 and len(sorted_docs) > 0:
+            min_score = 0.28 if is_vague else 0.32
+            filtered = [d for d in sorted_docs if d['rerank_score'] > min_score]
+        
+        # Jamais 0 résultats
+        if len(filtered) == 0:
+            filtered = sorted_docs[:1]
+        
         return filtered[:top_k]

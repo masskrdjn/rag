@@ -144,9 +144,39 @@ def extract_process_sections(text, source_file):
         toc_lines.append("")
     
     toc_lines.append("Sections du document:")
+    
+    # FIX: Pour les sections courtes (<600 chars), inclure le contenu directement
+    # Cela résout le problème des "couleurs du robot" qui étaient listées sans explication
     for i, match in enumerate(matches, 1):
         section_title = match.group(1).strip()
-        toc_lines.append(f"  {i}. {section_title}")
+        
+        # Calculer la longueur de cette section (FIX: utiliser le bon index)
+        start_pos = matches[i-1].start()  # matches est 0-indexed, i est 1-indexed
+        if i < len(matches):  # Pas la dernière section
+            end_pos = matches[i].start()
+        else:  # Dernière section
+            end_pos = len(text)
+        
+        section_content = text[start_pos:end_pos].strip()
+        section_length = len(section_content)
+        
+        # DEBUG pour 1107
+        if "1107" in source_file and i == 1:
+            print(f"\nDEBUG 1107 Section 1: Length={section_length}")
+            print(f"Threshold: 800")
+            print(f"Decision: {'INCLUDE' if section_length < 800 else 'EXCLUDE'}")
+            print(f"Content start: {section_content[:50]}...")
+        
+        # Si section courte (<800 chars), inclure le contenu (augmenté de 600)
+        if section_length < 800:
+            # Nettoyer le contenu (enlever le marker +-)
+            clean_content = re.sub(r'\+-.*?\n', '', section_content, count=1).strip()
+            toc_lines.append(f"  {i}. {section_title}")
+            toc_lines.append(f"{clean_content}")
+            toc_lines.append("")  # Ligne vide pour séparation
+        else:
+            # Section longue, juste le titre
+            toc_lines.append(f"  {i}. {section_title}")
     
     toc_lines.append("")
     toc_lines.append("Pour les détails de chaque étape, consulter les sections correspondantes.")

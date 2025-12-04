@@ -80,12 +80,15 @@ class HallucinationDetectorLightweight:
     """
     Hallucination detector SANS SentenceTransformer
     Utilise TF-IDF + pattern matching
+    
+    FIX: Seuil abaissé de 0.3 à 0.18 pour réduire les faux positifs
+    sur les réponses paraphrasées mais correctes.
     """
     
-    def __init__(self, threshold: float = 0.3):
+    def __init__(self, threshold: float = 0.18):
         self.threshold = threshold
         self.tfidf = TFIDFMatcher()
-        print("✓ HallucinationDetectorLightweight initialisé (CPU-only, pas de dépendances ML)")
+        print("✓ HallucinationDetectorLightweight initialisé (CPU-only, seuil optimisé)")
     
     def split_sentences(self, text: str) -> List[str]:
         """Split text into sentences"""
@@ -111,9 +114,44 @@ class HallucinationDetectorLightweight:
         
         return claims if claims else sentences
     
+    def _word_overlap_score(self, claim: str, source_text: str) -> float:
+        """
+        Compute word overlap between claim and source (Jaccard-like).
+        This catches paraphrases that TF-IDF might miss.
+        """
+        # Tokenize and filter stop words
+        STOP_WORDS = {
+            'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'au', 'aux',
+            'ce', 'cette', 'ces', 'mon', 'ma', 'mes', 'ton', 'ta', 'tes',
+            'son', 'sa', 'ses', 'notre', 'nos', 'votre', 'vos', 'leur', 'leurs',
+            'je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles',
+            'et', 'ou', 'mais', 'donc', 'car', 'ni', 'que', 'qui', 'quoi',
+            'pour', 'par', 'avec', 'sans', 'sur', 'sous', 'dans', 'entre',
+            'est', 'sont', 'être', 'avoir', 'fait', 'faire'
+        }
+        
+        claim_words = set(w.lower() for w in re.findall(r'\b\w+\b', claim) 
+                         if len(w) > 3 and w.lower() not in STOP_WORDS)
+        source_words = set(w.lower() for w in re.findall(r'\b\w+\b', source_text) 
+                          if len(w) > 3 and w.lower() not in STOP_WORDS)
+        
+        if not claim_words:
+            return 0.0
+        
+        # Jaccard similarity
+        intersection = claim_words & source_words
+        union = claim_words | source_words
+        
+        if not union:
+            return 0.0
+            
+        return len(intersection) / len(union)
+    
     def check_hallucinations(self, response: str, source_documents: List[Dict]) -> Dict:
         """
-        Check hallucinations in response
+        Check hallucinations in response using a multi-stage approach:
+        1. Exact substring matching (high confidence)
+        2. Sliding window TF-IDF (medium confidence)
         
         Returns:
             {
@@ -139,13 +177,13 @@ class HallucinationDetectorLightweight:
         # Extract claims from response
         response_claims = self.extract_claims(response)
         
-        # Combine source text
-        source_text = ' '.join([
+        # Combine source text but keep track of chunks/sentences for granular matching
+        full_source_text = ' '.join([
             d.get('content', '') or d.get('page_content', '') 
             for d in source_documents
         ])
         
-        if not source_text.strip():
+        if not full_source_text.strip():
             return {
                 'has_hallucinations': False,
                 'confidence_score': 0.5,
@@ -154,9 +192,25 @@ class HallucinationDetectorLightweight:
                 'unclear_claims': response_claims,
                 'reason': 'No source text content'
             }
+            
+        # Prepare source chunks for sliding window TF-IDF
+        # Split by sentences to avoid dilution
+        source_sentences = self.split_sentences(full_source_text)
+        # Create larger chunks (e.g., 3 sentences) for better context
+        source_chunks = []
+        for i in range(0, len(source_sentences), 1):
+            chunk = " ".join(source_sentences[i:i+3])
+            if len(chunk) > 50:
+                source_chunks.append(chunk)
         
-        # Train TF-IDF on sources
-        self.tfidf.fit([source_text])
+        # Also keep the full text for exact matching
+        full_source_lower = full_source_text.lower()
+        
+        # Train TF-IDF on chunks (not the whole doc as one blob)
+        if source_chunks:
+            self.tfidf.fit(source_chunks)
+        else:
+            self.tfidf.fit([full_source_text])
         
         supported = []
         hallucinated = []
@@ -165,21 +219,64 @@ class HallucinationDetectorLightweight:
         # Check each claim
         for claim in response_claims:
             try:
-                similarity = self.tfidf.cosine_similarity(claim, source_text)
+                claim_lower = claim.lower()
                 
-                if similarity > self.threshold + 0.2:
+                # STAGE 1: Exact Substring Matching
+                # If a significant part of the claim is verbatim in source, it's supported.
+                if claim_lower in full_source_lower:
                     supported.append(claim)
-                elif similarity < self.threshold - 0.1:
+                    continue
+                
+                # STAGE 2: Sliding Window TF-IDF
+                # Compare claim against all source chunks and take the MAX similarity
+                max_tfidf_sim = 0.0
+                
+                if source_chunks:
+                    for chunk in source_chunks:
+                        sim = self.tfidf.cosine_similarity(claim, chunk)
+                        if sim > max_tfidf_sim:
+                            max_tfidf_sim = sim
+                else:
+                    max_tfidf_sim = self.tfidf.cosine_similarity(claim, full_source_text)
+                
+                # STAGE 3: Word Overlap (for paraphrases)
+                max_word_overlap = 0.0
+                if source_chunks:
+                    for chunk in source_chunks:
+                        overlap = self._word_overlap_score(claim, chunk)
+                        if overlap > max_word_overlap:
+                            max_word_overlap = overlap
+                else:
+                    max_word_overlap = self._word_overlap_score(claim, full_source_text)
+                
+                # DECISION: Combine both metrics (FIX: seuils assouplis)
+                # Le LLM paraphrase souvent les sources, ce qui est acceptable
+                # On cherche à détecter les VRAIES hallucinations (info inventée)
+                
+                if max_tfidf_sim > self.threshold or max_word_overlap > 0.35:
+                    # Evidence suffisante: TF-IDF OU word overlap acceptable
+                    supported.append(claim)
+                elif max_tfidf_sim < 0.08 and max_word_overlap < 0.15:
+                    # Très faible sur les deux: probablement hallucination
                     hallucinated.append(claim)
                 else:
-                    unclear.append(claim)
+                    # Borderline: considéré comme supporté (bénéfice du doute)
+                    # FIX: avant, unclear comptait comme 0.5, maintenant comme supporté
+                    supported.append(claim)
+                    
             except Exception as e:
                 print(f"⚠️  Error checking claim: {e}")
                 unclear.append(claim)
         
-        # Calculate confidence score
+        # Calculate confidence score (FIX: formule simplifiée)
         total = len(response_claims)
-        confidence = len(supported) / max(total, 1)
+        if total == 0:
+            confidence = 1.0
+        else:
+            # FIX: On compte uniquement les hallucinations avérées
+            # Ratio = (total - hallucinated) / total
+            # Si pas d'hallucination -> 1.0, si tout est halluciné -> 0.0
+            confidence = (total - len(hallucinated)) / total
         
         return {
             'has_hallucinations': len(hallucinated) > 0,
@@ -187,7 +284,7 @@ class HallucinationDetectorLightweight:
             'hallucinated_claims': hallucinated,
             'supported_claims': supported,
             'unclear_claims': unclear,
-            'summary': f"{len(supported)}/{total} claims supported"
+            'summary': f"{len(supported)}/{total} claims supported ({len(hallucinated)} rejected)"
         }
     
     def add_confidence_badge(self, response: str, check_result: Dict) -> str:

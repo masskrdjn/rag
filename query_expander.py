@@ -27,15 +27,33 @@ class QueryExpander:
             'congé': ['absence', 'jour', 'vacance', 'permission'],
             'maladie': ['arrêt', 'repos', 'indisponibilité'],
             'format': ['structure', 'modèle', 'template', 'gabarit'],
-            'amadeus': ['système', 'gds', 'booking', 'système de réservation'],
-            'émission': ['création', 'génération', 'production'],
-            'dossier': ['ticket', 'case', 'demande', 'requête'],
+            'amadeus': ['système', 'gds', 'booking', 'système de réservation', '1a'],
+            'émission': ['création', 'génération', 'production', 'émettre', 'ticketing', 'billet'],
+            'dossier': ['ticket', 'case', 'demande', 'requête', 'pnr'],
             'procédure': ['étapes', 'processus', 'démarche', 'étapes'],
             'étape': ['phase', 'étapes', 'niveau'],
             'utiliser': ['employer', 'utilisation', 'usage', 'use'],
             'spécial': ['spéciaux', 'particulier', 'particuliers'],
             'repas': ['nourriture', 'meal', 'service'],
             'srr': ['special request', 'demande spéciale', 'special meal'],
+            # Ajouts pour améliorer le retrieval
+            'échec': ['échoue', 'erreur', 'problème', 'failed', 'ko', 'impossible'],
+            'échoue': ['échec', 'erreur', 'problème', 'failed', 'ko'],
+            'erreur': ['échec', 'échoue', 'problème', 'bug', 'failed'],
+            'robot': ['automatique', 'auto', 'bot', 'automate', 'émission auto', 'logo robot'],
+            'réclamation': ['plainte', 'litige', 'problème client'],
+            'échange': ['modification', 'changement', 'rerouting'],
+            'bsp': ['compagnie', 'iata', 'aérien'],
+            # Nouveaux ajouts pour GDS et connecteurs
+            'gds': ['galileo', 'sabre', 'amadeus', 'système réservation', '1g', '1s', '1a'],
+            'galileo': ['gds', '1g', 'système réservation'],
+            'sabre': ['gds', '1s', 'système réservation'],
+            'connecteur': ['interface', 'système', 'api', 'connexion', 'connectivité'],
+            'sncf': ['train', 'rail', '77', 'ferroviaire'],
+            'train': ['sncf', 'rail', 'ferroviaire', '77'],
+            'iata': ['bsp', 'compagnie', 'resa iata', 'émission iata'],
+            'couleur': ['code couleur', 'statut', 'indicateur', 'codes', 'signification', 'logo'],
+            'émettre': ['émission', 'ticketing', 'billet', 'création'],
         }
     
     def expand_with_synonyms(self, question: str) -> Set[str]:
@@ -79,11 +97,17 @@ class QueryExpander:
         """Générer variantes avec LLM (coûteux mais meilleur)"""
         expanded = {question}
         
-        template = """Générez {num_variants} variantes COURTES (max 15 mots) de cette question pour améliorer la recherche vectorielle. 
-Chaque variante doit être différente mais explorer le même sujet.
+        template = """Génère {num_variants} variantes de cette question pour améliorer la recherche dans une base documentaire de procédures de voyage.
+
+CONSIGNES :
+- Si la question est vague, génère des variantes SPÉCIFIQUES explorant différents cas (ex: "échec émission" → "échec émission GDS", "échec émission train")
+- Si la question mentionne un élé technique, génère des variantes avec des termes connexes
+- Garde les variantes COURTES (max 15 mots)
+- En français uniquement
+
 Question: "{question}"
 
-Variantes (une par ligne, sans numérotation, en français):"""
+Variantes (une par ligne, sans numérotation):"""
 
         prompt = ChatPromptTemplate.from_template(template)
         chain = prompt | self.llm | StrOutputParser()
