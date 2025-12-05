@@ -1,12 +1,9 @@
-import os
-# Force CPU usage to avoid CUDA compatibility issues with old GPU (GT 1030)
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from rag_pipeline import SimpleRAG
 import uvicorn
+import os
 
 # Initialize FastAPI
 app = FastAPI(title="RAG Enterprise API", version="1.0.0")
