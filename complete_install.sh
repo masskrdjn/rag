@@ -9,12 +9,10 @@
 # - Ubuntu 22.04 ou ultérieur
 # - Privilèges sudo
 # - Connexion Internet
-# - (Optionnel) GPU NVIDIA avec CUDA pour accélération
 #
 # Répertoire d'installation : /home/rag/
 #
 # Utilisation : sudo bash complete_install.sh
-#               sudo bash complete_install.sh --gpu   # Avec support GPU
 # ============================================================================
 
 set -e  # Quitter en cas d'erreur
@@ -22,22 +20,10 @@ set -e  # Quitter en cas d'erreur
 # Répertoire d'installation
 RAG_DIR="/home/rag"
 
-# Détecter si on veut installer le support GPU
-INSTALL_GPU=false
-if [[ "$1" == "--gpu" ]] || [[ "$1" == "-g" ]]; then
-    INSTALL_GPU=true
-fi
-
 echo "=========================================="
 echo "SYSTÈME RAG - INSTALLATION COMPLÈTE"
 echo "=========================================="
 echo "Répertoire d'installation : $RAG_DIR"
-if [ "$INSTALL_GPU" = true ]; then
-    echo "Mode : Installation avec support GPU"
-else
-    echo "Mode : Installation CPU uniquement"
-    echo "       (Utilisez --gpu pour activer le support GPU)"
-fi
 echo ""
 
 # ============================================================================
@@ -114,22 +100,7 @@ pip3 install \
     fastapi \
     uvicorn \
     python-dotenv \
-    beautifulsoup4 \
-    sentence-transformers
-
-# Installation GPU (optionnelle)
-if [ "$INSTALL_GPU" = true ]; then
-    echo "Installation de PyTorch avec support CUDA..."
-    pip3 install torch --index-url https://download.pytorch.org/whl/cu118
-    
-    # Vérifier si CUDA est disponible
-    CUDA_CHECK=$(python3 -c "import torch; print(torch.cuda.is_available())" 2>/dev/null || echo "False")
-    if [ "$CUDA_CHECK" = "True" ]; then
-        echo "✓ CUDA détecté et fonctionnel"
-    else
-        echo "⚠ CUDA non détecté - le système utilisera le CPU"
-    fi
-fi
+    beautifulsoup4
 
 echo "[4/6] Dépendances Python installées ✓"
 echo ""
@@ -216,9 +187,4 @@ echo "  - Vérifiez les journaux : cat $RAG_DIR/server.log"
 echo "  - Vérifiez si Ollama est en cours d'exécution : systemctl status ollama"
 echo "  - Vérifiez les modèles : ollama list"
 echo "  - Tuez les processus bloqués : pkill -f 'python3 server.py'"
-echo ""
-echo "Configuration GPU/CPU :"
-echo "  - Vérifier le mode : python3 -c 'from device_config import print_device_status; print_device_status()'"
-echo "  - Activer GPU : export RAG_USE_GPU=1"
-echo "  - Forcer CPU  : export RAG_USE_GPU=0"
 echo ""

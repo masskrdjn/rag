@@ -3,11 +3,10 @@
 ## Table des matières
 1. [Prérequis](#prérequis)
 2. [Étapes d'installation](#étapes-dinstallation)
-3. [Configuration GPU/CPU](#configuration-gpucpu)
-4. [Ingestion des données](#ingestion-des-données)
-5. [Gestion des services](#gestion-des-services)
-6. [Dépannage](#dépannage)
-7. [Maintenance](#maintenance)
+3. [Ingestion des données](#ingestion-des-données)
+4. [Gestion des services](#gestion-des-services)
+5. [Dépannage](#dépannage)
+6. [Maintenance](#maintenance)
 
 ---
 
@@ -18,7 +17,6 @@
 - **Réseau :** connexion Internet pour télécharger les modèles (~2-4 Go)
 - **Espace disque :** ~10 Go libres (pour les modèles et ChromaDB)
 - **Répertoire d'installation :** `/home/rag/`
-- **GPU (optionnel) :** NVIDIA avec support CUDA pour accélération
 
 ---
 
@@ -95,57 +93,7 @@ pip3 install \
     fastapi \
     uvicorn \
     python-dotenv \
-    beautifulsoup4 \
-    sentence-transformers
-```
-
----
-
-## Configuration GPU/CPU
-
-Le système supporte deux modes de fonctionnement :
-- **Mode CPU (défaut)** : Utilise BM25 et TF-IDF pour le reranking
-- **Mode GPU** : Utilise CrossEncoder et SentenceTransformer pour de meilleures performances
-
-### Configuration via variable d'environnement
-
-```bash
-# Vérifier le mode actuel
-python3 -c "from device_config import print_device_status; print_device_status()"
-
-# Forcer mode CPU (par défaut)
-export RAG_USE_GPU=0
-
-# Forcer mode GPU
-export RAG_USE_GPU=1
-
-# Détection automatique
-export RAG_USE_GPU=auto
-```
-
-### Configuration pour le service systemd
-
-```bash
-# Éditer le fichier du service
-sudo nano /etc/systemd/system/rag-api.service
-
-# Ajouter dans la section [Service] :
-# Environment="RAG_USE_GPU=1"   ← pour GPU
-# Environment="RAG_USE_GPU=0"   ← pour CPU (défaut)
-
-# Recharger et redémarrer
-sudo systemctl daemon-reload
-sudo systemctl restart rag-api
-```
-
-### Installation GPU (si GPU NVIDIA disponible)
-
-```bash
-# Installer PyTorch avec support CUDA
-pip3 install torch --index-url https://download.pytorch.org/whl/cu118
-
-# Vérifier l'installation
-python3 -c "import torch; print(f'CUDA disponible: {torch.cuda.is_available()}')"
+    beautifulsoup4
 ```
 
 ---
@@ -444,8 +392,6 @@ bash /home/rag/restart_server.sh
 | Ingérer les données | `cd /home/rag && python3 ingest_html_adaptive.py` |
 | Lister les modèles | `ollama list` |
 | Changer le modèle | `bash /home/rag/change_model.sh <nom_modele>` |
-| Vérifier mode GPU/CPU | `python3 -c "from device_config import print_device_status; print_device_status()"` |
-| Activer GPU | `export RAG_USE_GPU=1` |
 
 ---
 

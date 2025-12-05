@@ -144,39 +144,9 @@ def extract_process_sections(text, source_file):
         toc_lines.append("")
     
     toc_lines.append("Sections du document:")
-    
-    # FIX: Pour les sections courtes (<600 chars), inclure le contenu directement
-    # Cela résout le problème des "couleurs du robot" qui étaient listées sans explication
     for i, match in enumerate(matches, 1):
         section_title = match.group(1).strip()
-        
-        # Calculer la longueur de cette section (FIX: utiliser le bon index)
-        start_pos = matches[i-1].start()  # matches est 0-indexed, i est 1-indexed
-        if i < len(matches):  # Pas la dernière section
-            end_pos = matches[i].start()
-        else:  # Dernière section
-            end_pos = len(text)
-        
-        section_content = text[start_pos:end_pos].strip()
-        section_length = len(section_content)
-        
-        # DEBUG pour 1107
-        if "1107" in source_file and i == 1:
-            print(f"\nDEBUG 1107 Section 1: Length={section_length}")
-            print(f"Threshold: 800")
-            print(f"Decision: {'INCLUDE' if section_length < 800 else 'EXCLUDE'}")
-            print(f"Content start: {section_content[:50]}...")
-        
-        # Si section courte (<800 chars), inclure le contenu (augmenté de 600)
-        if section_length < 800:
-            # Nettoyer le contenu (enlever le marker +-)
-            clean_content = re.sub(r'\+-.*?\n', '', section_content, count=1).strip()
-            toc_lines.append(f"  {i}. {section_title}")
-            toc_lines.append(f"{clean_content}")
-            toc_lines.append("")  # Ligne vide pour séparation
-        else:
-            # Section longue, juste le titre
-            toc_lines.append(f"  {i}. {section_title}")
+        toc_lines.append(f"  {i}. {section_title}")
     
     toc_lines.append("")
     toc_lines.append("Pour les détails de chaque étape, consulter les sections correspondantes.")
@@ -302,49 +272,6 @@ def extract_html_metadata(html_content):
     return metadata
 
 
-def enrich_document_metadata(section: dict, html_metadata: dict) -> dict:
-    """Enrichir les métadonnées pour meilleure pertinence"""
-    
-    enhanced = html_metadata.copy()
-    
-    # 1. Ajouter des signaux de fiabilité/importance
-    content = section['content']
-    
-    reliability_signals = {
-        'has_official_link': 1.0 if 'whaller' in content.lower() else 0.5,
-        'is_procedure': 1.0 if any(w in content.lower() for w in ['étape', 'procédure', 'comment']) else 0.5,
-        'has_date_info': 1.0 if any(c.isdigit() for c in content) else 0.5,
-        'document_freshness': 1.0,  # À adapter avec date réelle
-    }
-    
-    enhanced['reliability_score'] = sum(reliability_signals.values()) / len(reliability_signals)
-    enhanced['reliability_signals'] = str(reliability_signals) # Convert to string for ChromaDB
-    
-    # 2. Ajouter des catégories automatiques (classification)
-    content_lower = content.lower()
-    categories = []
-    
-    if 'amadeus' in content_lower or 'gds' in content_lower or 'format' in content_lower:
-        categories.append('amadeus_formats')
-    if 'congé' in content_lower or 'absence' in content_lower:
-        categories.append('absences')
-    if 'émission' in content_lower or 'dossier' in content_lower:
-        categories.append('gds_operations')
-    
-    enhanced['auto_categories'] = str(categories) # Convert to string for ChromaDB
-    enhanced['category_string'] = ' '.join(categories)  # Pour embeddings
-    
-    # 3. Ajouter des signaux de densité informationnelle
-    words = content.split()
-    unique_words = len(set(words))
-    enhanced['information_density'] = unique_words / max(len(words), 1)
-    
-    # 4. Taille du chunk normalisée
-    enhanced['chunk_size_kb'] = len(content) / 1024
-    
-    return enhanced
-
-
 def load_html_documents_adaptive(data_path):
     """
     Charge tous les fichiers HTML avec chunking adaptatif.
@@ -391,9 +318,6 @@ def load_html_documents_adaptive(data_path):
                     section_length = len(section['content'])
                     chunk_config = get_adaptive_chunk_config(section_length, has_sections=True)
                     
-                    # Enrichir les métadonnées
-                    enriched_meta = enrich_document_metadata(section, html_metadata)
-                    
                     # Type de document plus précis
                     if section.get('is_summary'):
                         doc_type_str = f"html_{section['doc_type']}_summary"
@@ -414,7 +338,7 @@ def load_html_documents_adaptive(data_path):
                             "chunk_size": chunk_config['chunk_size'],
                             "chunk_overlap": chunk_config['chunk_overlap'],
                             "text_length": section_length,
-                            **enriched_meta  # Ajouter les métadonnées enrichies
+                            **html_metadata  # Ajouter les métadonnées HTML
                         }
                     )
                     documents.append(doc)
@@ -425,10 +349,6 @@ def load_html_documents_adaptive(data_path):
             else:
                 # Traitement normal avec chunking adaptatif
                 chunk_config = get_adaptive_chunk_config(text_length, has_sections=False)
-                
-                # Enrichir les métadonnées (simulé pour doc entier)
-                dummy_section = {'content': text}
-                enriched_meta = enrich_document_metadata(dummy_section, html_metadata)
                 
                 # Catégoriser pour les stats
                 if text_length < 2000:
@@ -454,7 +374,7 @@ def load_html_documents_adaptive(data_path):
                         "chunk_overlap": chunk_config['chunk_overlap'],
                         "chunk_strategy": chunk_config['description'],
                         "text_length": text_length,
-                        **enriched_meta  # Ajouter les métadonnées enrichies
+                        **html_metadata  # Ajouter les métadonnées HTML
                     }
                 )
                 documents.append(doc)
