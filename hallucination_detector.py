@@ -300,3 +300,37 @@ class HallucinationDetectorLightweight:
             badge = "❌ **[BASSE CONFIANCE]** Consultez un expert RH ou Amadeus pour validation."
         
         return f"{response}\n\n{badge}"
+
+
+# =============================================================================
+# FACTORY FUNCTION - Sélection automatique CPU/GPU
+# =============================================================================
+
+def get_hallucination_detector(use_gpu: bool = None):
+    """
+    Factory pour obtenir le bon détecteur selon la configuration.
+    
+    Args:
+        use_gpu: Force GPU (True) ou CPU (False). Si None, utilise la config.
+    
+    Returns:
+        Instance de HallucinationDetectorLightweight (CPU) ou HallucinationDetectorGPU (GPU)
+    """
+    # Importer ici pour éviter import circulaire
+    from device_config import USE_GPU as DEFAULT_USE_GPU
+    
+    should_use_gpu = use_gpu if use_gpu is not None else DEFAULT_USE_GPU
+    
+    if should_use_gpu:
+        try:
+            from hallucination_detector_gpu import HallucinationDetectorGPU
+            return HallucinationDetectorGPU()
+        except ImportError as e:
+            print(f"⚠️ GPU detector non disponible ({e}), fallback CPU")
+            return HallucinationDetectorLightweight()
+        except Exception as e:
+            print(f"⚠️ Erreur init GPU detector ({e}), fallback CPU")
+            return HallucinationDetectorLightweight()
+    else:
+        return HallucinationDetectorLightweight()
+

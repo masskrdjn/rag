@@ -246,3 +246,37 @@ class RAGRerankerStrict:
             filtered = sorted_docs[:1]
         
         return filtered[:top_k]
+
+
+# =============================================================================
+# FACTORY FUNCTION - Sélection automatique CPU/GPU
+# =============================================================================
+
+def get_reranker(use_gpu: bool = None):
+    """
+    Factory pour obtenir le bon reranker selon la configuration.
+    
+    Args:
+        use_gpu: Force GPU (True) ou CPU (False). Si None, utilise la config.
+    
+    Returns:
+        Instance de RAGRerankerStrict (CPU) ou RAGRerankerGPU (GPU)
+    """
+    # Importer ici pour éviter import circulaire
+    from device_config import USE_GPU as DEFAULT_USE_GPU
+    
+    should_use_gpu = use_gpu if use_gpu is not None else DEFAULT_USE_GPU
+    
+    if should_use_gpu:
+        try:
+            from reranker_gpu import RAGRerankerGPU
+            return RAGRerankerGPU()
+        except ImportError as e:
+            print(f"⚠️ GPU reranker non disponible ({e}), fallback CPU")
+            return RAGRerankerStrict()
+        except Exception as e:
+            print(f"⚠️ Erreur init GPU reranker ({e}), fallback CPU")
+            return RAGRerankerStrict()
+    else:
+        return RAGRerankerStrict()
+

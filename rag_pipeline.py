@@ -14,13 +14,17 @@ import time
 # Import configuration
 from config import get_active_model_config, RAG_CONFIG, EMBEDDING_MODEL, CHROMA_DB_PATH
 
+# Import device config (affiche le statut GPU/CPU au chargement)
+from device_config import get_device, USE_GPU, print_device_status
+
 from langchain_core.retrievers import BaseRetriever
 from typing import Dict, List
-# Import optimization modules
-from reranker import RAGRerankerStrict as RAGReranker
+
+# Import optimization modules avec factory functions
+from reranker import get_reranker
 from cache_manager import CacheManager
 from query_expander import QueryExpander
-from hallucination_detector import HallucinationDetectorLightweight as HallucinationDetector
+from hallucination_detector import get_hallucination_detector
 
 class SimpleRAG:
     def __init__(self, 
@@ -60,10 +64,11 @@ class SimpleRAG:
         
         # Initialisation des modules d'optimisation
         print(f"🚀 Initialisation avec modèle: {self.model_name}")
+        print(f"📍 Device: {get_device().upper()}")
         self.cache_manager = CacheManager()
-        self.reranker = RAGReranker()
+        self.reranker = get_reranker()  # Auto CPU/GPU
         self.query_expander = QueryExpander(model_name=self.model_name)
-        self.hallucination_detector = HallucinationDetector()
+        self.hallucination_detector = get_hallucination_detector()  # Auto CPU/GPU
         print("✓ Modules chargés")
 
     def setup_chain(self):
