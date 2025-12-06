@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Data>
+    <Action Purpose="Get" Code="Availability" />
+    <Trip>
+        <Segment xsi:type="SegmentProductType">
+            <Segments What="Details">
+                <Segment xsi:type="SegmentAirType" Type="OneWay">
+                    <Seat Quantity="1" />
+                </Segment>
+            </Segments>
+        </Segment>
+        <Travellers>
+            <Traveller ID="T1" Type="Adult" />
+        </Travellers>
+        <Begin Value="2026-01-19" />
+        <From xsi:type="CityType" Code="CDG" />
+        <To xsi:type="CityType" Code="LHR" />
+    </Trip>
+</Data>
