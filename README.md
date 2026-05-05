@@ -67,8 +67,14 @@ Tout passe par `config.py` ou par variables d'environnement (qui surchargent) :
 | `RAG_CHROMA_DB_PATH` | `./chroma_db` (Win) ou `/home/rag/chroma_db` (Linux si dispo) | Dossier de persistance ChromaDB. |
 | `RAG_DATA_PATH` | `./data` | Dossier source HTML pour l'ingestion. |
 | `RAG_TOP_K` | `6` | Nombre de candidats avant reranking. |
+| `RAG_MAX_DYNAMIC_TOP_K` | `8` | Plafond du `top_k` dynamique selon la question. |
+| `RAG_MAX_QUESTION_CHARS` | `1000` | Taille maximale acceptee par `/ask`. |
 | `RAG_MAX_CONTEXT` | `3000` | Longueur max (chars) du contexte injecté au LLM. |
 | `RAG_USE_HYBRID` | `1` | Active la branche BM25 hybride. |
+| `RAG_CACHE_TTL_SECONDS` | â€” | TTL optionnel du cache SQLite. Vide = pas d'expiration temporelle. |
+| `RAG_CORPUS_BUILD_ID` | hash leger de Chroma | Identifiant de corpus pour invalider le cache apres reingestion. |
+| `RAG_API_KEY` | â€” | Si defini, `/ask` exige le header `X-API-Key`. |
+| `RAG_KEYWORDS_CONFIG` | â€” | Fichier JSON optionnel pour remplacer/etendre les mots-cles retrieval. |
 | `RAG_USE_GPU` | `auto` | `0`/`1`/`auto` pour le placement device. `1` autorise CUDA côté API si `RAG_DISABLE_CUDA` n'est pas défini. |
 | `RAG_DISABLE_CUDA` | `1` côté API | Si `1`, désactive CUDA côté API uniquement (compat. vieux GPU). Mettre `0` pour l'autoriser explicitement. |
 
@@ -164,6 +170,17 @@ journalctl -u rag-api.service -f
 ├── requirements.txt
 ├── AGENTS.md                         # consignes pour agents IA
 └── README.md
+```
+
+## Benchmark Embeddings
+
+`bge-m3` est documente comme candidat prioritaire pour le francais, mais il
+necessite une reingestion dans une base Chroma dediee avant comparaison :
+
+```bash
+RAG_EMBEDDING_MODEL=nomic-embed-text RAG_CHROMA_DB_PATH=./chroma_nomic python ingest_html_adaptive.py
+RAG_EMBEDDING_MODEL=bge-m3 RAG_CHROMA_DB_PATH=./chroma_bge_m3 python ingest_html_adaptive.py
+python benchmark_embeddings.py --embedding nomic-embed-text --chroma ./chroma_nomic --embedding bge-m3 --chroma ./chroma_bge_m3
 ```
 
 ## Notes

@@ -88,13 +88,17 @@ class HallucinationDetectorLightweight:
     def __init__(self, threshold: float = 0.18):
         self.threshold = threshold
         self.tfidf = TFIDFMatcher()
-        print("✓ HallucinationDetectorLightweight initialisé (CPU-only, seuil optimisé)")
+        print("HallucinationDetectorLightweight initialise (CPU-only)")
     
     def split_sentences(self, text: str) -> List[str]:
         """Split text into sentences"""
-        # Regex pour phrases FR
-        sentences = re.split(r'[.!?]+', text)
-        return [s.strip() for s in sentences if len(s.strip()) > 15]
+        pieces = []
+        for line in text.splitlines():
+            line = re.sub(r'^\s*[-*]\s*', '', line).strip()
+            if not line:
+                continue
+            pieces.extend(re.split(r'[.!?;]+', line))
+        return [s.strip() for s in pieces if len(s.strip()) > 8]
     
     def extract_claims(self, text: str) -> List[str]:
         """Extract main claims from text"""
@@ -114,6 +118,46 @@ class HallucinationDetectorLightweight:
         
         return claims if claims else sentences
     
+    def extract_claims(self, text: str) -> List[str]:
+        """Extract claims from sentences and list items without verb filtering."""
+        return self.split_sentences(text)
+
+    def _extract_sensitive_tokens(self, text: str) -> List[str]:
+        patterns = [
+            r'\b\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b',
+            r'\b\d+(?:[.,]\d+)?\s?(?:%|eur|€|euros?)\b',
+            r'\b\d{2,}\b',
+            r'\b[A-Z][A-Z0-9]{2,}(?:-[A-Z0-9]+)?\b',
+        ]
+        tokens = []
+        for pattern in patterns:
+            tokens.extend(re.findall(pattern, text, flags=re.IGNORECASE))
+        citations = set(re.findall(r'\[S\d+\]', text, flags=re.IGNORECASE))
+        filtered = []
+        for token in dict.fromkeys(tokens):
+            if token.upper() in citations or f"[{token.upper()}]" in citations:
+                continue
+            if (
+                re.search(r'[A-Za-z]', token)
+                and not re.search(r'\d', token)
+                and token.upper() != token
+            ):
+                continue
+            filtered.append(token)
+        return filtered
+
+    @staticmethod
+    def _claim_citation_ids(claim: str) -> List[str]:
+        return [m.upper().strip("[]") for m in re.findall(r'\[S\d+\]', claim, flags=re.IGNORECASE)]
+
+    @staticmethod
+    def _source_map(source_documents: List[Dict]) -> Dict[str, str]:
+        mapped = {}
+        for index, doc in enumerate(source_documents, 1):
+            source_id = str(doc.get("source_id") or f"S{index}").upper()
+            mapped[source_id] = doc.get('content', '') or doc.get('page_content', '')
+        return mapped
+
     def _word_overlap_score(self, claim: str, source_text: str) -> float:
         """
         Compute word overlap between claim and source (Jaccard-like).
@@ -176,6 +220,7 @@ class HallucinationDetectorLightweight:
         
         # Extract claims from response
         response_claims = self.extract_claims(response)
+        source_by_id = self._source_map(source_documents)
         
         # Combine source text but keep track of chunks/sentences for granular matching
         full_source_text = ' '.join([
@@ -220,34 +265,68 @@ class HallucinationDetectorLightweight:
         for claim in response_claims:
             try:
                 claim_lower = claim.lower()
+                citation_ids = self._claim_citation_ids(claim)
                 
                 # STAGE 1: Exact Substring Matching
                 # If a significant part of the claim is verbatim in source, it's supported.
                 if claim_lower in full_source_lower:
-                    supported.append(claim)
+                    if citation_ids:
+                        supported.append(claim)
+                    else:
+                        unclear.append(f"{claim} [citation manquante]")
                     continue
+
+                cited_source_text = " ".join(
+                    source_by_id.get(source_id, "") for source_id in citation_ids
+                ).strip()
+                evidence_text = cited_source_text or full_source_text
+
+                if citation_ids and not cited_source_text:
+                    hallucinated.append(f"{claim} [citation inconnue]")
+                    continue
+
+                sensitive_tokens = self._extract_sensitive_tokens(claim)
+                missing_sensitive = [
+                    token for token in sensitive_tokens
+                    if token.lower() not in evidence_text.lower()
+                ]
+                if missing_sensitive:
+                    hallucinated.append(
+                        f"{claim} [tokens absents: {', '.join(missing_sensitive[:5])}]"
+                    )
+                    continue
+
+                comparison_sentences = self.split_sentences(evidence_text)
+                comparison_chunks = []
+                for idx in range(0, len(comparison_sentences), 1):
+                    chunk = " ".join(comparison_sentences[idx:idx+3])
+                    if len(chunk) > 30:
+                        comparison_chunks.append(chunk)
+                if not comparison_chunks:
+                    comparison_chunks = [evidence_text]
+                self.tfidf.fit(comparison_chunks)
                 
                 # STAGE 2: Sliding Window TF-IDF
                 # Compare claim against all source chunks and take the MAX similarity
                 max_tfidf_sim = 0.0
                 
-                if source_chunks:
-                    for chunk in source_chunks:
+                if comparison_chunks:
+                    for chunk in comparison_chunks:
                         sim = self.tfidf.cosine_similarity(claim, chunk)
                         if sim > max_tfidf_sim:
                             max_tfidf_sim = sim
                 else:
-                    max_tfidf_sim = self.tfidf.cosine_similarity(claim, full_source_text)
+                    max_tfidf_sim = self.tfidf.cosine_similarity(claim, evidence_text)
                 
                 # STAGE 3: Word Overlap (for paraphrases)
                 max_word_overlap = 0.0
-                if source_chunks:
-                    for chunk in source_chunks:
+                if comparison_chunks:
+                    for chunk in comparison_chunks:
                         overlap = self._word_overlap_score(claim, chunk)
                         if overlap > max_word_overlap:
                             max_word_overlap = overlap
                 else:
-                    max_word_overlap = self._word_overlap_score(claim, full_source_text)
+                    max_word_overlap = self._word_overlap_score(claim, evidence_text)
                 
                 # DECISION: Combine both metrics (FIX: seuils assouplis)
                 # Le LLM paraphrase souvent les sources, ce qui est acceptable
@@ -255,10 +334,15 @@ class HallucinationDetectorLightweight:
                 
                 if max_tfidf_sim > self.threshold or max_word_overlap > 0.35:
                     # Evidence suffisante: TF-IDF OU word overlap acceptable
-                    supported.append(claim)
+                    if citation_ids:
+                        supported.append(claim)
+                    else:
+                        unclear.append(f"{claim} [citation manquante]")
                 elif max_tfidf_sim < 0.08 and max_word_overlap < 0.15:
                     # Très faible sur les deux: probablement hallucination
                     hallucinated.append(claim)
+                elif max_tfidf_sim <= self.threshold and max_word_overlap <= 0.35:
+                    unclear.append(claim)
                 else:
                     # Borderline: considéré comme supporté (bénéfice du doute)
                     # FIX: avant, unclear comptait comme 0.5, maintenant comme supporté
@@ -276,7 +360,8 @@ class HallucinationDetectorLightweight:
             # FIX: On compte uniquement les hallucinations avérées
             # Ratio = (total - hallucinated) / total
             # Si pas d'hallucination -> 1.0, si tout est halluciné -> 0.0
-            confidence = (total - len(hallucinated)) / total
+            penalty = (len(hallucinated) * 1.0) + (len(unclear) * 0.35)
+            confidence = max(0.0, 1.0 - (penalty / total))
         
         return {
             'has_hallucinations': len(hallucinated) > 0,

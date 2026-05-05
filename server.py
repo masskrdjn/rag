@@ -11,6 +11,7 @@ Variables d'environnement utiles :
 """
 
 import os
+import asyncio
 
 # Désactivation conditionnelle de CUDA. Historiquement forcé pour contourner
 # une incompatibilité avec une GT 1030 ; le CPU reste le défaut sûr pour l'API.
@@ -33,8 +34,8 @@ from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
 
 import uvicorn
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, Header, HTTPException
+from pydantic import BaseModel, Field
 
 from config import RAG_CONFIG, get_active_model_config
 from rag_pipeline import SimpleRAG
@@ -65,7 +66,10 @@ app = FastAPI(title="RAG Enterprise API", version="1.0.0", lifespan=lifespan)
 
 
 class QueryRequest(BaseModel):
-    question: str
+    question: str = Field(
+        min_length=1,
+        max_length=RAG_CONFIG["max_question_chars"],
+    )
     dynamic_k: bool = True
 
 
@@ -79,20 +83,29 @@ class SourceInfo(BaseModel):
 
 class QueryResponse(BaseModel):
     answer: str
-    sources: List[SourceInfo] = []
-    metadata: Dict[str, Any] = {}
+    sources: List[SourceInfo] = Field(default_factory=list)
+    metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
 @app.post("/ask", response_model=QueryResponse)
-async def ask_question(request: QueryRequest):
-    if not request.question.strip():
+async def ask_question(
+    request: QueryRequest,
+    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+):
+    expected_api_key = RAG_CONFIG.get("api_key")
+    if expected_api_key and x_api_key != expected_api_key:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+
+    question = request.question.strip()
+    if not question:
         raise HTTPException(status_code=400, detail="Question cannot be empty")
 
     try:
-        result = rag.ask(
-            request.question,
-            return_sources=True,
-            dynamic_k=request.dynamic_k,
+        result = await asyncio.to_thread(
+            rag.ask,
+            question,
+            True,
+            request.dynamic_k,
         )
         if isinstance(result, str):
             return QueryResponse(answer=result)

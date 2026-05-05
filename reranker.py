@@ -9,6 +9,26 @@ from typing import List, Dict
 from collections import Counter
 import re
 import math
+import unicodedata
+
+from config import RAG_CONFIG
+
+
+KEYWORD_TAXONOMY = RAG_CONFIG["keyword_taxonomy"]
+BROAD_KEYWORDS = tuple(KEYWORD_TAXONOMY.get("broad", ()))
+SPECIFIC_KEYWORDS = tuple(KEYWORD_TAXONOMY.get("specific", ()))
+
+
+def normalize_text(text: str) -> str:
+    normalized = unicodedata.normalize("NFKD", str(text).lower())
+    normalized = "".join(c for c in normalized if not unicodedata.combining(c))
+    normalized = re.sub(r"\s+", " ", normalized)
+    return normalized.strip()
+
+
+def contains_keyword(text: str, keywords) -> bool:
+    normalized = normalize_text(text)
+    return any(normalize_text(kw) in normalized for kw in keywords)
 
 class BM25:
     """Implémentation BM25 (Okapi) - sans dépendances externes"""
@@ -85,7 +105,7 @@ class RAGRerankerStrict:
             'son', 'sa', 'ses', 'notre', 'nos', 'votre', 'vos', 'leur', 'leurs',
             'comment', 'où', 'quand', 'pourquoi', 'qui', 'quoi'
         }
-        print("✓ RAGRerankerStrict initialisé (CPU-only, scoring strict)")
+        print("RAGRerankerStrict initialise (CPU-only, scoring strict)")
     
     def extract_keywords(self, text: str) -> List[str]:
         """Extract keywords (>3 chars, non-stopwords)"""
@@ -106,8 +126,8 @@ class RAGRerankerStrict:
         score = 0.5
         
         # NOUVEAU: Bonus si le titre du document match la question
-        filename = document.get('filename', '').lower().replace('_', ' ').replace('.html', '')
-        question_lower = question.lower()
+        filename = normalize_text(document.get('filename', '').replace('_', ' ').replace('.html', ''))
+        question_lower = normalize_text(question)
         question_keywords = self.extract_keywords(question)
         
         # Compter les mots-clés de la question présents dans le filename
@@ -125,6 +145,36 @@ class RAGRerankerStrict:
                 score = max(score, 0.4)
         
         # Pénalité pour redirects trop court
+        is_summary = bool(document.get('is_summary', False))
+        is_broad = contains_keyword(question, BROAD_KEYWORDS)
+        is_specific = contains_keyword(question, SPECIFIC_KEYWORDS)
+        if is_summary and is_broad and not is_specific:
+            score = max(score, 0.85)
+        elif is_summary and is_specific:
+            score = min(score, 0.35)
+
+        section_title = normalize_text(document.get('section_title', ''))
+        section_matches = sum(
+            1 for kw in question_keywords if normalize_text(kw) in section_title
+        )
+        if section_matches:
+            score = min(1.0, score + min(section_matches * 0.08, 0.20))
+
+        try:
+            reliability = max(0.0, min(float(document.get('reliability_score', 0.5)), 1.0))
+            score = (score * 0.85) + (reliability * 0.15)
+        except (TypeError, ValueError):
+            pass
+
+        try:
+            density = float(document.get('information_density', 0.5))
+            if density < 0.18:
+                score *= 0.9
+            elif density > 0.45:
+                score = min(1.0, score + 0.05)
+        except (TypeError, ValueError):
+            pass
+
         content = document.get('content', '')
         if len(content) < 200 and 'whaller' in content.lower():
             score *= 0.6
@@ -137,8 +187,8 @@ class RAGRerankerStrict:
         Scoring strict avec gates agressifs + boost keyword exact matches
         """
         content = document.get('content', '') or document.get('page_content', '')
-        content_lower = content.lower()
-        question_lower = question.lower()
+        content_lower = normalize_text(content)
+        question_lower = normalize_text(question)
         
         # 🔴 GATE 1: Rejeter contenu très court (< 150 chars)
         if len(content.strip()) < 150:
@@ -204,9 +254,9 @@ class RAGRerankerStrict:
             return []
         
         # Détecter questions larges/vagues nécessitant plus de contexte
-        question_lower = question.lower()
+        question_lower = normalize_text(question)
         vague_keywords = ['comment', 'que faire', 'quels', 'quelles', 'quel']
-        is_vague = any(kw in question_lower for kw in vague_keywords)
+        is_vague = any(kw in question_lower for kw in vague_keywords) or contains_keyword(question, BROAD_KEYWORDS)
         
         # Score tous les docs
         scored = []

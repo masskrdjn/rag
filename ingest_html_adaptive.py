@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import hashlib
 from pathlib import Path
 
 from bs4 import BeautifulSoup
@@ -13,6 +14,11 @@ from config import CHROMA_DB_PATH, DATA_PATH, EMBEDDING_MODEL
 
 # Alias historiques pour rétrocompatibilité avec les fonctions ci-dessous
 CHROMA_PATH = CHROMA_DB_PATH
+
+
+def make_stable_id(*parts) -> str:
+    raw = "|".join(str(part or "") for part in parts)
+    return hashlib.md5(raw.encode("utf-8")).hexdigest()
 
 def clear_chroma_db():
     """Supprime la base de données existante pour éviter la corruption."""
@@ -390,6 +396,13 @@ def load_html_documents_adaptive(data_path):
                 for section in sections:
                     section_length = len(section['content'])
                     chunk_config = get_adaptive_chunk_config(section_length, has_sections=True)
+                    parent_id = make_stable_id(html_file.name, html_metadata.get("post_id"), "parent")
+                    child_id = make_stable_id(
+                        html_file.name,
+                        html_metadata.get("post_id"),
+                        section.get('section_num'),
+                        section.get('title'),
+                    )
                     
                     # Enrichir les métadonnées
                     enriched_meta = enrich_document_metadata(section, html_metadata)
@@ -409,6 +422,8 @@ def load_html_documents_adaptive(data_path):
                             "section_title": section['title'],
                             "section_num": section['section_num'],
                             "total_sections": section.get('total_sections', 0),
+                            "parent_id": parent_id,
+                            "child_id": child_id,
                             "is_summary": section.get('is_summary', False),
                             "doc_type": section['doc_type'],
                             "chunk_size": chunk_config['chunk_size'],
@@ -450,6 +465,8 @@ def load_html_documents_adaptive(data_path):
                         "source": str(html_file),
                         "filename": html_file.name,
                         "type": "html",
+                        "parent_id": make_stable_id(html_file.name, html_metadata.get("post_id"), "parent"),
+                        "child_id": make_stable_id(html_file.name, html_metadata.get("post_id"), "full"),
                         "chunk_size": chunk_config['chunk_size'],
                         "chunk_overlap": chunk_config['chunk_overlap'],
                         "chunk_strategy": chunk_config['description'],
@@ -525,6 +542,16 @@ def chunk_documents_adaptive(documents):
         )
         
         chunks = text_splitter.split_documents(group_docs)
+        for index, chunk in enumerate(chunks):
+            base_child_id = chunk.metadata.get("child_id") or make_stable_id(
+                chunk.metadata.get("filename"),
+                chunk.metadata.get("section_num"),
+                chunk.metadata.get("start_index"),
+            )
+            chunk.metadata["child_id"] = make_stable_id(base_child_id, chunk.metadata.get("start_index"), index)
+            chunk.metadata["parent_id"] = chunk.metadata.get("parent_id") or make_stable_id(
+                chunk.metadata.get("filename"), "parent"
+            )
         all_chunks.extend(chunks)
         
         print(f" → {len(chunks)} chunks")
