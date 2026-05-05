@@ -1,7 +1,21 @@
 # config.py
 """
-Configuration centrale pour le système RAG
+Configuration centrale pour le système RAG.
+
+Toutes les valeurs sont surchargeables via variables d'environnement :
+
+- RAG_ACTIVE_MODEL    : clé du modèle dans MODELS (ex: "qwen-14b")
+- RAG_MODEL           : nom Ollama brut (ex: "mistral:7b") — prioritaire sur RAG_ACTIVE_MODEL
+- RAG_EMBEDDING_MODEL : modèle d'embeddings Ollama
+- RAG_CHROMA_DB_PATH  : dossier ChromaDB persistant
+- RAG_DATA_PATH       : dossier source pour l'ingestion
+- RAG_TOP_K           : top_k retrieval
+- RAG_MAX_CONTEXT     : taille max du contexte (chars) injecté au LLM
+- RAG_USE_HYBRID      : "1"/"0" pour activer/désactiver BM25 hybride
 """
+
+import os
+from pathlib import Path
 
 # =============================================================================
 # CONFIGURATION DES MODÈLES
@@ -45,47 +59,81 @@ MODELS = {
     },
 }
 
-# Modèle actif (changer cette valeur pour basculer)
-ACTIVE_MODEL = "qwen-14b"  # Options: mistral-7b, qwen-14b, qwen-7b, command-r-35b, llama-8b
+ACTIVE_MODEL = os.environ.get("RAG_ACTIVE_MODEL", "qwen-14b")
+
+# =============================================================================
+# CHEMINS (avec défauts adaptatifs Windows / Linux)
+# =============================================================================
+
+_PROJECT_ROOT = Path(__file__).resolve().parent
+
+def _default_chroma_path() -> str:
+    """
+    Défaut intelligent :
+    - Linux production : /home/rag/chroma_db si le dossier parent existe
+    - Sinon (Windows, dev local) : <projet>/chroma_db
+    """
+    linux_default = Path("/home/rag/chroma_db")
+    if linux_default.parent.exists():
+        return str(linux_default)
+    return str(_PROJECT_ROOT / "chroma_db")
+
+CHROMA_DB_PATH = os.environ.get("RAG_CHROMA_DB_PATH", _default_chroma_path())
+DATA_PATH = os.environ.get("RAG_DATA_PATH", str(_PROJECT_ROOT / "data"))
 
 # =============================================================================
 # CONFIGURATION RAG
 # =============================================================================
 
+def _env_bool(key: str, default: bool) -> bool:
+    raw = os.environ.get(key)
+    if raw is None:
+        return default
+    return raw.strip().lower() in ("1", "true", "yes", "on")
+
 RAG_CONFIG = {
     "retrieval_mode": "similarity",
-    "top_k": 6,  # Augmenté de 4 à 6 pour meilleur recall
-    "score_threshold": 1.5,  # Augmenté de 0.5 à 1.5: distances ChromaDB peuvent aller jusqu'à ~0.8 pour docs pertinents
-    "use_hybrid": True,
+    "top_k": int(os.environ.get("RAG_TOP_K", "6")),
+    "score_threshold": 1.5,
+    "use_hybrid": _env_bool("RAG_USE_HYBRID", True),
     "hybrid_weights": [0.2, 0.8],
-    "max_context_chars": 3000,
+    "max_context_chars": int(os.environ.get("RAG_MAX_CONTEXT", "3000")),
 }
 
 # =============================================================================
 # CONFIGURATION EMBEDDINGS
 # =============================================================================
 
-EMBEDDING_MODEL = "nomic-embed-text"
-CHROMA_DB_PATH = "/home/rag/chroma_db"
+EMBEDDING_MODEL = os.environ.get("RAG_EMBEDDING_MODEL", "nomic-embed-text")
 
 # =============================================================================
 # HELPERS
 # =============================================================================
 
-def get_active_model_config():
-    """Récupère la configuration du modèle actif"""
+def get_active_model_config() -> dict:
+    """Récupère la configuration du modèle actif (RAG_MODEL surcharge tout)."""
     if ACTIVE_MODEL not in MODELS:
-        raise ValueError(f"Modèle '{ACTIVE_MODEL}' non reconnu. Options: {list(MODELS.keys())}")
-    return MODELS[ACTIVE_MODEL]
+        raise ValueError(
+            f"Modèle '{ACTIVE_MODEL}' non reconnu. Options: {list(MODELS.keys())}"
+        )
+    config = dict(MODELS[ACTIVE_MODEL])
+    override = os.environ.get("RAG_MODEL")
+    if override:
+        config["name"] = override
+    return config
 
-def list_available_models():
-    """Liste tous les modèles disponibles avec leurs descriptions"""
-    print("\n📋 MODÈLES DISPONIBLES:\n")
+def list_available_models() -> None:
+    """Affiche les modèles disponibles avec leurs descriptions."""
+    print("\nMODÈLES DISPONIBLES :\n")
     for key, model in MODELS.items():
-        active = "✓ ACTIF" if key == ACTIVE_MODEL else ""
+        active = "(ACTIF)" if key == ACTIVE_MODEL else ""
         print(f"  {key:15} - {model['description']} ({model['ram_required']}) {active}")
     print()
 
 if __name__ == "__main__":
     list_available_models()
-    print(f"Configuration active: {get_active_model_config()}")
+    print(f"Modèle actif       : {get_active_model_config()}")
+    print(f"Embeddings         : {EMBEDDING_MODEL}")
+    print(f"ChromaDB           : {CHROMA_DB_PATH}")
+    print(f"Données ingestion  : {DATA_PATH}")
+    print(f"Retrieval          : {RAG_CONFIG}")

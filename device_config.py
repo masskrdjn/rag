@@ -40,7 +40,7 @@ def _check_cuda_available() -> bool:
     except ImportError:
         return False
     except Exception as e:
-        print(f"⚠️  Erreur lors de la vérification CUDA: {e}")
+        print(f"[!] Erreur lors de la vérification CUDA : {e}")
         return False
 
 def _get_cuda_device_name() -> str:
@@ -69,7 +69,7 @@ elif _GPU_MODE == "gpu":
         USE_GPU = True
         DEVICE = "cuda"
     else:
-        print("⚠️  RAG_USE_GPU=1 mais CUDA non disponible. Forçage CPU.")
+        print("[!] RAG_USE_GPU=1 mais CUDA non disponible. Forçage CPU.")
         USE_GPU = False
         DEVICE = "cpu"
 else:  # auto
@@ -141,10 +141,10 @@ def print_device_status():
     if USE_GPU:
         gpu_name = info.get("gpu_name", "Unknown")
         gpu_mem = info.get("gpu_memory_total", "?")
-        print(f"🚀 GPU activé: {gpu_name} ({gpu_mem})")
+        print(f"[GPU] activé : {gpu_name} ({gpu_mem})")
     else:
         reason = "forcé par RAG_USE_GPU=0" if _GPU_MODE == "cpu" else "CUDA non disponible"
-        print(f"💻 Mode CPU ({reason})")
+        print(f"[CPU] mode actif ({reason})")
 
 # =============================================================================
 # HELPER POUR MODÈLES
