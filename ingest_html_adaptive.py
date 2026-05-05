@@ -1,18 +1,18 @@
 import os
-from pathlib import Path
-from bs4 import BeautifulSoup
-from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_ollama import OllamaEmbeddings
-from langchain_chroma import Chroma
 import re
-
 import shutil
+from pathlib import Path
 
-# Configuration
-DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-CHROMA_PATH = "/home/rag/chroma_db"  # Base de données ChromaDB
-EMBEDDING_MODEL = "nomic-embed-text"
+from bs4 import BeautifulSoup
+from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from langchain_ollama import OllamaEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from config import CHROMA_DB_PATH, DATA_PATH, EMBEDDING_MODEL
+
+# Alias historiques pour rétrocompatibilité avec les fonctions ci-dessous
+CHROMA_PATH = CHROMA_DB_PATH
 
 def clear_chroma_db():
     """Supprime la base de données existante pour éviter la corruption."""

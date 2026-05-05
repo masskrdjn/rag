@@ -1,42 +1,43 @@
 #!/usr/bin/env python3
-"""Test direct de l'API avec timeout adapté"""
-import requests
+"""Test direct de l'API : /health puis une question simple."""
+
 import json
 import sys
 
-print("="*60)
-print("TEST API RAG")
-print("="*60)
+import requests
 
-# Test 1: Health check
-print("\n1. Test /health...")
-try:
-    response = requests.get("http://localhost:8000/health", timeout=30)
-    print(f"✓ Status: {response.status_code}")
-    print(f"  Réponse: {response.json()}")
-except Exception as e:
-    print(f"✗ Erreur: {e}")
-    sys.exit(1)
+API_BASE = "http://localhost:8000"
 
-# Test 2: Question simple
-print("\n2. Test question simple...")
-question = "quelles sont les regles des conges"
-try:
-    print(f"Question: '{question}'")
-    response = requests.post(
-        "http://localhost:8000/ask",
-        json={"question": question},
-        timeout=120  # 2 minutes pour laisser le temps
-    )
-    print(f"✓ Status: {response.status_code}")
-    result = response.json()
-    print(f"\nRéponse:")
-    print(json.dumps(result, indent=2, ensure_ascii=False))
-except Exception as e:
-    print(f"✗ Erreur: {e}")
-    import traceback
-    traceback.print_exc()
 
-print("\n" + "="*60)
-print("FIN DU TEST")
-print("="*60)
+def main() -> None:
+    print("=" * 60)
+    print("TEST API RAG")
+    print("=" * 60)
+
+    print("\n1. /health")
+    try:
+        r = requests.get(f"{API_BASE}/health", timeout=30)
+        print(f"   Status : {r.status_code} | {r.json()}")
+    except Exception as e:
+        print(f"   ERREUR : {e}")
+        sys.exit(1)
+
+    print("\n2. /ask")
+    question = "quelles sont les regles des conges"
+    print(f"   Question : '{question}'")
+    try:
+        r = requests.post(
+            f"{API_BASE}/ask",
+            json={"question": question},
+            timeout=120,
+        )
+        r.raise_for_status()
+        print(f"   Status : {r.status_code}")
+        print(json.dumps(r.json(), indent=2, ensure_ascii=False))
+    except Exception as e:
+        print(f"   ERREUR : {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
