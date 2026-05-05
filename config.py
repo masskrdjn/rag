@@ -59,7 +59,8 @@ MODELS = {
     },
 }
 
-ACTIVE_MODEL = os.environ.get("RAG_ACTIVE_MODEL", "qwen-14b")
+DEFAULT_ACTIVE_MODEL = "qwen-14b"
+ACTIVE_MODEL = os.environ.get("RAG_ACTIVE_MODEL", DEFAULT_ACTIVE_MODEL)
 
 # =============================================================================
 # CHEMINS (avec défauts adaptatifs Windows / Linux)
@@ -112,14 +113,18 @@ EMBEDDING_MODEL = os.environ.get("RAG_EMBEDDING_MODEL", "nomic-embed-text")
 
 def get_active_model_config() -> dict:
     """Récupère la configuration du modèle actif (RAG_MODEL surcharge tout)."""
+    override = os.environ.get("RAG_MODEL")
+    if override:
+        base_model = MODELS.get(ACTIVE_MODEL, MODELS[DEFAULT_ACTIVE_MODEL])
+        config = dict(base_model)
+        config["name"] = override
+        return config
+
     if ACTIVE_MODEL not in MODELS:
         raise ValueError(
             f"Modèle '{ACTIVE_MODEL}' non reconnu. Options: {list(MODELS.keys())}"
         )
     config = dict(MODELS[ACTIVE_MODEL])
-    override = os.environ.get("RAG_MODEL")
-    if override:
-        config["name"] = override
     return config
 
 def list_available_models() -> None:

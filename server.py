@@ -4,16 +4,29 @@ API FastAPI exposant le pipeline RAG.
 Variables d'environnement utiles :
 - RAG_DISABLE_CUDA : "1" pour forcer la désactivation de CUDA côté API
                      (utile sur GPU anciens incompatibles avec PyTorch récent).
-                     Défaut : non défini = on respecte RAG_USE_GPU / device_config.
+                     Défaut : non défini = CPU, sauf opt-in GPU explicite.
+- RAG_USE_GPU      : "1"/"true"/"gpu"/"cuda" pour autoriser CUDA côté API
+                     si RAG_DISABLE_CUDA n'est pas défini.
 - Tous les autres RAG_* sont gérés par config.py.
 """
 
 import os
 
 # Désactivation conditionnelle de CUDA. Historiquement forcé pour contourner
-# une incompatibilité avec une GT 1030 ; rendu optionnel pour les machines
-# récentes.
-if os.environ.get("RAG_DISABLE_CUDA", "0").lower() in ("1", "true", "yes"):
+# une incompatibilité avec une GT 1030 ; le CPU reste le défaut sûr pour l'API.
+disable_cuda = os.environ.get("RAG_DISABLE_CUDA")
+gpu_requested = os.environ.get("RAG_USE_GPU", "").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+    "gpu",
+    "cuda",
+)
+if disable_cuda is None:
+    disable_cuda = "0" if gpu_requested else "1"
+
+if disable_cuda.strip().lower() in ("1", "true", "yes", "on", "gpu", "cuda"):
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 from contextlib import asynccontextmanager

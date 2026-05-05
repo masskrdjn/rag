@@ -69,8 +69,8 @@ Tout passe par `config.py` ou par variables d'environnement (qui surchargent) :
 | `RAG_TOP_K` | `6` | Nombre de candidats avant reranking. |
 | `RAG_MAX_CONTEXT` | `3000` | Longueur max (chars) du contexte injecté au LLM. |
 | `RAG_USE_HYBRID` | `1` | Active la branche BM25 hybride. |
-| `RAG_USE_GPU` | `auto` | `0`/`1`/`auto` pour le placement device. |
-| `RAG_DISABLE_CUDA` | `0` | Si `1`, désactive CUDA côté API uniquement (compat. vieux GPU). |
+| `RAG_USE_GPU` | `auto` | `0`/`1`/`auto` pour le placement device. `1` autorise CUDA côté API si `RAG_DISABLE_CUDA` n'est pas défini. |
+| `RAG_DISABLE_CUDA` | `1` côté API | Si `1`, désactive CUDA côté API uniquement (compat. vieux GPU). Mettre `0` pour l'autoriser explicitement. |
 
 Lister les modèles disponibles :
 
