@@ -28,28 +28,28 @@ MODELS = {
         "description": "Mistral 7B - Rapide mais tendance à halluciner",
         "ram_required": "6-8GB",
         "temperature": 0.1,
-        "num_predict": 512,
+        "num_predict": 1024,
     },
     "qwen-14b": {
         "name": "qwen2.5:14b",
         "description": "Qwen 2.5 14B - Meilleur suivi d'instructions, excellent français",
         "ram_required": "10-12GB",
         "temperature": 0.1,
-        "num_predict": 512,
+        "num_predict": 1024,
     },
     "qwen-7b": {
         "name": "qwen2.5:7b",
         "description": "Qwen 2.5 7B - Bon compromis, meilleur que mistral",
         "ram_required": "6-8GB",
         "temperature": 0.1,
-        "num_predict": 512,
+        "num_predict": 1024,
     },
     "command-r-35b": {
         "name": "command-r:35b",
         "description": "Command-R 35B - Optimisé pour RAG, citations précises",
         "ram_required": "20-24GB",
         "temperature": 0.1,
-        "num_predict": 512,
+        "num_predict": 1024,
     },
     "qwen3-14b": {
         "name": "qwen3:14b",
@@ -70,7 +70,7 @@ MODELS = {
         "description": "Llama 3.1 8B - Rapide et fiable",
         "ram_required": "6-8GB",
         "temperature": 0.1,
-        "num_predict": 512,
+        "num_predict": 1024,
     },
 }
 
@@ -162,7 +162,9 @@ RAG_CONFIG = {
     "max_dynamic_top_k": int(os.environ.get("RAG_MAX_DYNAMIC_TOP_K", "8")),
     "score_threshold": 1.5,
     "use_hybrid": _env_bool("RAG_USE_HYBRID", True),
-    "hybrid_weights": [0.2, 0.8],
+    # [BM25, vector] — corpus métier riche en acronymes (GDS, BSP, PNR…)
+    # nécessite un BM25 fort. Tester [0.4, 0.6] ou [0.6, 0.4] sur ton batch.
+    "hybrid_weights": [0.5, 0.5],
     "max_context_chars": int(os.environ.get("RAG_MAX_CONTEXT", "3000")),
     "max_question_chars": int(os.environ.get("RAG_MAX_QUESTION_CHARS", "1000")),
     "cache_ttl_seconds": _env_optional_int("RAG_CACHE_TTL_SECONDS"),

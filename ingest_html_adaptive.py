@@ -7,10 +7,10 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from config import CHROMA_DB_PATH, DATA_PATH, EMBEDDING_MODEL
+from embeddings_factory import get_embeddings
 
 # Alias historiques pour rétrocompatibilité avec les fonctions ci-dessous
 CHROMA_PATH = CHROMA_DB_PATH
@@ -136,107 +136,76 @@ def extract_process_sections(text, source_file):
     print(f"  ✓ Document {doc_type} détecté avec {total_sections} sections")
     
     # === DOCUMENT DE SYNTHÈSE (index/sommaire) ===
-    # Ce chunk sera trouvé pour les questions générales "comment utiliser X"
-    toc_lines = [f"Document: {doc_title}", "", "=== SOMMAIRE / VUE D'ENSEMBLE ===", ""]
-    
-    # Extraire l'introduction (texte avant la première section)
+    # Sommaire = index pour les questions générales (« comment utiliser X »).
+    # On garde juste le titre du doc + intro + liste des titres de sections.
+    # On N'inclut PLUS le contenu des sections courtes (gérées comme sections
+    # individuelles), pour éviter qu'un long sommaire concurrence les chunks
+    # précis lors du retrieval.
+    toc_lines = [f"Document: {doc_title}", "", "Sommaire:"]
+
     intro_end = matches[0].start()
     intro_text = text[:intro_end].strip()
-    # Nettoyer l'intro (enlever le titre déjà extrait)
     intro_text = re.sub(r'Titre du document : [^\n]+\n?', '', intro_text).strip()
     if intro_text and len(intro_text) > 50:
-        toc_lines.append("Introduction:")
-        toc_lines.append(intro_text[:500])  # Limiter l'intro
         toc_lines.append("")
-    
-    toc_lines.append("Sections du document:")
-    
-    # FIX: Pour les sections courtes (<600 chars), inclure le contenu directement
-    # Cela résout le problème des "couleurs du robot" qui étaient listées sans explication
+        toc_lines.append("Introduction :")
+        toc_lines.append(intro_text[:400])
+
+    toc_lines.append("")
+    toc_lines.append("Sections :")
     for i, match in enumerate(matches, 1):
         section_title = match.group(1).strip()
-        
-        # Calculer la longueur de cette section (FIX: utiliser le bon index)
-        start_pos = matches[i-1].start()  # matches est 0-indexed, i est 1-indexed
-        if i < len(matches):  # Pas la dernière section
-            end_pos = matches[i].start()
-        else:  # Dernière section
-            end_pos = len(text)
-        
-        section_content = text[start_pos:end_pos].strip()
-        section_length = len(section_content)
-        
-        # DEBUG pour 1107
-        if "1107" in source_file and i == 1:
-            print(f"\nDEBUG 1107 Section 1: Length={section_length}")
-            print(f"Threshold: 800")
-            print(f"Decision: {'INCLUDE' if section_length < 800 else 'EXCLUDE'}")
-            print(f"Content start: {section_content[:50]}...")
-        
-        # Si section courte (<800 chars), inclure le contenu (augmenté de 600)
-        if section_length < 800:
-            # Nettoyer le contenu (enlever le marker +-)
-            clean_content = re.sub(r'\+-.*?\n', '', section_content, count=1).strip()
-            toc_lines.append(f"  {i}. {section_title}")
-            toc_lines.append(f"{clean_content}")
-            toc_lines.append("")  # Ligne vide pour séparation
-        else:
-            # Section longue, juste le titre
-            toc_lines.append(f"  {i}. {section_title}")
-    
-    toc_lines.append("")
-    toc_lines.append("Pour les détails de chaque étape, consulter les sections correspondantes.")
-    
+        toc_lines.append(f"  {i}. {section_title}")
+
     sections.append({
         'content': "\n".join(toc_lines),
         'title': 'Sommaire',
         'section_num': 0,  # 0 = sommaire, toujours en premier
         'total_sections': total_sections,
         'doc_type': doc_type,
-        'is_summary': True
+        'is_summary': True,
+        # Pas de voisins pour le sommaire — il couvre tout le doc.
+        'doc_title': doc_title,
+        'prev_section_title': '',
+        'next_section_title': '',
     })
-    
-    # === SECTIONS INDIVIDUELLES avec contexte enrichi ===
+
+    # === SECTIONS INDIVIDUELLES ===
+    # Le contenu indexé contient seulement le titre de section + le contenu.
+    # Le contexte hiérarchique (doc parent, voisins) passe en métadonnée pour
+    # ne PAS polluer l'embedding avec du boilerplate quasi-identique entre les
+    # sections d'un même document.
     for i, match in enumerate(matches):
         section_title = match.group(1).strip()
         start_pos = match.start()
-        
-        # Trouver la fin de la section
+
         if i < len(matches) - 1:
             end_pos = matches[i + 1].start()
         else:
             end_pos = len(text)
-        
+
         section_content = text[start_pos:end_pos].strip()
-        
-        # Construire le contexte hiérarchique
-        # Cela aide le LLM à comprendre où se situe cette section
-        context_header = [
-            f"Document: {doc_title}",
-            f"Section {i+1}/{total_sections}: {section_title}",
-        ]
-        
-        # Ajouter les titres des sections adjacentes pour le contexte
-        if i > 0:
-            prev_title = matches[i-1].group(1).strip()
-            context_header.append(f"(Précédent: {prev_title})")
-        if i < len(matches) - 1:
-            next_title = matches[i+1].group(1).strip()
-            context_header.append(f"(Suivant: {next_title})")
-        
-        context_header.append("")  # Ligne vide
-        
-        enriched_content = "\n".join(context_header) + section_content
-        
+        # Nettoyage du marker `+-Titre` lui-même (déjà capturé dans le titre).
+        section_content = re.sub(r'^\+-[^\n]*\n?', '', section_content).strip()
+
+        prev_title = matches[i - 1].group(1).strip() if i > 0 else ''
+        next_title = matches[i + 1].group(1).strip() if i < len(matches) - 1 else ''
+
+        # Contenu indexé : titre + texte. Pas de header verbeux.
+        indexed_content = f"{section_title}\n\n{section_content}"
+
         sections.append({
-            'content': enriched_content,
+            'content': indexed_content,
             'title': section_title,
             'section_num': i + 1,
             'total_sections': total_sections,
             'doc_type': doc_type,
-            'is_summary': False
+            'is_summary': False,
+            'doc_title': doc_title,
+            'prev_section_title': prev_title,
+            'next_section_title': next_title,
         })
-    
+
     return sections
 
 def extract_images_from_html(html_content, source_file):
@@ -308,46 +277,89 @@ def extract_html_metadata(html_content):
     return metadata
 
 
+_DATE_REGEX = re.compile(
+    r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b'        # JJ/MM/AAAA
+    r'|\b\d{4}-\d{2}-\d{2}\b'                    # ISO
+    r'|\b\d{1,2}\s+(?:janvier|février|mars|avril|mai|juin|juillet|aoû?t|septembre|octobre|novembre|décembre)\b',
+    flags=re.IGNORECASE,
+)
+
+
+def _compute_freshness(modified_date: str) -> float:
+    """
+    Score [0, 1] décroissant avec l'âge du document. Renvoie 0.5 si la date
+    n'est pas parseable, pour ne pas pénaliser injustement.
+    """
+    if not modified_date:
+        return 0.5
+    try:
+        # Format ISO attendu : "2017-09-27T16:00:33"
+        from datetime import datetime, timezone
+        dt = datetime.fromisoformat(modified_date.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        age_days = (datetime.now(timezone.utc) - dt).days
+        if age_days < 365:
+            return 1.0
+        if age_days < 365 * 3:
+            return 0.8
+        if age_days < 365 * 5:
+            return 0.6
+        if age_days < 365 * 8:
+            return 0.4
+        return 0.3
+    except (ValueError, TypeError):
+        return 0.5
+
+
 def enrich_document_metadata(section: dict, html_metadata: dict) -> dict:
-    """Enrichir les métadonnées pour meilleure pertinence"""
-    
+    """Enrichir les métadonnées pour meilleure pertinence."""
+
     enhanced = html_metadata.copy()
-    
-    # 1. Ajouter des signaux de fiabilité/importance
+
     content = section['content']
-    
-    reliability_signals = {
-        'has_official_link': 1.0 if 'whaller' in content.lower() else 0.5,
-        'is_procedure': 1.0 if any(w in content.lower() for w in ['étape', 'procédure', 'comment']) else 0.5,
-        'has_date_info': 1.0 if any(c.isdigit() for c in content) else 0.5,
-        'document_freshness': 1.0,  # À adapter avec date réelle
-    }
-    
-    enhanced['reliability_score'] = sum(reliability_signals.values()) / len(reliability_signals)
-    enhanced['reliability_signals'] = str(reliability_signals) # Convert to string for ChromaDB
-    
-    # 2. Ajouter des catégories automatiques (classification)
     content_lower = content.lower()
+
+    # 1. Signaux de fiabilité/importance — désormais alignés sur des proxys
+    # robustes plutôt que des heuristiques boolean-presque-toujours-True.
+    reliability_signals = {
+        'has_official_link': 1.0 if 'whaller' in content_lower else 0.5,
+        'is_procedure': 1.0 if any(
+            w in content_lower for w in ('étape', 'procédure', 'process', 'comment')
+        ) else 0.5,
+        'has_date_info': 1.0 if _DATE_REGEX.search(content) else 0.5,
+        'document_freshness': _compute_freshness(html_metadata.get('modified_date', '')),
+    }
+
+    enhanced['reliability_score'] = sum(reliability_signals.values()) / len(reliability_signals)
+    enhanced['reliability_signals'] = str(reliability_signals)
+
+    # 2. Catégories automatiques (classification grossière à la lecture)
     categories = []
-    
     if 'amadeus' in content_lower or 'gds' in content_lower or 'format' in content_lower:
         categories.append('amadeus_formats')
     if 'congé' in content_lower or 'absence' in content_lower:
         categories.append('absences')
     if 'émission' in content_lower or 'dossier' in content_lower:
         categories.append('gds_operations')
-    
-    enhanced['auto_categories'] = str(categories) # Convert to string for ChromaDB
-    enhanced['category_string'] = ' '.join(categories)  # Pour embeddings
-    
-    # 3. Ajouter des signaux de densité informationnelle
+
+    enhanced['auto_categories'] = str(categories)
+    enhanced['category_string'] = ' '.join(categories)
+
+    # 3. Densité informationnelle (utilisée par le reranker)
     words = content.split()
     unique_words = len(set(words))
     enhanced['information_density'] = unique_words / max(len(words), 1)
-    
-    # 4. Taille du chunk normalisée
+
+    # 4. Taille normalisée
     enhanced['chunk_size_kb'] = len(content) / 1024
-    
+
+    # 5. Contexte hiérarchique de la section, en MÉTADONNÉE et non plus dans
+    # le page_content (évite de polluer l'embedding avec du boilerplate).
+    for key in ('doc_title', 'prev_section_title', 'next_section_title'):
+        if key in section:
+            enhanced[key] = section[key]
+
     return enhanced
 
 
@@ -611,7 +623,7 @@ def ingest_html_documents_adaptive():
     print(f"\n{'='*80}")
     print("SAUVEGARDE DANS CHROMADB")
     print(f"{'='*80}")
-    embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
+    embeddings = get_embeddings(EMBEDDING_MODEL)
     
     # Créer/mettre à jour le vector store
     vectorstore = Chroma.from_documents(

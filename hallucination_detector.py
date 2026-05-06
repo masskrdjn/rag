@@ -101,33 +101,63 @@ class HallucinationDetectorLightweight:
         return [s.strip() for s in pieces if len(s.strip()) > 8]
     
     def extract_claims(self, text: str) -> List[str]:
-        """Extract main claims from text"""
+        """
+        Extrait les phrases factuelles du texte.
+
+        On filtre les phrases purement neutres ou interrogatives (« Pour plus
+        de détails... », « Voir ci-dessous ») qui ne portent pas d'assertion
+        et gonflent le dénominateur du score de confiance. On conserve les
+        items de liste (tirets) déjà nettoyés par split_sentences.
+        """
         sentences = self.split_sentences(text)
-        claims = []
-        
-        # Filter sentences that contain verbs/assertions
+        if not sentences:
+            return []
+
         assertion_patterns = [
-            r'\b(est|sont|avoir|être|pouvoir|devoir|vouloir)\b',
-            r'\b(existe|occupe|comprend|contient)\b',
-            r'^\d+',  # Stats
+            # Verbes d'état/action courants (présent, passé, futur, conditionnel)
+            r'\b(est|sont|était|étaient|sera|seront|serait|seraient)\b',
+            r'\b(a|ont|avait|avaient|aura|auront|aurait|auraient)\b',
+            r'\b(peut|peuvent|doit|doivent|faut|veut|veulent)\b',
+            r'\b(existe|comprend|contient|inclut|nécessite|permet|requiert)\b',
+            r'\b(faire|émettre|annuler|modifier|consulter|envoyer|traiter)\b',
+            # Phrase commençant par un nombre / chiffre / puce numérique
+            r'^\s*\d+',
+            # Items de liste avec : ou — qui définissent un terme
+            r':\s*\S',
         ]
-        
-        for sent in sentences:
-            if any(re.search(pat, sent.lower()) for pat in assertion_patterns):
-                claims.append(sent)
-        
+
+        claims = [
+            sent for sent in sentences
+            if any(re.search(pat, sent.lower()) for pat in assertion_patterns)
+        ]
+
+        # Si aucun pattern ne matche (cas des réponses très courtes), on garde
+        # quand même tout pour ne pas masquer une éventuelle hallucination.
         return claims if claims else sentences
-    
-    def extract_claims(self, text: str) -> List[str]:
-        """Extract claims from sentences and list items without verb filtering."""
-        return self.split_sentences(text)
+
+    # Petits entiers très courants en français (heures, jours, étapes,
+    # numéros de section), trop bruités pour servir de proxy d'hallucination.
+    _COMMON_SMALL_NUMBERS = {str(n) for n in range(0, 25)} | {
+        "30", "60", "90", "100", "1000", "2024", "2025", "2026"
+    }
 
     def _extract_sensitive_tokens(self, text: str) -> List[str]:
+        """
+        Extrait les tokens à fort signal factuel (dates, montants, codes IATA,
+        identifiants) pour vérifier qu'ils sont bien présents dans la source.
+
+        On ignore :
+        - les citations [Sx] (ce sont des marqueurs internes, pas du contenu)
+        - les mots simples avec majuscule initiale uniquement (« Galileo »,
+          « Sabre ») qui ne sont pas des codes
+        - les petits entiers communs qui apparaissent dans presque tous les
+          textes et déclencheraient des faux positifs
+        """
         patterns = [
-            r'\b\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b',
-            r'\b\d+(?:[.,]\d+)?\s?(?:%|eur|€|euros?)\b',
-            r'\b\d{2,}\b',
-            r'\b[A-Z][A-Z0-9]{2,}(?:-[A-Z0-9]+)?\b',
+            r'\b\d{1,2}[/-]\d{1,2}(?:[/-]\d{2,4})?\b',          # dates JJ/MM[/AAAA]
+            r'\b\d+(?:[.,]\d+)?\s?(?:%|eur|€|euros?)\b',        # montants
+            r'\b\d{2,}\b',                                       # nombres ≥ 2 chiffres
+            r'\b[A-Z][A-Z0-9]{2,}(?:-[A-Z0-9]+)?\b',            # codes IATA / acronymes
         ]
         tokens = []
         for pattern in patterns:
@@ -137,11 +167,15 @@ class HallucinationDetectorLightweight:
         for token in dict.fromkeys(tokens):
             if token.upper() in citations or f"[{token.upper()}]" in citations:
                 continue
+            # On rejette les mots de type "Galileo" (majuscule initiale, pas un code)
             if (
                 re.search(r'[A-Za-z]', token)
                 and not re.search(r'\d', token)
                 and token.upper() != token
             ):
+                continue
+            # On filtre les petits entiers courants (heures, étapes, années récentes)
+            if token.isdigit() and token in self._COMMON_SMALL_NUMBERS:
                 continue
             filtered.append(token)
         return filtered
@@ -238,37 +272,58 @@ class HallucinationDetectorLightweight:
                 'reason': 'No source text content'
             }
             
-        # Prepare source chunks for sliding window TF-IDF
-        # Split by sentences to avoid dilution
-        source_sentences = self.split_sentences(full_source_text)
-        # Create larger chunks (e.g., 3 sentences) for better context
-        source_chunks = []
-        for i in range(0, len(source_sentences), 1):
-            chunk = " ".join(source_sentences[i:i+3])
-            if len(chunk) > 50:
-                source_chunks.append(chunk)
-        
-        # Also keep the full text for exact matching
+        # Préparer les chunks et matchers TF-IDF UNE SEULE FOIS, par source.
+        # On évite ainsi de re-fitter à chaque claim (10× pour 10 claims).
         full_source_lower = full_source_text.lower()
-        
-        # Train TF-IDF on chunks (not the whole doc as one blob)
-        if source_chunks:
-            self.tfidf.fit(source_chunks)
-        else:
-            self.tfidf.fit([full_source_text])
-        
+
+        def _make_chunks(text: str) -> List[str]:
+            sentences = self.split_sentences(text)
+            chunks = []
+            for idx in range(0, max(len(sentences), 1)):
+                chunk = " ".join(sentences[idx:idx + 3])
+                if len(chunk) > 30:
+                    chunks.append(chunk)
+            return chunks or [text]
+
+        def _make_matcher(chunks: List[str]) -> TFIDFMatcher:
+            matcher = TFIDFMatcher()
+            matcher.fit(chunks)
+            return matcher
+
+        # Matcher global (toutes sources concaténées) pour les claims sans citation.
+        global_chunks = _make_chunks(full_source_text)
+        global_matcher = _make_matcher(global_chunks)
+
+        # Matcher dédié par source_id, calculé à la demande puis caché.
+        cached_matchers: Dict[tuple, tuple] = {}
+
+        def _matcher_for_citations(citation_ids: List[str]):
+            if not citation_ids:
+                return global_matcher, global_chunks
+            key = tuple(sorted(set(citation_ids)))
+            if key not in cached_matchers:
+                merged = " ".join(
+                    source_by_id.get(sid, "") for sid in key
+                ).strip()
+                if not merged:
+                    cached_matchers[key] = (None, [])
+                else:
+                    chunks = _make_chunks(merged)
+                    cached_matchers[key] = (_make_matcher(chunks), chunks)
+            return cached_matchers[key]
+
         supported = []
         hallucinated = []
         unclear = []
-        
+
         # Check each claim
         for claim in response_claims:
             try:
                 claim_lower = claim.lower()
                 citation_ids = self._claim_citation_ids(claim)
-                
+
                 # STAGE 1: Exact Substring Matching
-                # If a significant part of the claim is verbatim in source, it's supported.
+                # Si le claim est verbatim dans la source, considéré comme supporté.
                 if claim_lower in full_source_lower:
                     if citation_ids:
                         supported.append(claim)
@@ -296,37 +351,23 @@ class HallucinationDetectorLightweight:
                     )
                     continue
 
-                comparison_sentences = self.split_sentences(evidence_text)
-                comparison_chunks = []
-                for idx in range(0, len(comparison_sentences), 1):
-                    chunk = " ".join(comparison_sentences[idx:idx+3])
-                    if len(chunk) > 30:
-                        comparison_chunks.append(chunk)
-                if not comparison_chunks:
-                    comparison_chunks = [evidence_text]
-                self.tfidf.fit(comparison_chunks)
-                
-                # STAGE 2: Sliding Window TF-IDF
-                # Compare claim against all source chunks and take the MAX similarity
+                matcher, comparison_chunks = _matcher_for_citations(citation_ids)
+                if matcher is None or not comparison_chunks:
+                    matcher, comparison_chunks = global_matcher, global_chunks
+
+                # STAGE 2: Sliding Window TF-IDF — max sim sur les chunks
                 max_tfidf_sim = 0.0
-                
-                if comparison_chunks:
-                    for chunk in comparison_chunks:
-                        sim = self.tfidf.cosine_similarity(claim, chunk)
-                        if sim > max_tfidf_sim:
-                            max_tfidf_sim = sim
-                else:
-                    max_tfidf_sim = self.tfidf.cosine_similarity(claim, evidence_text)
-                
-                # STAGE 3: Word Overlap (for paraphrases)
+                for chunk in comparison_chunks:
+                    sim = matcher.cosine_similarity(claim, chunk)
+                    if sim > max_tfidf_sim:
+                        max_tfidf_sim = sim
+
+                # STAGE 3: Word Overlap (paraphrases)
                 max_word_overlap = 0.0
-                if comparison_chunks:
-                    for chunk in comparison_chunks:
-                        overlap = self._word_overlap_score(claim, chunk)
-                        if overlap > max_word_overlap:
-                            max_word_overlap = overlap
-                else:
-                    max_word_overlap = self._word_overlap_score(claim, evidence_text)
+                for chunk in comparison_chunks:
+                    overlap = self._word_overlap_score(claim, chunk)
+                    if overlap > max_word_overlap:
+                        max_word_overlap = overlap
                 
                 # DECISION: Combine both metrics (FIX: seuils assouplis)
                 # Le LLM paraphrase souvent les sources, ce qui est acceptable

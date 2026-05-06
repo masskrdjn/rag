@@ -46,13 +46,17 @@ MAX_CONTEXT = RAG_CONFIG["max_context_chars"]
 
 print(f"Configuration RAG : model={MODEL_NAME}, max_context={MAX_CONTEXT}")
 
-rag = SimpleRAG(model_name=MODEL_NAME, max_context_chars=MAX_CONTEXT)
+# Instance créée dans le lifespan pour ne PAS déclencher l'init (Ollama,
+# reranker, détecteur, query expander) au simple import de `server`.
+rag: Optional[SimpleRAG] = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global rag
     print("Démarrage de l'API RAG...")
     try:
+        rag = SimpleRAG(model_name=MODEL_NAME, max_context_chars=MAX_CONTEXT)
         rag.setup_chain()
         print("Pipeline RAG prêt.")
     except Exception as e:
@@ -99,6 +103,9 @@ async def ask_question(
     question = request.question.strip()
     if not question:
         raise HTTPException(status_code=400, detail="Question cannot be empty")
+
+    if rag is None:
+        raise HTTPException(status_code=503, detail="Pipeline RAG non initialisé")
 
     try:
         result = await asyncio.to_thread(

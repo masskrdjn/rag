@@ -57,21 +57,24 @@ class CacheManager:
         raw = json.dumps(payload, sort_keys=True, ensure_ascii=False)
         return hashlib.md5(raw.encode("utf-8")).hexdigest()
 
-    def _query_hash(self, query: str, top_k: int, namespace: str = None) -> str:
+    def _query_hash(self, query: str, top_k: int = None, namespace: str = None) -> str:
+        # `top_k` est ignoré dans la clé : le top_k réel est dynamique par
+        # question (cf. _estimate_dynamic_topk), et le matérialiser dans la
+        # clé invaliderait le cache à chaque variation de RAG_TOP_K sans
+        # bénéfice réel sur la qualité.
         payload = {
             "query": self._normalize_query(query),
-            "top_k": top_k,
             "namespace": namespace if namespace is not None else self.namespace,
         }
         return self._get_hash(payload)
 
-    def get(self, query: str, top_k: int, namespace: str = None) -> Optional[Dict]:
+    def get(self, query: str, top_k: int = None, namespace: str = None) -> Optional[Dict]:
         query_hash = self._query_hash(query, top_k, namespace)
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute(
                 "SELECT response, sources, metadata, timestamp FROM cache "
-                "WHERE query_hash = ? AND top_k >= ?",
-                (query_hash, top_k),
+                "WHERE query_hash = ?",
+                (query_hash,),
             )
             row = cursor.fetchone()
             if row:
@@ -89,7 +92,9 @@ class CacheManager:
                 }
         return None
 
-    def set(self, query: str, top_k: int, result: Dict, namespace: str = None) -> None:
+    def set(self, query: str, top_k: int = None, result: Dict = None, namespace: str = None) -> None:
+        if result is None:
+            return
         query_hash = self._query_hash(query, top_k, namespace)
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(

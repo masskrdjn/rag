@@ -187,8 +187,9 @@ python benchmark_embeddings.py --embedding nomic-embed-text --chroma ./chroma_no
 
 - Le pipeline n'autorise en cache que les réponses dont la confiance
   anti-hallucination dépasse `0.5` (cf. `rag_pipeline.SimpleRAG.ask`).
-- Le top_k est ramené dynamiquement à `4` côté reranker pour limiter le bruit
-  et la latence (cf. `_estimate_dynamic_topk`).
+- `_estimate_dynamic_topk` renvoie 4 sources sur les questions précises
+  (mots-clés métier détectés), 8 sur les questions larges/procédurales,
+  6 par défaut.
 - L'expansion LLM n'est déclenchée que sur les questions vraiment vagues
   (ex. « que faire si l'émission échoue ? »). Les questions ciblées
   (« couleurs du robot », « règles des congés ») la court-circuitent.
