@@ -87,12 +87,16 @@ _PROJECT_ROOT = Path(__file__).resolve().parent
 def _default_chroma_path() -> str:
     """
     Défaut adaptatif :
-    - Linux : /home/rag/chroma_db (chemin attendu par restart.sh et systemd,
-      indépendamment de l'existence pour rester cohérent au premier déploiement
-      ou après nettoyage).
-    - Autres OS (Windows, macOS) : <projet>/chroma_db.
+    - Linux avec utilisateur `rag` provisionné (`/home/rag` existe) :
+      `/home/rag/chroma_db`, le chemin attendu par `restart.sh` et systemd,
+      même si le sous-dossier n'est pas encore créé (1er déploiement /
+      après nettoyage).
+    - Linux dev / CI sans utilisateur `rag` : `<projet>/chroma_db`, pour
+      éviter une régression de démarrage si `RAG_CHROMA_DB_PATH` n'est pas
+      défini explicitement.
+    - Autres OS (Windows, macOS) : `<projet>/chroma_db`.
     """
-    if sys.platform.startswith("linux"):
+    if sys.platform.startswith("linux") and Path("/home/rag").exists():
         return "/home/rag/chroma_db"
     return str(_PROJECT_ROOT / "chroma_db")
 

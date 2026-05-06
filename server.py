@@ -51,11 +51,19 @@ print(f"Configuration RAG : model={MODEL_NAME}, max_context={MAX_CONTEXT}")
 # reranker, détecteur, query expander) au simple import de `server`.
 rag: Optional[SimpleRAG] = None
 
+# `SimpleRAG.ask` mute un état partagé non thread-safe (`_bm25_retriever.k`,
+# `search_kwargs["k"]`) en read-modify-restore. Deux `/ask` concurrents
+# entrelacés peuvent fausser le top-k effectif. On sérialise les appels au
+# pipeline ; l'event loop reste libre pour /health et la gestion des
+# connexions pendant que le worker tourne.
+_rag_lock: Optional[asyncio.Lock] = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global rag
+    global rag, _rag_lock
     print("Démarrage de l'API RAG...")
+    _rag_lock = asyncio.Lock()
     try:
         rag = SimpleRAG(model_name=MODEL_NAME, max_context_chars=MAX_CONTEXT)
         rag.setup_chain()
@@ -110,16 +118,17 @@ async def ask_question(
     if not question:
         raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-    if rag is None:
+    if rag is None or _rag_lock is None:
         raise HTTPException(status_code=503, detail="Pipeline RAG non initialisé")
 
     try:
-        result = await asyncio.to_thread(
-            rag.ask,
-            question,
-            True,
-            request.dynamic_k,
-        )
+        async with _rag_lock:
+            result = await asyncio.to_thread(
+                rag.ask,
+                question,
+                True,
+                request.dynamic_k,
+            )
         if isinstance(result, str):
             return QueryResponse(answer=result)
 
