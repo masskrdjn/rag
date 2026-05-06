@@ -16,6 +16,7 @@ Toutes les valeurs sont surchargeables via variables d'environnement :
 
 import json
 import os
+import sys
 from pathlib import Path
 
 # =============================================================================
@@ -85,13 +86,14 @@ _PROJECT_ROOT = Path(__file__).resolve().parent
 
 def _default_chroma_path() -> str:
     """
-    Défaut intelligent :
-    - Linux production : /home/rag/chroma_db si la base existe vraiment
-    - Sinon (Windows, dev local) : <projet>/chroma_db
+    Défaut adaptatif :
+    - Linux : /home/rag/chroma_db (chemin attendu par restart.sh et systemd,
+      indépendamment de l'existence pour rester cohérent au premier déploiement
+      ou après nettoyage).
+    - Autres OS (Windows, macOS) : <projet>/chroma_db.
     """
-    linux_default = Path("/home/rag/chroma_db")
-    if linux_default.exists():
-        return str(linux_default)
+    if sys.platform.startswith("linux"):
+        return "/home/rag/chroma_db"
     return str(_PROJECT_ROOT / "chroma_db")
 
 CHROMA_DB_PATH = os.environ.get("RAG_CHROMA_DB_PATH", _default_chroma_path())

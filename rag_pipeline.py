@@ -332,31 +332,38 @@ class SimpleRAG:
 
     def _vector_search(self, query: str, k: int) -> List[Document]:
         fetch_k = min(max(k * 4, 8), 30)
-        try:
-            scored = self.vectorstore.similarity_search_with_score(query, k=fetch_k)
-            docs = []
-            for rank, (doc, raw_score) in enumerate(scored, 1):
-                similarity = 1.0 / (1.0 + max(float(raw_score), 0.0))
-                docs.append(self._with_metadata(
-                    doc,
-                    similarity_score=similarity,
-                    vector_rank=rank,
-                    vector_score=similarity,
-                    retrieval_source="vector",
-                ))
-            return docs
-        except Exception:
-            docs = self._vector_retriever.invoke(query)
-            return [
-                self._with_metadata(
-                    doc,
-                    similarity_score=0.5,
-                    vector_rank=rank,
-                    vector_score=0.5,
-                    retrieval_source="vector",
-                )
-                for rank, doc in enumerate(docs[:fetch_k], 1)
-            ]
+
+        # Chemin rapide avec scores explicites pour le mode `similarity`.
+        # Pour `mmr` et `similarity_score_threshold`, on délègue au retriever
+        # déjà configuré dans `_create_retriever` afin de respecter les
+        # paramètres (fetch_k MMR, score_threshold, etc.).
+        if self.retrieval_mode == "similarity":
+            try:
+                scored = self.vectorstore.similarity_search_with_score(query, k=fetch_k)
+                return [
+                    self._with_metadata(
+                        doc,
+                        similarity_score=1.0 / (1.0 + max(float(raw_score), 0.0)),
+                        vector_rank=rank,
+                        vector_score=1.0 / (1.0 + max(float(raw_score), 0.0)),
+                        retrieval_source="vector",
+                    )
+                    for rank, (doc, raw_score) in enumerate(scored, 1)
+                ]
+            except Exception:
+                pass  # bascule sur le retriever configuré
+
+        docs = self._vector_retriever.invoke(query)
+        return [
+            self._with_metadata(
+                doc,
+                similarity_score=max(0.35, 1.0 - (rank - 1) * 0.05),
+                vector_rank=rank,
+                vector_score=max(0.35, 1.0 - (rank - 1) * 0.05),
+                retrieval_source="vector",
+            )
+            for rank, doc in enumerate(docs[:fetch_k], 1)
+        ]
 
     def _bm25_search(self, query: str, k: int) -> List[Document]:
         if not hasattr(self, "_bm25_retriever"):

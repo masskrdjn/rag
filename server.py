@@ -12,6 +12,7 @@ Variables d'environnement utiles :
 
 import os
 import asyncio
+import secrets
 
 # Désactivation conditionnelle de CUDA. Historiquement forcé pour contourner
 # une incompatibilité avec une GT 1030 ; le CPU reste le défaut sûr pour l'API.
@@ -97,8 +98,13 @@ async def ask_question(
     x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
 ):
     expected_api_key = RAG_CONFIG.get("api_key")
-    if expected_api_key and x_api_key != expected_api_key:
-        raise HTTPException(status_code=401, detail="Invalid API key")
+    if expected_api_key:
+        # Comparaison en temps constant pour éviter un canal temporel sur la
+        # validation de la clé. `compare_digest` tolère deux chaînes de
+        # longueurs différentes sans divulguer leur écart.
+        provided_api_key = x_api_key or ""
+        if not secrets.compare_digest(provided_api_key, expected_api_key):
+            raise HTTPException(status_code=401, detail="Invalid API key")
 
     question = request.question.strip()
     if not question:
